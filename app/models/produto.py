@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, Float, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 from app.db.database import Base
-
 
 class Produto(Base):
     __tablename__ = "produto"
@@ -16,10 +14,8 @@ class Produto(Base):
     unidade_medida = Column(String(10), nullable=True, default="ml")
     ativo = Column(Boolean, default=True)
 
-    # Corrigido para referenciar 'categorias.id' (plural)
-    categoria_id = Column(Integer, ForeignKey("categorias.id"), nullable=True)
+    categoria_id = Column(Integer, ForeignKey("categoria.id", ondelete="SET NULL"), nullable=True)
 
-    # Relacionamentos
     categoria = relationship("Categoria", back_populates="produtos")
     imagens = relationship("ProdutoImagem", back_populates="produto", cascade="all, delete-orphan")
     estoque = relationship("Estoque", uselist=False, back_populates="produto", cascade="all, delete-orphan")
@@ -28,10 +24,8 @@ class Produto(Base):
 
     @property
     def preco_final(self):
-        """Retorna o menor preço entre o preço original e o promocional ativo."""
         promocao_ativa = next(
-            (p for p in self.promocoes
-             if p.ativo and p.data_inicio <= func.now() and p.data_fim >= func.now()),
+            (p for p in self.promocoes if p.ativo and p.data_inicio <= func.now() and p.data_fim >= func.now()),
             None
         )
         if promocao_ativa and promocao_ativa.preco_promocional:

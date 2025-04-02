@@ -33,7 +33,8 @@ async def buscar_categoria_endpoint(categoria_id: int, db: Session = Depends(get
 async def atualizar_categoria_endpoint(
     categoria_id: int,
     categoria_dados: CategoriaUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
 ):
     categoria = atualizar_categoria(db, categoria_id, categoria_dados)
     if not categoria:

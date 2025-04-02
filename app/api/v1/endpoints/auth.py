@@ -16,22 +16,13 @@ router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# Função para obter a sessão do banco
+# 📌 Função para obter a sessão do banco
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
-# 📌 Validação de CPF/CNPJ
-def validar_cpf_cnpj(value: str):
-    value = re.sub(r"\D", "", value)  # Remove caracteres não numéricos
-    if len(value) == 11 and CPF().validate(value):
-        return value
-    elif len(value) == 14 and CNPJ().validate(value):
-        return value
-    raise ValueError("CPF ou CNPJ inválido")
 
 # 📌 Esquema de entrada para criação do usuário
 class UserCreate(BaseModel):
@@ -42,22 +33,26 @@ class UserCreate(BaseModel):
     telefone: str
     tipo_usuario: TipoUsuarioEnum
 
-    # 📌 Validações
     @validator("cpf_cnpj")
-    def validar_cpf(cls, v):
-        return validar_cpf_cnpj(v)
+    def validar_cpf_cnpj(cls, value):
+        value = re.sub(r"\D", "", value)  # Remove caracteres não numéricos
+        if len(value) == 11 and CPF().validate(value):
+            return value
+        elif len(value) == 14 and CNPJ().validate(value):
+            return value
+        raise ValueError("CPF ou CNPJ inválido")
 
     @validator("telefone")
-    def validar_telefone(cls, v):
-        if not re.fullmatch(r"^\d{10,11}$", v):  # Aceita 10 ou 11 dígitos
+    def validar_telefone(cls, value):
+        if not re.fullmatch(r"^\d{10,11}$", value):  # Aceita 10 ou 11 dígitos
             raise ValueError("Telefone inválido. Use apenas números (DDD + número)")
-        return v
+        return value
 
     @validator("senha")
-    def validar_senha(cls, v):
-        if len(v) < 8 or not re.search(r"\d", v) or not re.search(r"[A-Za-z]", v):
+    def validar_senha(cls, value):
+        if len(value) < 8 or not re.search(r"\d", value) or not re.search(r"[A-Za-z]", value):
             raise ValueError("A senha deve ter pelo menos 8 caracteres, incluindo letras e números")
-        return v
+        return value
 
 # 📌 Esquema de entrada para login
 class UserLogin(BaseModel):
@@ -77,43 +72,47 @@ class TokenRefresh(BaseModel):
 # 📌 Endpoint para registrar usuário
 @router.post("/register", response_model=TokenSchema)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    # 🔹 Verifica se o e-mail já existe
-    if db.query(Usuario).filter(Usuario.email == user.email).first():
-        raise HTTPException(status_code=400, detail="E-mail já cadastrado")
+    try:
+        # 🔹 Verifica se o e-mail já existe
+        if db.query(Usuario).filter(Usuario.email == user.email).first():
+            raise HTTPException(status_code=400, detail="E-mail já cadastrado")
 
-    # 🔹 Verifica se o CPF/CNPJ já existe
-    if db.query(Usuario).filter(Usuario.cpf_cnpj == user.cpf_cnpj).first():
-        raise HTTPException(status_code=400, detail="CPF/CNPJ já cadastrado")
+        # 🔹 Verifica se o CPF/CNPJ já existe
+        if db.query(Usuario).filter(Usuario.cpf_cnpj == user.cpf_cnpj).first():
+            raise HTTPException(status_code=400, detail="CPF/CNPJ já cadastrado")
 
-    hashed_password = hash_password(user.senha)
+        hashed_password = hash_password(user.senha)
 
-    db_user = Usuario(
-        nome=user.nome,
-        email=user.email,
-        senha=hashed_password,
-        cpf_cnpj=user.cpf_cnpj,
-        telefone=user.telefone,
-        tipo_usuario=user.tipo_usuario
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+        db_user = Usuario(
+            nome=user.nome,
+            email=user.email,
+            senha=hashed_password,
+            cpf_cnpj=user.cpf_cnpj,
+            telefone=user.telefone,
+            tipo_usuario=user.tipo_usuario
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
 
-    # Gera tokens
-    access_token = create_access_token(
-        data={"sub": db_user.email},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-    refresh_token = create_refresh_token(data={"sub": db_user.email})
+        # Gera tokens
+        access_token = create_access_token(
+            data={"sub": db_user.email},
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
+        refresh_token = create_refresh_token(data={"sub": db_user.email})
 
-    # Salva o refresh token no banco
-    db_user.refresh_token = refresh_token
-    db.commit()
+        # Salva o refresh token no banco
+        db_user.refresh_token = refresh_token
+        db.commit()
 
-    return TokenSchema(
-        access_token=access_token,
-        refresh_token=refresh_token
-    )
+        return TokenSchema(
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 # 🔑 Endpoint para login
 @router.post("/login", response_model=TokenSchema)
@@ -132,6 +131,7 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     # Atualiza o refresh token no banco
     db_user.refresh_token = refresh_token
     db.commit()
+    db.refresh(db_user)
 
     return TokenSchema(
         access_token=access_token,
@@ -155,6 +155,7 @@ def refresh_access_token(token_data: TokenRefresh, db: Session = Depends(get_db)
     # Atualiza o refresh token no banco
     db_user.refresh_token = new_refresh_token
     db.commit()
+    db.refresh(db_user)
 
     return TokenSchema(
         access_token=new_access_token,
@@ -171,5 +172,6 @@ def logout_user(token_data: TokenRefresh, db: Session = Depends(get_db)):
     # Invalida o refresh token
     db_user.refresh_token = None
     db.commit()
+    db.refresh(db_user)
 
     return {"msg": "Logout realizado com sucesso"}
