@@ -19,4 +19,5 @@ class Usuario(Base):
     cpf_cnpj = Column(String(20), unique=True, nullable=False)
     telefone = Column(String(20), nullable=True)
     tipo_usuario = Column(Enum(TipoUsuarioEnum), nullable=False)
+    refresh_token = Column(String(500), nullable=True)  # Novo campo para armazenar o refresh token
     criado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())  # Atualiza quando editado
