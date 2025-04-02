@@ -1,0 +1,24 @@
+# Arquivos Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configurações do ambiente virtual
+venv/
+.env
+.idea/
+.venv/
+.env.local
+*.sqlite3
+*.db
+
+# Logs e arquivos temporários
+logs/
+*.log
+tmp/
+*.swp
+
+# Configuração do IDE
+.vscode/
+.idea/
