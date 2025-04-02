@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, Float, Boolean
 from sqlalchemy.orm import relationship
+from app.models.produto_imagem import ProdutoImagem
 from app.db.database import Base
 
 class Produto(Base):
@@ -17,7 +18,7 @@ class Produto(Base):
     categoria_id = Column(Integer, ForeignKey("categoria.id", ondelete="SET NULL"), nullable=True)
 
     categoria = relationship("Categoria", back_populates="produtos")
-    imagens = relationship("ProdutoImagem", back_populates="produto", cascade="all, delete-orphan")
+    imagens = relationship("ProdutoImagem", back_populates="produto", lazy="joined")  # Use "ProdutoImagem" como string
     estoque = relationship("Estoque", uselist=False, back_populates="produto", cascade="all, delete-orphan")
     avaliacoes = relationship("Avaliacao", back_populates="produto", cascade="all, delete-orphan")
     promocoes = relationship("Promocao", back_populates="produto", cascade="all, delete-orphan")
