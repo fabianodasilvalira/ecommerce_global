@@ -13,4 +13,4 @@ class ProdutoImagem(Base):
     ordem = Column(Integer, nullable=True)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
 
-    produto = relationship("Produto", back_populates="imagens")  # Aqui deve ser "Produto"
+    produto = relationship("Produto", back_populates="imagens")

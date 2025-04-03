@@ -18,6 +18,7 @@ if config.config_file_name is not None:
 from app.db.database import Base
 from app.models.usuario import Usuario
 from app.models.produto import Produto
+from app.models.categoria import Categoria
 from app.models.produto_imagem import ProdutoImagem
 from app.models.promocao import Promocao
 from app.models.estoque import Estoque
@@ -29,7 +30,6 @@ from app.models.entrega import Entrega
 from app.models.rastreamento_entrega import RastreamentoEntrega
 from app.models.cupom import Cupom
 from app.models.endereco import Endereco
-from app.models.categoria import Categoria
 
 target_metadata = Base.metadata
 

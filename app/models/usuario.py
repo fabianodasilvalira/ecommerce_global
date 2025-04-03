@@ -16,14 +16,15 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nome = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False, index=True)
-    senha = Column(String(255), nullable=False)  # Alterado para 255 para compatibilidade com hashing forte
+    senha = Column(String(255), nullable=False)
     cpf_cnpj = Column(String(20), unique=True, nullable=False)
     telefone = Column(String(20), nullable=True)
     tipo_usuario = Column(Enum(TipoUsuarioEnum), nullable=False)
-    refresh_token = Column(String(500), nullable=True)  # Mantido para armazenar refresh tokens
+    refresh_token = Column(String(500), nullable=True)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Relacionamentos (se necessário)
+    # Relacionamentos corrigidos
+    enderecos = relationship("Endereco", back_populates="usuario", cascade="all, delete-orphan")
     vendas = relationship("Venda", back_populates="usuario", cascade="all, delete-orphan")
-
+    avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan")  # Adicionado

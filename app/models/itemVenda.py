@@ -16,5 +16,6 @@ class ItemVenda(Base):
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)  # Novo
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)  # Novo
 
-    venda = relationship("Venda")
-    produto = relationship("Produto")
+    # Relacionamentos
+    venda = relationship("Venda", back_populates="itens")
+    produto = relationship("Produto", back_populates="itens_venda")

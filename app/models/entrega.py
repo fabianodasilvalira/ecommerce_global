@@ -20,4 +20,5 @@ class Entrega(Base):
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    venda = relationship("Venda", back_populates="entrega")
 

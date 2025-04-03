@@ -1,3 +1,4 @@
+# Adicione no início do arquivo:
 from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -20,7 +21,9 @@ class Venda(Base):
     status = Column(Enum(StatusVendaEnum), nullable=False, default=StatusVendaEnum.PENDENTE)
     data_venda = Column(TIMESTAMP, server_default=func.now(), nullable=False)
 
+    # Relacionamentos atualizados (usando string references)
     usuario = relationship("Usuario", back_populates="vendas")
+    itens = relationship("ItemVenda", back_populates="venda", cascade="all, delete-orphan")  # Corrigido para 'itens'
     endereco = relationship("Endereco", back_populates="vendas")
     cupom = relationship("Cupom", back_populates="vendas")
     entrega = relationship("Entrega", back_populates="venda", uselist=False)
