@@ -4,18 +4,28 @@ from typing import Optional
 
 class ProdutoCreate(BaseModel):
     nome: str
-    descricao: Optional[str] = None
+    descricao: str
     preco: float
-    categoria_id: int  # Ajustado para inteiro
+    categoria_id: int  # Certifique-se de que você está usando categoria_id aqui
+    volume: Optional[float] = None
+    unidade_medida: Optional[str] = 'ml'
+    ativo: Optional[bool] = True
 
 
-class ProdutoResponse(ProdutoCreate):
+class ProdutoResponse(BaseModel):
     id: int
     sku: str
-    preco_final: float
+    nome: str
+    descricao: str
+    preco: float
+    volume: Optional[float] = None  # Atualizado para ser opcional, como na sua lógica
+    unidade_medida: str
+    ativo: bool
+    categoria_id: int
+    preco_final: float  # Adicionando o campo preco_final
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class ProdutoUpdate(BaseModel):

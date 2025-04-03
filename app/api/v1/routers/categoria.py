@@ -9,7 +9,7 @@ from app.services.categoria_service import (
     listar_categorias,
     buscar_categoria,
     atualizar_categoria,
-    deletar_categoria
+    inativar_categoria_e_atualizar_produtos
 )
 
 router = APIRouter(prefix="/categorias", tags=["categorias"])
@@ -29,21 +29,23 @@ async def buscar_categoria_endpoint(categoria_id: int, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
     return categoria
 
+# Atualizar Categoria
 @router.put("/{categoria_id}", response_model=CategoriaResponse)
 async def atualizar_categoria_endpoint(
     categoria_id: int,
     categoria_dados: CategoriaUpdate,
     db: Session = Depends(get_db),
-
 ):
     categoria = atualizar_categoria(db, categoria_id, categoria_dados)
     if not categoria:
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
     return categoria
 
-@router.delete("/{categoria_id}", status_code=204)
-async def deletar_categoria_endpoint(categoria_id: int, db: Session = Depends(get_db)):
-    categoria = deletar_categoria(db, categoria_id)
+# Inativar Categoria e atualizar produtos relacionados
+@router.put("/{categoria_id}/inativar", response_model=CategoriaResponse)
+async def inativar_categoria_endpoint(categoria_id: int, db: Session = Depends(get_db)):
+    categoria = inativar_categoria_e_atualizar_produtos(db, categoria_id)
     if not categoria:
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
-    return None  # Retorna um status 204 sem conteúdo
+    return categoria
+
