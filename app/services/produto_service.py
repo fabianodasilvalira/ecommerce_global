@@ -1,29 +1,17 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException, status
 from app.models.produto import Produto
 from app.models.categoria import Categoria
-from fastapi import HTTPException, status
+from app.schemas.produto_schema import ProdutoResponse, ProdutoCreate
 import random
 import string
 import logging
-from typing import Dict, Any, Optional
-
-from app.schemas.produto_schema import ProdutoResponse, ProdutoCreate
+from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
 def generate_sku(db: Session, nome: str, categoria_id: int) -> str:
-    """
-    Gera um SKU único verificando colisões no banco de dados.
-
-    Args:
-        db: Sessão do banco de dados
-        nome: Nome do produto
-        categoria_id: ID da categoria
-
-    Returns:
-        str: SKU único no formato PREFIX-CAT-1234
-    """
     max_attempts = 5
     attempt = 0
 
@@ -46,7 +34,6 @@ def generate_sku(db: Session, nome: str, categoria_id: int) -> str:
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         detail="Não foi possível gerar um SKU único após várias tentativas"
     )
-
 
 def criar_produto(db: Session, produto_data: ProdutoCreate) -> ProdutoResponse:
     try:
@@ -114,118 +101,47 @@ def criar_produto(db: Session, produto_data: ProdutoCreate) -> ProdutoResponse:
 
     except IntegrityError as e:
         db.rollback()
-        logger.error(f"Erro de integridade ao criar produto: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Erro ao criar produto: possíveis dados duplicados ou inválidos"
         )
 
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Erro ao criar produto: {str(e)}")
-        raise HTTPException(
-            status_code=400,
-            detail="Produto já cadastrado e ativo na mesma categoria"
-        )
+def listar_produtos_service(db: Session) -> List[ProdutoResponse]:
+    produtos = db.query(Produto).filter(Produto.ativo == True).all()
+    return produtos
+
+def buscar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
+    produto = db.query(Produto).filter(Produto.id == produto_id, Produto.ativo == True).first()
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado ou inativo")
+    return produto
 
 def atualizar_produto_service(db: Session, produto_id: int, update_data: Dict[str, Any]) -> ProdutoResponse:
-    """
-    Atualiza um produto existente.
-
-    Args:
-        db: Sessão do banco de dados
-        produto_id: ID do produto a ser atualizado
-        update_data: Dicionário com campos para atualizar
-
-    Returns:
-        ProdutoResponse: O produto atualizado com preco_final calculado
-    """
-    try:
-        produto = db.query(Produto).filter(Produto.id == produto_id).first()
-        if not produto:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Produto não encontrado"
-            )
-
-        # Verifica se a nova categoria existe (se for fornecida)
-        if 'categoria_id' in update_data:
-            if not db.query(Categoria).get(update_data['categoria_id']):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Categoria não encontrada"
-                )
-
-        # Atualiza os campos
-        for field, value in update_data.items():
-            setattr(produto, field, value)
-
-        db.commit()
-        db.refresh(produto)
-
-        # Calculando o preco_final
-        margem_lucro = update_data.get('margem_lucro', produto.margem_lucro or 20.0)  # Default 20%
-        produto.preco_final = produto.preco * (1 + margem_lucro / 100)
-
-        produto_response = ProdutoResponse(
-            id=produto.id,
-            sku=produto.sku,
-            nome=produto.nome,
-            descricao=produto.descricao,
-            preco=produto.preco,
-            volume=produto.volume,
-            unidade_medida=produto.unidade_medida,
-            ativo=produto.ativo,
-            categoria_id=produto.categoria_id,
-            preco_final=produto.preco_final
-        )
-
-        return produto_response
-
-    except IntegrityError as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Erro de integridade ao atualizar produto: {str(e)}"
-        )
-
-def inativar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
-    """
-    Inativa um produto no sistema.
-
-    Args:
-        db: Sessão do banco de dados
-        produto_id: ID do produto a ser inativado
-
-    Returns:
-        ProdutoResponse: Produto inativado
-    """
     produto = db.query(Produto).filter(Produto.id == produto_id).first()
     if not produto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Produto não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-    # Alterando o status para inativo
-    produto.ativo = False
+    if "categoria_id" in update_data:
+        if not db.query(Categoria).filter_by(id=update_data["categoria_id"]).first():
+            raise HTTPException(status_code=400, detail="Categoria não encontrada")
+
+    for field, value in update_data.items():
+        setattr(produto, field, value)
+
+    produto.preco_final = produto.preco * (1 + (produto.margem_lucro or 20) / 100)
 
     db.commit()
     db.refresh(produto)
 
-    # Retorna o produto com o preco_final calculado
-    margem_lucro = produto.margem_lucro or 20.00  # Usa a margem definida no produto ou 20% como padrão
-    preco_final = produto.preco * (1 + (margem_lucro / 100))
+    return produto
 
-    return ProdutoResponse(
-        id=produto.id,
-        sku=produto.sku,
-        nome=produto.nome,
-        descricao=produto.descricao,
-        preco=produto.preco,
-        volume=produto.volume,
-        unidade_medida=produto.unidade_medida,
-        ativo=produto.ativo,
-        categoria_id=produto.categoria_id,
-        preco_final=preco_final
-    )
+def inativar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
+    produto = db.query(Produto).filter(Produto.id == produto_id).first()
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    produto.ativo = not produto.ativo
+    db.commit()
+    db.refresh(produto)
+
+    return produto

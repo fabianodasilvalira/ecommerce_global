@@ -1,0 +1,25 @@
+from pydantic import BaseModel, Field
+from datetime import datetime
+from typing import Optional
+
+class CupomCreate(BaseModel):
+    codigo: str = Field(..., max_length=50)
+    desconto: float = Field(..., gt=0)
+    validade: datetime
+    ativo: bool = True
+
+class CupomUpdate(BaseModel):
+    desconto: Optional[float] = Field(None, gt=0)
+    validade: Optional[datetime] = None
+    ativo: Optional[bool] = None
+
+class CupomResponse(BaseModel):
+    id: int
+    codigo: str
+    desconto: float
+    validade: datetime
+    ativo: bool
+    criado_em: datetime
+
+    class Config:
+        from_attributes = True

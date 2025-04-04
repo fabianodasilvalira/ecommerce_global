@@ -10,7 +10,7 @@ class Estoque(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     produto_id = Column(Integer, ForeignKey("produto.id", ondelete="CASCADE"), nullable=False)
-    quantidade = Column(Integer, nullable=False)
+    quantidade = Column(Integer, nullable=False, default=0)  # Define um valor padrão
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
 
