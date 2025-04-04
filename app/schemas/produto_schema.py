@@ -6,10 +6,11 @@ class ProdutoCreate(BaseModel):
     nome: str
     descricao: str
     preco: float
-    categoria_id: int  # Certifique-se de que você está usando categoria_id aqui
+    categoria_id: int  # Certifique-se de que está correto
     volume: Optional[float] = None
-    unidade_medida: Optional[str] = 'ml'
+    unidade_medida: Optional[str] = None  # Melhor manter None do que 'ml' por padrão
     ativo: Optional[bool] = True
+    margem_lucro: Optional[float] = 20.0  # Margem de lucro com valor padrão
 
 
 class ProdutoResponse(BaseModel):
@@ -18,21 +19,23 @@ class ProdutoResponse(BaseModel):
     nome: str
     descricao: str
     preco: float
-    volume: Optional[float] = None  # Atualizado para ser opcional, como na sua lógica
-    unidade_medida: str
+    volume: Optional[float] = None  # Mantém consistência com ProdutoCreate
+    unidade_medida: Optional[str] = None  # Evita usar string vazia como padrão
     ativo: bool
     categoria_id: int
-    preco_final: float  # Adicionando o campo preco_final
+    margem_lucro: float
+    preco_final: float  # Preço final já calculado
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # ✅ Correção para Pydantic v2
 
 
 class ProdutoUpdate(BaseModel):
     nome: Optional[str] = None
     descricao: Optional[str] = None
     preco: Optional[float] = None
-    categoria_id: Optional[int] = None
-    ativo: Optional[bool] = None
     volume: Optional[float] = None
     unidade_medida: Optional[str] = None
+    ativo: Optional[bool] = None
+    categoria_id: Optional[int] = None
+    margem_lucro: Optional[float] = None

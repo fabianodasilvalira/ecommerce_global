@@ -19,6 +19,7 @@ from app.db.database import Base
 from app.models.usuario import Usuario
 from app.models.produto import Produto
 from app.models.categoria import Categoria
+from app.models.categoria_imagem import CategoriaImagem
 from app.models.produto_imagem import ProdutoImagem
 from app.models.promocao import Promocao
 from app.models.estoque import Estoque

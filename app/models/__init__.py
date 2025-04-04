@@ -11,6 +11,8 @@ from .promocao import Promocao
 from .itemVenda import ItemVenda           # Adicione esta linha
 
 from .categoria import Categoria
+from .categoria_imagem import CategoriaImagem
+
 # ... outros imports
 # ... outros modelos
 

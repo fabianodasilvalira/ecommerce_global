@@ -1,8 +1,8 @@
-"""iniciando tabelas
+"""criando todas as tabelas
 
-Revision ID: c28b7017a5cd
+Revision ID: 756bcf8c4a14
 Revises: 
-Create Date: 2025-04-02 13:13:40.086624
+Create Date: 2025-04-04 09:17:19.288994
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c28b7017a5cd'
+revision: str = '756bcf8c4a14'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -37,6 +37,8 @@ def upgrade() -> None:
     sa.Column('codigo', sa.String(length=50), nullable=False),
     sa.Column('desconto', sa.Float(), nullable=False),
     sa.Column('validade', sa.TIMESTAMP(), nullable=False),
+    sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('ativo', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('codigo')
     )
@@ -45,27 +47,42 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('senha', sa.String(length=60), nullable=False),
+    sa.Column('senha', sa.String(length=255), nullable=False),
     sa.Column('cpf_cnpj', sa.String(length=20), nullable=False),
     sa.Column('telefone', sa.String(length=20), nullable=True),
     sa.Column('tipo_usuario', sa.Enum('CLIENTE', 'ADMIN', 'FUNCIONARIO', 'ENTREGADOR', name='tipousuarioenum'), nullable=False),
     sa.Column('refresh_token', sa.String(length=500), nullable=True),
-    sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('atualizado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('cpf_cnpj')
     )
     op.create_index(op.f('ix_usuario_email'), 'usuario', ['email'], unique=True)
     op.create_index(op.f('ix_usuario_id'), 'usuario', ['id'], unique=False)
+    op.create_table('categoria_imagem',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('categoria_id', sa.Integer(), nullable=False),
+    sa.Column('imagem_url', sa.String(length=500), nullable=False),
+    sa.Column('tipo', sa.String(length=50), nullable=False),
+    sa.Column('ordem', sa.Integer(), nullable=True),
+    sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['categoria_id'], ['categorias.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_categoria_imagem_id'), 'categoria_imagem', ['id'], unique=False)
     op.create_table('endereco',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('logradouro', sa.String(length=255), nullable=False),
-    sa.Column('numero', sa.String(length=10), nullable=True),
+    sa.Column('numero', sa.String(length=10), nullable=False),
+    sa.Column('complemento', sa.String(length=100), nullable=True),
+    sa.Column('bairro', sa.String(length=100), nullable=False),
     sa.Column('cidade', sa.String(length=100), nullable=False),
-    sa.Column('estado', sa.String(length=50), nullable=False),
-    sa.Column('cep', sa.String(length=20), nullable=False),
+    sa.Column('estado', sa.String(length=2), nullable=False),
+    sa.Column('cep', sa.String(length=9), nullable=False),
     sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.Column('atualizado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_endereco_id'), 'endereco', ['id'], unique=False)
@@ -79,11 +96,26 @@ def upgrade() -> None:
     sa.Column('unidade_medida', sa.String(length=10), nullable=True),
     sa.Column('ativo', sa.Boolean(), nullable=True),
     sa.Column('categoria_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['categoria_id'], ['categorias.id'], ),
+    sa.Column('margem_lucro', sa.DECIMAL(precision=5, scale=2), nullable=False),
+    sa.Column('preco_final', sa.DECIMAL(precision=10, scale=2), nullable=False),
+    sa.ForeignKeyConstraint(['categoria_id'], ['categorias.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_produto_id'), 'produto', ['id'], unique=False)
     op.create_index(op.f('ix_produto_sku'), 'produto', ['sku'], unique=True)
+    op.create_table('avaliacao',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('produto_id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
+    sa.Column('nota', sa.Float(), nullable=False),
+    sa.Column('comentario', sa.String(length=500), nullable=True),
+    sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('atualizado_em', sa.TIMESTAMP(), nullable=True),
+    sa.ForeignKeyConstraint(['produto_id'], ['produto.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_avaliacao_id'), 'avaliacao', ['id'], unique=False)
     op.create_table('estoque',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('produto_id', sa.Integer(), nullable=False),
@@ -139,11 +171,11 @@ def upgrade() -> None:
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('endereco_id', sa.Integer(), nullable=True),
     sa.Column('cupom_id', sa.Integer(), nullable=True),
-    sa.Column('total', sa.Float(), nullable=False),
+    sa.Column('total', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.Enum('PENDENTE', 'PAGO', 'CANCELADO', name='statusvendaenum'), nullable=False),
-    sa.Column('data_venda', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=True),
-    sa.ForeignKeyConstraint(['cupom_id'], ['cupom.id'], ),
-    sa.ForeignKeyConstraint(['endereco_id'], ['endereco.id'], ),
+    sa.Column('data_venda', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['cupom_id'], ['cupom.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['endereco_id'], ['endereco.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -174,11 +206,11 @@ def upgrade() -> None:
     op.create_table('pagamento',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('venda_id', sa.Integer(), nullable=False),
-    sa.Column('valor', sa.Float(), nullable=False),
+    sa.Column('valor', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.Enum('PENDENTE', 'APROVADO', 'CANCELADO', name='statuspagamento'), nullable=False),
     sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.Column('atualizado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['venda_id'], ['venda.id'], ),
+    sa.ForeignKeyConstraint(['venda_id'], ['venda.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_pagamento_id'), 'pagamento', ['id'], unique=False)
@@ -218,11 +250,15 @@ def downgrade() -> None:
     op.drop_table('movimentacao_estoque')
     op.drop_index(op.f('ix_estoque_id'), table_name='estoque')
     op.drop_table('estoque')
+    op.drop_index(op.f('ix_avaliacao_id'), table_name='avaliacao')
+    op.drop_table('avaliacao')
     op.drop_index(op.f('ix_produto_sku'), table_name='produto')
     op.drop_index(op.f('ix_produto_id'), table_name='produto')
     op.drop_table('produto')
     op.drop_index(op.f('ix_endereco_id'), table_name='endereco')
     op.drop_table('endereco')
+    op.drop_index(op.f('ix_categoria_imagem_id'), table_name='categoria_imagem')
+    op.drop_table('categoria_imagem')
     op.drop_index(op.f('ix_usuario_id'), table_name='usuario')
     op.drop_index(op.f('ix_usuario_email'), table_name='usuario')
     op.drop_table('usuario')

@@ -8,7 +8,7 @@ import string
 import logging
 from typing import Dict, Any, Optional
 
-from app.schemas.produto_schema import ProdutoResponse
+from app.schemas.produto_schema import ProdutoResponse, ProdutoCreate
 
 logger = logging.getLogger(__name__)
 
@@ -48,106 +48,85 @@ def generate_sku(db: Session, nome: str, categoria_id: int) -> str:
     )
 
 
-def criar_produto(db: Session, produto_data: Dict[str, Any]) -> ProdutoResponse:
+def criar_produto(db: Session, produto_data: ProdutoCreate) -> ProdutoResponse:
     try:
-        categoria_id = produto_data.get('categoria_id')
+        categoria_id = produto_data.categoria_id
 
         # Verifica se a categoria existe
-        if not db.query(Categoria).get(categoria_id):
+        categoria = db.query(Categoria).filter_by(id=categoria_id).first()
+        if not categoria:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Categoria com ID {categoria_id} não encontrada"
             )
 
-        # Verifica se o produto já existe (ativo ou inativo) na categoria
+        # Verifica se o produto já existe na categoria
         produto_existente = db.query(Produto).filter(
-            Produto.nome == produto_data['nome'],
+            Produto.nome == produto_data.nome,
             Produto.categoria_id == categoria_id
         ).first()
 
         if produto_existente:
             if produto_existente.ativo:
-                # Caso o produto já esteja ativo, não permite duplicação
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Produto já cadastrado e ativo na mesma categoria"
                 )
             else:
-                # Caso o produto esteja inativo, atualiza ele e reativa
-                produto_existente.ativo = True  # Reativa o produto
-                produto_existente.preco = produto_data['preco']  # Atualiza o preço
-                produto_existente.descricao = produto_data['descricao']  # Atualiza a descrição
-                produto_existente.volume = produto_data.get('volume', produto_existente.volume)  # Atualiza o volume
-                produto_existente.unidade_medida = produto_data.get('unidade_medida', produto_existente.unidade_medida)  # Atualiza unidade medida
+                # Atualiza e reativa o produto inativo
+                produto_existente.ativo = True
+                produto_existente.preco = produto_data.preco
+                produto_existente.descricao = produto_data.descricao
+                produto_existente.volume = produto_data.volume or produto_existente.volume
+                produto_existente.unidade_medida = produto_data.unidade_medida or produto_existente.unidade_medida
+                produto_existente.margem_lucro = produto_existente.margem_lucro if produto_existente.margem_lucro is not None else 20.0
+                produto_existente.preco_final = produto_existente.preco * (1 + produto_existente.margem_lucro / 100)
 
-                # Commit das alterações
                 db.commit()
                 db.refresh(produto_existente)
 
-                # Calculando o preco_final
-                preco_final = produto_existente.preco * 1.2  # Exemplo de cálculo com "imposto" de 20%
+                return ProdutoResponse.model_validate(produto_existente)
 
-                # Retorna o produto atualizado com o preco_final calculado
-                produto_response = ProdutoResponse(
-                    id=produto_existente.id,
-                    sku=produto_existente.sku,
-                    nome=produto_existente.nome,
-                    descricao=produto_existente.descricao,
-                    preco=produto_existente.preco,
-                    volume=produto_existente.volume,
-                    unidade_medida=produto_existente.unidade_medida,
-                    ativo=produto_existente.ativo,
-                    categoria_id=produto_existente.categoria_id,
-                    preco_final=preco_final  # Incluindo o preco_final no response
-                )
+        # Criando um novo produto
+        sku = generate_sku(db, produto_data.nome, categoria_id)
 
-                return produto_response
-
-        # Caso não encontre um produto existente (ativo ou inativo), cria um novo produto
-        sku = generate_sku(db, produto_data['nome'], categoria_id)
-
-        # Calculando o preco_final
-        preco_final = produto_data['preco'] * 1.2  # Exemplo de cálculo com "imposto" de 20%
+        margem_lucro = produto_data.margem_lucro if produto_data.margem_lucro is not None else 20.0
+        preco_final = produto_data.preco * (1 + margem_lucro / 100)
 
         novo_produto = Produto(
             sku=sku,
-            nome=produto_data['nome'],
-            descricao=produto_data['descricao'],
-            preco=produto_data['preco'],
+            nome=produto_data.nome,
+            descricao=produto_data.descricao,
+            preco=produto_data.preco,
             categoria_id=categoria_id,
-            volume=produto_data.get('volume'),
-            unidade_medida=produto_data.get('unidade_medida', 'ml'),
-            ativo=produto_data.get('ativo', True)
+            volume=produto_data.volume,
+            unidade_medida=produto_data.unidade_medida if produto_data.unidade_medida else None,
+            ativo=produto_data.ativo if produto_data.ativo is not None else True,
+            margem_lucro=margem_lucro,
+            preco_final=preco_final
         )
 
         db.add(novo_produto)
         db.commit()
         db.refresh(novo_produto)
 
-        # Retorne o produto com o preco_final calculado
-        produto_response = ProdutoResponse(
-            id=novo_produto.id,
-            sku=novo_produto.sku,
-            nome=novo_produto.nome,
-            descricao=novo_produto.descricao,
-            preco=novo_produto.preco,
-            volume=novo_produto.volume,
-            unidade_medida=novo_produto.unidade_medida,
-            ativo=novo_produto.ativo,
-            categoria_id=novo_produto.categoria_id,
-            preco_final=preco_final  # Incluindo o preco_final no response
-        )
+        return ProdutoResponse.model_validate(novo_produto)
 
-        return produto_response
     except IntegrityError as e:
         db.rollback()
         logger.error(f"Erro de integridade ao criar produto: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Erro ao criar produto (dados inválidos ou duplicados)"
+            detail="Erro ao criar produto: possíveis dados duplicados ou inválidos"
         )
 
-
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao criar produto: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail="Produto já cadastrado e ativo na mesma categoria"
+        )
 
 def atualizar_produto_service(db: Session, produto_id: int, update_data: Dict[str, Any]) -> ProdutoResponse:
     """
@@ -185,7 +164,8 @@ def atualizar_produto_service(db: Session, produto_id: int, update_data: Dict[st
         db.refresh(produto)
 
         # Calculando o preco_final
-        preco_final = produto.preco * 1.2  # Exemplo de cálculo de preço final com 20% de imposto
+        margem_lucro = update_data.get('margem_lucro', produto.margem_lucro or 20.0)  # Default 20%
+        produto.preco_final = produto.preco * (1 + margem_lucro / 100)
 
         produto_response = ProdutoResponse(
             id=produto.id,
@@ -197,7 +177,7 @@ def atualizar_produto_service(db: Session, produto_id: int, update_data: Dict[st
             unidade_medida=produto.unidade_medida,
             ativo=produto.ativo,
             categoria_id=produto.categoria_id,
-            preco_final=preco_final  # Incluindo o preco_final no response
+            preco_final=produto.preco_final
         )
 
         return produto_response
@@ -234,7 +214,8 @@ def inativar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
     db.refresh(produto)
 
     # Retorna o produto com o preco_final calculado
-    preco_final = produto.preco * 1.2  # Ajuste conforme a lógica de preço final
+    margem_lucro = produto.margem_lucro or 20.00  # Usa a margem definida no produto ou 20% como padrão
+    preco_final = produto.preco * (1 + (margem_lucro / 100))
 
     return ProdutoResponse(
         id=produto.id,

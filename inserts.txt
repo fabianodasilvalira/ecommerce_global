@@ -1,0 +1,43 @@
+-- Insere as 4 categorias (execute no seu cliente de banco de dados: pgAdmin, DBeaver, MySQL Workbench, etc.)
+INSERT INTO categorias (nome, descricao, cor_destaque, ativo)
+VALUES
+    ('Masculino', 'Perfumes e produtos para homens', '#1E3A8A', true),
+    ('Feminino', 'Perfumes e produtos para mulheres', '#BE185D', true),
+    ('Infantil', 'Produtos para crianças', '#047857', true),
+    ('Unissex', 'Produtos para todos os gêneros', '#6B7280', true)
+ON CONFLICT (nome) DO NOTHING;  -- Evita duplicatas (PostgreSQL)
+
+-- Produtos para cada categoria
+WITH categoria_ids AS (
+    SELECT id, nome FROM categorias
+)
+INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro)
+VALUES
+    -- Masculino
+    ('PM-001', 'Perfume Masculino Premium', 'Fragrância amadeirada com notas de bergamota', 120.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 25.00),
+    ('PM-002', 'Desodorante Colônia', 'Desodorante masculino de longa duração', 45.50, 150, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 20.00),
+    ('PM-003', 'Gel de Banho', 'Gel de banho com aroma refrescante', 32.90, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 15.00),
+    ('PM-004', 'Loção Pós-Barba', 'Hidratante pós-barba com aloe vera', 58.00, 75, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 30.00),
+    ('PM-005', 'Kit Presente Masculino', 'Kit com perfume e loção pós-barba', 199.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 25.00),
+    -- Feminino
+    ('PF-001', 'Perfume Feminino Floral', 'Fragrância floral com notas de jasmim', 135.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 30.00),
+    ('PF-002', 'Água de Colônia', 'Versão leve do perfume feminino', 75.00, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 25.00),
+    ('PF-003', 'Creme Corporal', 'Hidratante com aroma suave', 42.00, 250, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 20.00),
+    ('PF-004', 'Óleo Perfumado', 'Óleo corporal perfumado', 68.00, 50, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 35.00),
+    ('PF-005', 'Kit Presente Feminino', 'Kit com perfume e creme corporal', 229.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 30.00),
+    -- Infantil
+    ('PI-001', 'Colônia Infantil', 'Fragrância suave para crianças', 39.90, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 15.00),
+    ('PI-002', 'Shampoo Infantil', 'Shampoo sem lágrimas', 28.50, 300, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
+    ('PI-003', 'Sabonete Líquido', 'Sabonete suave para bebês', 22.00, 500, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
+    ('PI-004', 'Talco Infantil', 'Talco perfumado para bebês', 18.00, 200, 'g', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
+    ('PI-005', 'Kit Bebê', 'Kit com shampoo, sabonete e talco', 79.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 15.00),
+    -- Unissex
+    ('PU-001', 'Perfume Unissex', 'Fragrância neutra para todos', 110.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 20.00),
+    ('PU-002', 'Desodorante Roll-On', 'Desodorante sem perfume', 35.00, 50, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 15.00),
+    ('PU-003', 'Sabonete Líquido Neutro', 'Sabonete para peles sensíveis', 26.00, 300, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 10.00),
+    ('PU-004', 'Hidratante Corporal', 'Hidratante sem fragrância', 48.00, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 25.00),
+    ('PU-005', 'Kit Viagem Unissex', 'Kit com produtos de viagem', 89.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 20.00);
+
+-- Imagens para os produtos
+INSERT INTO produto_imagem (produto_id, imagem_url, tipo, ordem)
+SELECT id, 'https://exemplo.com/imagens/' || sku || '.jpg', 'destaque', 1 FROM produto;

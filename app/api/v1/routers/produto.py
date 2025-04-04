@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from decimal import Decimal
-
 from app.db.database import get_db
 from app.services.produto_service import criar_produto
 from app.models.produto import Produto
@@ -14,28 +12,14 @@ router = APIRouter()
 # 1. Criar um novo produto
 @router.post("/produtos/", response_model=ProdutoResponse)
 def criar_novo_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
-    produto_criado = criar_produto(db, produto)  # Aceita diretamente ProdutoCreate
+    produto_criado = criar_produto(db, produto)
     return produto_criado
 
 # 2. Listar todos os produtos
 @router.get("/produtos/", response_model=List[ProdutoResponse])
 def listar_produtos(db: Session = Depends(get_db)):
     produtos = db.query(Produto).filter(Produto.ativo == True).all()
-    return [
-        ProdutoResponse(
-            id=produto.id,
-            sku=produto.sku,
-            nome=produto.nome,
-            descricao=produto.descricao,
-            preco=produto.preco,
-            volume=produto.volume,
-            unidade_medida=produto.unidade_medida,
-            ativo=produto.ativo,
-            categoria_id=produto.categoria_id,
-            margem_lucro=produto.margem_lucro,
-            preco_final=produto.calcular_preco_final()  # Usa o método da classe
-        ) for produto in produtos
-    ]
+    return produtos  # Produto já está no formato correto devido ao Pydantic
 
 # 3. Buscar um produto por ID
 @router.get("/produtos/{produto_id}", response_model=ProdutoResponse)
@@ -44,74 +28,44 @@ def buscar_produto(produto_id: int, db: Session = Depends(get_db)):
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado ou inativo")
 
-    return ProdutoResponse(
-        id=produto.id,
-        sku=produto.sku,
-        nome=produto.nome,
-        descricao=produto.descricao,
-        preco=produto.preco,
-        volume=produto.volume,
-        unidade_medida=produto.unidade_medida,
-        ativo=produto.ativo,
-        categoria_id=produto.categoria_id,
-        margem_lucro=produto.margem_lucro,
-        preco_final=produto.calcular_preco_final()  # Usa o método da classe
-    )
+    return produto  # ProdutoResponse já lida com a serialização
 
-# 4. Atualizar um produto
-@router.put("/produtos/{produto_id}", response_model=ProdutoResponse)
-def atualizar_produto(produto_id: int, produto_dados: ProdutoUpdate, db: Session = Depends(get_db)):
+# 4. Editar um produto
+@router.put("/produtos/{produto_id}/editar", response_model=ProdutoResponse)
+def editar_produto(produto_id: int, update_data: ProdutoUpdate, db: Session = Depends(get_db)):
     produto = db.query(Produto).filter(Produto.id == produto_id).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-    # Verifica se a categoria existe antes de atualizar o produto
-    if produto_dados.categoria_id:
-        categoria_existente = db.query(Categoria).filter(Categoria.id == produto_dados.categoria_id).first()
-        if not categoria_existente:
-            raise HTTPException(status_code=404, detail="Categoria não encontrada")
+    # Verifica se a categoria existe, caso tenha sido alterada
+    if update_data.categoria_id:
+        categoria = db.query(Categoria).filter(Categoria.id == update_data.categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=400, detail="Categoria não encontrada")
 
-    for key, value in produto_dados.dict(exclude_unset=True).items():
-        setattr(produto, key, value)
+    # Atualiza os campos permitidos
+    update_dict = update_data.dict(exclude_unset=True)
+    for field, value in update_dict.items():
+        setattr(produto, field, value)
+
+    # Atualiza preco_final se necessário
+    if "preco" in update_dict or "margem_lucro" in update_dict:
+        produto.atualizar_preco_final()
 
     db.commit()
     db.refresh(produto)
 
-    return ProdutoResponse(
-        id=produto.id,
-        sku=produto.sku,
-        nome=produto.nome,
-        descricao=produto.descricao,
-        preco=produto.preco,
-        volume=produto.volume,
-        unidade_medida=produto.unidade_medida,
-        ativo=produto.ativo,
-        categoria_id=produto.categoria_id,
-        margem_lucro=produto.margem_lucro,
-        preco_final=produto.calcular_preco_final()  # Usa o método da classe
-    )
+    return produto  # FastAPI converte automaticamente para ProdutoResponse
 
 # 5. Inativar um produto
-@router.put("/produtos/inativar/{produto_id}", response_model=ProdutoResponse)
+@router.put("/produtos/{produto_id}/inativar", response_model=ProdutoResponse)
 def inativar_produto(produto_id: int, db: Session = Depends(get_db)):
     produto = db.query(Produto).filter(Produto.id == produto_id).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-    produto.ativo = False  # Define o status do produto como inativo
+    produto.ativo = not produto.ativo
     db.commit()
     db.refresh(produto)
 
-    return ProdutoResponse(
-        id=produto.id,
-        sku=produto.sku,
-        nome=produto.nome,
-        descricao=produto.descricao,
-        preco=produto.preco,
-        volume=produto.volume,
-        unidade_medida=produto.unidade_medida,
-        ativo=produto.ativo,
-        categoria_id=produto.categoria_id,
-        margem_lucro=produto.margem_lucro,
-        preco_final=produto.calcular_preco_final()  # Usa o método da classe
-    )
+    return produto

@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, Float, Boolean
 from sqlalchemy.orm import relationship
+from decimal import Decimal
+
 from app.db.database import Base
 
 class Produto(Base):
@@ -11,13 +13,11 @@ class Produto(Base):
     descricao = Column(String(255), nullable=True)
     preco = Column(DECIMAL(10, 2), nullable=False)  # Preço de custo
     volume = Column(Float, nullable=True)
-    unidade_medida = Column(String(10), nullable=True, default="ml")
+    unidade_medida = Column(String(10), nullable=True)
     ativo = Column(Boolean, default=True)
-
     categoria_id = Column(Integer, ForeignKey("categorias.id", ondelete="SET NULL"), nullable=True)
-
-    # 🔹 NOVO CAMPO: Margem de lucro configurável
-    margem_lucro = Column(DECIMAL(5, 2), nullable=False, default=20.00)
+    margem_lucro = Column(DECIMAL(5, 2), nullable=False, default=20.00)  # Corrigido parêntese
+    preco_final = Column(DECIMAL(10, 2), nullable=False)  # Adicionando preco_final
 
     # Relacionamentos
     imagens = relationship("ProdutoImagem", back_populates="produto", lazy="joined", cascade="all, delete-orphan")
@@ -29,7 +29,13 @@ class Produto(Base):
 
     def calcular_preco_final(self):
         """Calcula o preço final do produto baseado na margem de lucro."""
-        return self.preco * (1 + (self.margem_lucro / 100))
+        preco_decimal = Decimal(str(self.preco))  # Converte para Decimal
+        margem_decimal = Decimal(self.margem_lucro) / Decimal(100) + Decimal(1)
+        return preco_decimal * margem_decimal
+
+    def atualizar_preco_final(self):
+        """Atualiza o campo preco_final no banco de dados."""
+        self.preco_final = self.calcular_preco_final()
 
     def __repr__(self):
         return f"<Produto(id={self.id}, nome='{self.nome}', sku='{self.sku}')>"
