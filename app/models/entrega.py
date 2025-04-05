@@ -19,6 +19,8 @@ class Entrega(Base):
     status = Column(Enum(StatusEntregaEnum), nullable=False, default=StatusEntregaEnum.PENDENTE)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
-
     venda = relationship("Venda", back_populates="entrega")
+    entregador_id = Column(Integer, ForeignKey("usuario.id", ondelete="SET NULL"), nullable=True)
+
+    entregador = relationship("Usuario", foreign_keys=[entregador_id])
 
