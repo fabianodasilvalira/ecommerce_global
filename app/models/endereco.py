@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey
+
+from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import Base
@@ -17,6 +18,8 @@ class Endereco(Base):
     cep = Column(String(9), nullable=False)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
+    ativo = Column(Boolean, default=True)
+
 
     # Relacionamentos corrigidos
     usuario = relationship("Usuario", back_populates="enderecos")

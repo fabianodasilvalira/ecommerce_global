@@ -7,6 +7,7 @@ from app.api.v1.routers.categoria import router as categoria_router
 from app.api.v1.routers.estoque import router as estoque_router
 from app.api.v1.routers.cupom import router as cupom_router
 from app.api.v1.routers.promocao import router as promocao_router
+from app.api.v1.routers.endereco import router as endereco
 
 
 app = FastAPI()
@@ -17,3 +18,4 @@ app.include_router(categoria_router, prefix="/api/v1", tags=["categorias"])
 app.include_router(estoque_router, prefix="/api/v1", tags=["estoque"])
 app.include_router(cupom_router, prefix="/api/v1", tags=["cupons"])
 app.include_router(promocao_router, prefix="/api/v1", tags=["promocao"])
+app.include_router(endereco, prefix="/api/v1", tags=["endereco"])
