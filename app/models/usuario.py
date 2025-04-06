@@ -28,3 +28,4 @@ class Usuario(Base):
     enderecos = relationship("Endereco", back_populates="usuario", cascade="all, delete-orphan")
     vendas = relationship("Venda", back_populates="usuario", cascade="all, delete-orphan")
     avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan")  # Adicionado
+    lista_desejos = relationship("ListaDesejos", back_populates="usuario", cascade="all, delete-orphan")
