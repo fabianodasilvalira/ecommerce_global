@@ -11,6 +11,8 @@ from app.api.v1.routers.promocao import router as promocao_router
 from app.api.v1.routers.endereco import router as endereco_router
 from app.api.v1.routers.produto_destaque import router as produto_destaque_router
 from app.api.v1.routers.usuario import router as usuario_router
+from app.api.v1.routers.historico_pagamento import router as historico_pagamento_router
+from app.api.v1.routers.relatorios import router as relatorios_router
 
 
 app = FastAPI()
@@ -25,3 +27,5 @@ app.include_router(cupom_router, prefix="/api/v1", tags=["cupons"])
 app.include_router(promocao_router, prefix="/api/v1", tags=["promocao"])
 app.include_router(endereco_router, prefix="/api/v1", tags=["endereco"])
 app.include_router(usuario_router, prefix="/api/v1", tags=["usuario"])
+app.include_router(historico_pagamento_router, prefix="/api/v1", tags=["historico_pagamento"])
+app.include_router(relatorios_router, prefix="/api/v1", tags=["relatorios"])
