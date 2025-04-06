@@ -1,8 +1,8 @@
-"""Migração inicial
+"""cria enum status_venda_enum
 
-Revision ID: c21388d79439
+Revision ID: d09dc0d8ed4e
 Revises: 
-Create Date: 2025-04-06 10:21:13.050429
+Create Date: 2025-04-06 18:06:03.154876
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c21388d79439'
+revision: str = 'd09dc0d8ed4e'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -199,7 +199,7 @@ def upgrade() -> None:
     sa.Column('endereco_id', sa.Integer(), nullable=True),
     sa.Column('cupom_id', sa.Integer(), nullable=True),
     sa.Column('total', sa.DECIMAL(precision=10, scale=2), nullable=False),
-    sa.Column('status', sa.Enum('PENDENTE', 'PAGO', 'CANCELADO', name='statusvendaenum'), nullable=False),
+    sa.Column('status', sa.Enum('PENDENTE', 'PAGO', 'CANCELADO', name='status_venda_enum'), nullable=False),
     sa.Column('data_venda', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['cupom_id'], ['cupom.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['endereco_id'], ['endereco.id'], ondelete='SET NULL'),
@@ -237,6 +237,8 @@ def upgrade() -> None:
     sa.Column('venda_id', sa.Integer(), nullable=False),
     sa.Column('valor', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.Enum('PENDENTE', 'APROVADO', 'CANCELADO', name='statuspagamento'), nullable=False),
+    sa.Column('metodo_pagamento', sa.String(length=30), nullable=False),
+    sa.Column('transacao_id', sa.String(length=100), nullable=True),
     sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.Column('atualizado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['venda_id'], ['venda.id'], ondelete='CASCADE'),
@@ -257,9 +259,10 @@ def upgrade() -> None:
     op.create_table('historico_pagamento',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('pagamento_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('pendente', 'autorizado', 'falhou', name='statushistoricopagamento'), nullable=False),
-    sa.Column('metodo_pagamento', sa.String(length=50), nullable=False),
-    sa.Column('data', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('status', sa.Enum('PENDENTE', 'AUTORIZADO', 'FALHOU', 'CANCELADO', 'ESTORNADO', name='statushistoricopagamento'), nullable=False),
+    sa.Column('metodo_pagamento', sa.String(length=50), nullable=True),
+    sa.Column('observacao', sa.String(length=255), nullable=True),
+    sa.Column('data_evento', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['pagamento_id'], ['pagamento.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

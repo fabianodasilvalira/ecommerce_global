@@ -2,47 +2,54 @@ from datetime import datetime, timedelta
 from typing import Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import HTTPException, status
 from app.core.config import settings
 
-# Configuração do algoritmo e tempo de expiração do token
+# 🔐 Configurações
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # Token expira após 30 minutos
-REFRESH_TOKEN_EXPIRE_DAYS = 7     # Token de refresh expira após 7 dias
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# Criação de contexto para o hash de senhas
+# 🔐 Contexto de hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Função para criptografar a senha
+# 🔐 Gera hash da senha
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
-# Função para verificar se a senha fornecida é válida
+# 🔍 Verifica se a senha está correta
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# Função para criar o token de acesso JWT
+# 📦 Cria Access Token
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None) -> str:
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# Função para criar o token de refresh JWT
+# 🔁 Cria Refresh Token
 def create_refresh_token(data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# Função para verificar o token
-def verify_token(token: str):
-    credentials_exception = Exception("Could not validate credentials")
+# 🧾 Decodifica token e valida
+def decode_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if "sub" not in payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido: 'sub' não encontrado",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return payload
     except JWTError:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

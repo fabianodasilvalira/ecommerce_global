@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
-from app.schemas.usuario_schema import UsuarioCreate, UsuarioUpdate
+from app.schemas.usuario_schema import UsuarioCreate, UsuarioUpdate, UsuarioUpdateAdmin
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,7 +32,24 @@ def obter_usuario(db: Session, usuario_id: int):
     return db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
 
-def atualizar_usuario(db: Session, usuario_id: int, dados: UsuarioUpdate):
+def atualizar_meu_usuario(db: Session, usuario_id: int, dados: UsuarioUpdate):
+    usuario = obter_usuario(db, usuario_id)
+    if not usuario:
+        return None
+
+    if dados.senha:
+        usuario.senha = get_password_hash(dados.senha)
+    if dados.nome:
+        usuario.nome = dados.nome
+    if dados.telefone:
+        usuario.telefone = dados.telefone
+
+    db.commit()
+    db.refresh(usuario)
+    return usuario
+
+
+def atualizar_usuario_admin(db: Session, usuario_id: int, dados: UsuarioUpdateAdmin):
     usuario = obter_usuario(db, usuario_id)
     if not usuario:
         return None
@@ -48,6 +65,7 @@ def atualizar_usuario(db: Session, usuario_id: int, dados: UsuarioUpdate):
     return usuario
 
 
+
 def inativar_usuario(db: Session, usuario_id: int):
     usuario = obter_usuario(db, usuario_id)
     if not usuario:
@@ -55,3 +73,7 @@ def inativar_usuario(db: Session, usuario_id: int):
     usuario.ativo = False
     db.commit()
     return usuario
+
+
+def obter_por_email(db: Session, email: str):
+    return db.query(Usuario).filter(Usuario.email == email).first()

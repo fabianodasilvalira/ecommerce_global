@@ -27,3 +27,4 @@ class Venda(Base):
     endereco = relationship("Endereco", back_populates="vendas")
     cupom = relationship("Cupom", back_populates="vendas")
     entrega = relationship("Entrega", back_populates="venda", uselist=False)
+    pagamentos = relationship("Pagamento", back_populates="venda")

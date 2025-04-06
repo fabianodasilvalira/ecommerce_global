@@ -23,4 +23,5 @@ class Entrega(Base):
     entregador_id = Column(Integer, ForeignKey("usuario.id", ondelete="SET NULL"), nullable=True)
 
     entregador = relationship("Usuario", foreign_keys=[entregador_id])
+    candidatos = relationship("EntregaCandidato", back_populates="entrega", cascade="all, delete-orphan")
 

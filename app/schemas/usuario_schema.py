@@ -27,7 +27,21 @@ class UsuarioUpdate(BaseModel):
     nome: Optional[str]
     telefone: Optional[str]
     senha: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class UsuarioUpdateAdmin(BaseModel):
+    nome: Optional[str]
+    telefone: Optional[str]
+    senha: Optional[str]
     tipo_usuario: Optional[TipoUsuarioEnum]
+    email: Optional[EmailStr]
+    cpf_cnpj: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 
 class UsuarioOut(UsuarioBase):
@@ -35,6 +49,13 @@ class UsuarioOut(UsuarioBase):
     ativo: bool
     criado_em: datetime
     atualizado_em: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class UsuarioResponse(UsuarioBase):
+    id: int
 
     class Config:
         orm_mode = True

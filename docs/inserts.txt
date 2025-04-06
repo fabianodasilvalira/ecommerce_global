@@ -1,3 +1,7 @@
+taskkill /F /IM uvicorn.exe
+
+
+
 -- Insere as 4 categorias (execute no seu cliente de banco de dados: pgAdmin, DBeaver, MySQL Workbench, etc.)
 INSERT INTO categorias (nome, descricao, cor_destaque, ativo)
 VALUES
