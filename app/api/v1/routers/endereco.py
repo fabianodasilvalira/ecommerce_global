@@ -4,8 +4,7 @@ from app.db.database import get_db
 from app.schemas.endereco import EnderecoCreate, EnderecoUpdate, EnderecoOut
 from app.services import endereco_service
 
-router = APIRouter(prefix="/enderecos", tags=["Endereços"])
-
+router = APIRouter()
 
 @router.post("/", response_model=EnderecoOut)
 def criar(endereco: EnderecoCreate, db: Session = Depends(get_db)):

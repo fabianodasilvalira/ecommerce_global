@@ -28,9 +28,16 @@ from app.models.venda import Venda
 from app.models.pagamento import Pagamento
 from app.models.itemVenda import ItemVenda
 from app.models.entrega import Entrega
+from app.models.entrega_candidato import EntregaCandidato
 from app.models.rastreamento_entrega import RastreamentoEntrega
 from app.models.cupom import Cupom
 from app.models.endereco import Endereco
+from app.models.produto_destaque import ProdutoDestaque
+from app.models.avaliacao import Avaliacao
+from app.models.historico_pagamento import HistoricoPagamento
+from app.models.listaDesejos import ListaDesejos
+from app.models.entregador import Entregador
+
 
 target_metadata = Base.metadata
 

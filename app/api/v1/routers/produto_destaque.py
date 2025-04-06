@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schemas.produto_destaque import ProdutoDestaqueCreate, ProdutoDestaqueResponse
-from services import produto_destaque as service
-from dependencies import get_db
 
-router = APIRouter(prefix="/api/v1/destaques", tags=["Destaques"])
+from app.db.database import get_db
+from app.schemas.produto_destaque import ProdutoDestaqueCreate, ProdutoDestaqueResponse
+from app.services import produto_destaque_service as service
+
+router = APIRouter()
 
 @router.post("/", response_model=ProdutoDestaqueResponse)
 def adicionar_destaque(destaque: ProdutoDestaqueCreate, db: Session = Depends(get_db)):

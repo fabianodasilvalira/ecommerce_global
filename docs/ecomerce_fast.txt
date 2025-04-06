@@ -1,7 +1,0 @@
-🔥 Pontos-chave para escalabilidade e performance
-✅ FastAPI – Melhor performance entre os frameworks Python.
-✅ Banco de dados PostgreSQL – Melhor para e-commerce do que SQLite.
-✅ Alembic para migrações – Evolução do banco sem complicações.
-✅ Redis para cache – Respostas rápidas e alívio na carga do banco.
-✅ Autenticação JWT – Segurança robusta e flexível.
-✅ Docker – Fácil deploy e escalabilidade.

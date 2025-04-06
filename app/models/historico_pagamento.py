@@ -1,27 +1,27 @@
 import enum
-from sqlalchemy import Column, Integer, DECIMAL, Enum, TIMESTAMP, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-from app import models
 from app.db.database import Base
 
-class StatusPagamento(enum.Enum):
+
+class StatusHistoricoPagamento(enum.Enum):
     PENDENTE = "PENDENTE"
-    APROVADO = "APROVADO"
+    AUTORIZADO = "AUTORIZADO"
+    FALHOU = "FALHOU"
     CANCELADO = "CANCELADO"
+    ESTORNADO = "ESTORNADO"
 
-class HistoricoPagamento(models.Model):
-    STATUS_CHOICES = [
-        ('pendente', 'Pendente'),
-        ('autorizado', 'Autorizado'),
-        ('falhou', 'Falhou'),
-    ]
 
-    pagamento = models.ForeignKey('Pagamento', on_delete=models.CASCADE, related_name='historicos')
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pendente')
-    metodo_pagamento = models.CharField(max_length=50)
-    data = models.DateTimeField(auto_now_add=True)
+class HistoricoPagamento(Base):
+    __tablename__ = "historico_pagamento"
 
-    def __str__(self):
-        return f'{self.pagamento} - {self.status} em {self.data.strftime("%d/%m/%Y %H:%M")}'
+    id = Column(Integer, primary_key=True, index=True)
+    pagamento_id = Column(Integer, ForeignKey("pagamento.id", ondelete="CASCADE"), nullable=False)
+
+    status = Column(Enum(StatusHistoricoPagamento), nullable=False)
+    metodo_pagamento = Column(String(50), nullable=True)  # opcional: cartão, pix, boleto
+    observacao = Column(String(255), nullable=True)       # opcional: "falha na verificação de cartão"
+    data_evento = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+
+    pagamento = relationship("Pagamento", back_populates="historicos")
