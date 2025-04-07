@@ -1,7 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.dependencies.auth import obter_usuario_logado
 from app.models.usuario import TipoUsuarioEnum, Usuario
+from app.services.auth import obter_usuario_logado
+
 
 def permissao_necessaria(*tipos: TipoUsuarioEnum):
     def wrapper(usuario: Usuario = Depends(obter_usuario_logado)):

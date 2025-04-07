@@ -1,5 +1,5 @@
 # FastAPI
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Security
 
 # Banco de dados e models
 from sqlalchemy.orm import Session
@@ -56,7 +56,7 @@ def atualizar_usuario(
 def inativar_usuario(
         usuario_id: int,
         db: Session = Depends(get_db),
-        usuario_logado: Usuario = Depends(obter_usuario_logado)  # Protegido
+        usuario_logado: Usuario = Security(obter_usuario_logado)  # Protegido
 ):
     # Exemplo: só o ADMIN pode inativar
     if usuario_logado.tipo_usuario != TipoUsuarioEnum.ADMIN:
