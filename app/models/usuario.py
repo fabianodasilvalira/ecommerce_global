@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Enum, TIMESTAMP, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -23,8 +23,10 @@ class Usuario(Base):
     refresh_token = Column(String(500), nullable=True)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
+    ativo = Column(Boolean, default=True, nullable=False)  # <- novo campo
 
     # Relacionamentos corrigidos
     enderecos = relationship("Endereco", back_populates="usuario", cascade="all, delete-orphan")
     vendas = relationship("Venda", back_populates="usuario", cascade="all, delete-orphan")
     avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan")  # Adicionado
+    lista_desejos = relationship("ListaDesejos", back_populates="usuario", cascade="all, delete-orphan")

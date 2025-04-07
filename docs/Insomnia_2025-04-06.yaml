@@ -29,35 +29,22 @@ collection:
       created: 1740571256005
       modified: 1741348406475
       sortKey: -1740571256005
-  - name: rest_sei
-    meta:
-      id: fld_12985ad48e5246df8d2a8085c478256f
-      created: 1743168289512
-      modified: 1743168289512
-      sortKey: -1743168289512
   - name: SeiService
     meta:
-      id: fld_62934b1c0b224889b896099b6d490314
+      id: fld_d491aebf5cdf4de882bd7ac42e06f7cb
       created: 1743169396300
       modified: 1743169396300
       sortKey: -1743169387255
-    children:
-      - name: SeiService
-        meta:
-          id: fld_c2c12ab9d3d14e6d8228853f81010e4f
-          created: 1743169396302
-          modified: 1743169396302
-          sortKey: -1743169387254
   - name: ecommerce_global
     meta:
-      id: fld_62b6e1f43cf141d2a1dd054ff0734734
+      id: fld_00f9a3d18f2248a384ac8df4329c06b4
       created: 1743601054079
       modified: 1743601054079
       sortKey: -1743601054080
     children:
       - name: Categorias
         meta:
-          id: fld_19458550ae3b4449b42f4b30b355cb2e
+          id: fld_9b34aba0812a4b9a9a286b1910a76881
           created: 1743677695690
           modified: 1743677695690
           sortKey: -1743677695690
@@ -65,7 +52,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/categorias/
             name: Cadastrar Categoria
             meta:
-              id: req_b60a02c5f9be487c9767deea44daaad9
+              id: req_22bacb87fd5d4053886a075655d977a8
               created: 1743605074850
               modified: 1743679625955
               isPrivate: false
@@ -82,8 +69,8 @@ collection:
                   "ativo": true
                 }
             parameters:
-              - id: pair_a354fa304b71401bac3633b5f1691412
-                disabled: false
+              - disabled: false
+                id: pair_a354fa304b71401bac3633b5f1691412
             headers:
               - name: Content-Type
                 value: application/json
@@ -100,7 +87,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/categorias
             name: Buscar Categorias
             meta:
-              id: req_2c67773613084b478b0f169db134ba94
+              id: req_262020e288a6429f8f8a8daa77ff4817
               created: 1743677778856
               modified: 1743765417170
               isPrivate: false
@@ -120,7 +107,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/categorias/1
             name: Editar Categoria
             meta:
-              id: req_8e34557327df4b869c28cc0b53128b61
+              id: req_23098a449dcb4e83894e46cb577890e5
               created: 1743678105661
               modified: 1743767570421
               isPrivate: false
@@ -149,7 +136,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/categorias/4/inativar
             name: Inativar/Deletar Categoria
             meta:
-              id: req_f427bb3b60d0499ca883080e75aabb2f
+              id: req_b9e534f8e96346379ac52e4231f9da9a
               created: 1743678141838
               modified: 1743767455055
               isPrivate: false
@@ -168,7 +155,7 @@ collection:
               rebuildPath: true
       - name: Produtos
         meta:
-          id: fld_dff0a502816748459e8bfe0fe866dc2e
+          id: fld_53fd9a6d2d9b4a94bdb7dd2f69f0d0e6
           created: 1743678212946
           modified: 1743678212946
           sortKey: -1743678212946
@@ -176,7 +163,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/produtos/
             name: Cadastrar Produtos
             meta:
-              id: req_a90812f48944431b80e1e4e529624e2f
+              id: req_a2089ff99f274dbaa31be7f982b8606e
               created: 1743602857251
               modified: 1743775474776
               isPrivate: false
@@ -207,7 +194,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/produtos
             name: Buscar Produtos
             meta:
-              id: req_117becd08bb04cd3bfa66194aca2b654
+              id: req_d60530d6caf84832840d7b1f611107bd
               created: 1743679904060
               modified: 1743775464726
               isPrivate: false
@@ -227,7 +214,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/produtos/10/inativar
             name: Inativar/Deletar Produto
             meta:
-              id: req_8fb308f26b654df8ba1b59bd3f0fc188
+              id: req_1c0e15afa1c74ffc8fba3840d70e3062
               created: 1743765839874
               modified: 1743769412046
               isPrivate: false
@@ -247,7 +234,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/produtos/10/editar
             name: Editar Produto
             meta:
-              id: req_ea9f05e29c494c6e8357394bae9e8a40
+              id: req_54a1ba671dd841eaa289c3fbe0d318f8
               created: 1743767557723
               modified: 1743775456287
               isPrivate: false
@@ -275,7 +262,7 @@ collection:
               rebuildPath: true
       - name: Estoque
         meta:
-          id: fld_141b389e35e8480b9aa59dc7933c6cb7
+          id: fld_c40ce9858bd94c2891cd768f3eab5d69
           created: 1743772535080
           modified: 1743772535080
           sortKey: -1743772535080
@@ -283,7 +270,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/estoque/
             name: Cadastrar Estoque
             meta:
-              id: req_37f806f1fa294dfba6151afd29c7d06c
+              id: req_78db8f819310415d915e20895d7e93fd
               created: 1743772541780
               modified: 1743772687001
               isPrivate: false
@@ -312,7 +299,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/estoque/11
             name: Editar Estoque
             meta:
-              id: req_5c77c2c9f8e8415287d08d64f08fe940
+              id: req_aadd194857c7492dafaeec010d9e135e
               created: 1743772555573
               modified: 1743773331606
               isPrivate: false
@@ -340,7 +327,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/estoque/11
             name: Deletar Estoque
             meta:
-              id: req_07d0f2d51b7247d191413860c4afbffc
+              id: req_519f88439e304279b0c362fc5c17f7f0
               created: 1743772579937
               modified: 1743773364468
               isPrivate: false
@@ -360,7 +347,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/estoque/
             name: Listar Estoque
             meta:
-              id: req_6475e66c84254b8fba2831feca2e69fc
+              id: req_ea4d1ef5950540c4b07d82441f794d24
               created: 1743772609851
               modified: 1743773374952
               isPrivate: false
@@ -379,7 +366,7 @@ collection:
               rebuildPath: true
       - name: Cupom
         meta:
-          id: fld_f972a789b1064cd394b9013b65fd1323
+          id: fld_fe2695fef2e54809b683c4d5e57dfee6
           created: 1743774020461
           modified: 1743774020461
           sortKey: -1743774020461
@@ -387,9 +374,9 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/cupons/DESCONTO10
             name: Listar Cupom
             meta:
-              id: req_f041a6a54fd54f209ea7e35861d015fa
+              id: req_b7e1b744bb3c4cd18c0a758e0b8dd9d7
               created: 1743774037695
-              modified: 1743776502590
+              modified: 1743944130613
               isPrivate: false
               sortKey: -1743776488505
             method: GET
@@ -407,7 +394,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/cupons/
             name: Cadastrar Cupom
             meta:
-              id: req_1f4b488915d84f16acd3daaa3a615186
+              id: req_93625c316f4848799302239a3572d556
               created: 1743774044025
               modified: 1743776503780
               isPrivate: false
@@ -438,7 +425,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/cupons/1
             name: Editar Cupom por Id
             meta:
-              id: req_7a41fa0f24af44e9bb01a138c95657e1
+              id: req_afc17a968a4144cc83a6915d370ce92c
               created: 1743774051232
               modified: 1743776495045
               isPrivate: false
@@ -467,7 +454,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/cupons/1/desativar
             name: Desativar Cupom
             meta:
-              id: req_7cd0135cdffe45a289b93a29845ea049
+              id: req_7dd1cbd05f8748afbee04b7514849fc7
               created: 1743774060205
               modified: 1743776501493
               isPrivate: false
@@ -487,7 +474,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/cupons/codigo/DESCONTO10
             name: Editar Cupom por Codigo
             meta:
-              id: req_18c6720f3afa483ba7e54b63d27c4699
+              id: req_0125cca623484397860acf208486b45e
               created: 1743775122654
               modified: 1743776488588
               isPrivate: false
@@ -515,7 +502,7 @@ collection:
               rebuildPath: true
       - name: Autenticacao
         meta:
-          id: fld_d68732376b4548d083f1d0e8b7312d81
+          id: fld_872e9310aa7b4ea9ae99d76487bdc96a
           created: 1743775513390
           modified: 1743775513390
           sortKey: -1743775513390
@@ -523,7 +510,7 @@ collection:
           - url: http://127.0.0.1:8000/auth/register/
             name: register
             meta:
-              id: req_0dfe2a91942842b09e3bda6a2dbbf2ae
+              id: req_ba06812bd61f4bdd9de82216f30fc537
               created: 1743601059890
               modified: 1743775521834
               isPrivate: false
@@ -556,7 +543,7 @@ collection:
           - url: http://127.0.0.1:8000/auth/login
             name: login
             meta:
-              id: req_1074713839b4485284add545e9cfcbaa
+              id: req_d6683fdd98bd46e7bfb5b04410d712e7
               created: 1743601564489
               modified: 1743775524299
               isPrivate: false
@@ -582,15 +569,9 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-      - name: Promocoes
-        meta:
-          id: fld_18f533342b184f69be5f525d78c5cd80
-          created: 1743776459948
-          modified: 1743776459948
-          sortKey: -1743776459948
       - name: Promocao
         meta:
-          id: fld_ee5404d7b6c9423aba7fe9d33d259445
+          id: fld_24cd91c198f946d5b3be97d7a81cb78d
           created: 1743776513737
           modified: 1743776513737
           sortKey: -1743725374013
@@ -598,7 +579,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/promocoes
             name: Cadastrar Promocao
             meta:
-              id: req_9c9f91917a8a4d5792f979e16fe98525
+              id: req_021c2bab94ff4be6b635b50b5f6f99ad
               created: 1743776513738
               modified: 1743777250178
               isPrivate: false
@@ -631,7 +612,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/promocoes/6/editar
             name: Editar Promocao
             meta:
-              id: req_ed7da4dbaaf4427997eb74796c62f888
+              id: req_e6dcf87bd4064cc393c4c2213e1330e5
               created: 1743776513740
               modified: 1743777533656
               isPrivate: false
@@ -660,7 +641,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/promocoes/6/inativar/
             name: Desativar Promocao
             meta:
-              id: req_842ccec142a244eca5fbd7c966c1d216
+              id: req_ccf65a087ae54d55a6c572a7a7d8c9e6
               created: 1743776513741
               modified: 1743777652595
               isPrivate: false
@@ -680,7 +661,7 @@ collection:
           - url: http://127.0.0.1:8000/api/v1/promocoes/6
             name: Listar Promocoes
             meta:
-              id: req_3f2ef89d8264461aa8b0faa5da2ce076
+              id: req_bf642836fa2e4cf9be53b24dd7ef9c04
               created: 1743776513742
               modified: 1743777267445
               isPrivate: false
@@ -697,12 +678,374 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
+      - name: Endereço
+        meta:
+          id: fld_ee00763e5e9c40e687cec2f5cd289519
+          created: 1743891398556
+          modified: 1743891398556
+          sortKey: -1743701793479.5
+        children:
+          - url: http://127.0.0.1:8000/api/v1/enderecos
+            name: Cadastrar Endereço
+            meta:
+              id: req_7033b456ea9f41e8a5ffcbdfadd490c7
+              created: 1743891398564
+              modified: 1743894136588
+              isPrivate: false
+              sortKey: -1743772541780
+            method: POST
+            body:
+              mimeType: application/json
+              text: |
+                {
+                  "usuario_id": 1,
+                  "logradouro": "Rua das Flores",
+                  "numero": "123",
+                  "complemento": "Apto 101",
+                  "bairro": "Centro",
+                  "cidade": "Cidade Exemplo",
+                  "estado": "SP",
+                	"ativo": true,
+                  "cep": "12345678"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/enderecos/1/editar
+            name: Editar
+            meta:
+              id: req_c5778ddf84f24ce08de8dc90cf9bc3b1
+              created: 1743891398579
+              modified: 1743895172014
+              isPrivate: false
+              sortKey: -1743725380324.5
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "logradouro": "Rua Nova",
+                  "numero": "456",
+                  "complemento": "Bloco B",
+                  "bairro": "Jardim",
+                  "cidade": "Nova Cidade",
+                  "estado": "RJ",
+                  "cep": "98765432",
+                	"ativo":true
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/enderecos/1/inativar/
+            name: "Desativar "
+            meta:
+              id: req_9f0626e0128f4f8b80b8d3f138cebca0
+              created: 1743891398586
+              modified: 1743894340957
+              isPrivate: false
+              sortKey: -1743701799596.75
+            method: DELETE
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/enderecos/1
+            name: Listar Endereço
+            meta:
+              id: req_e6d096eafc284cff9b9fe14d235a8a8e
+              created: 1743891398595
+              modified: 1743894185596
+              isPrivate: false
+              sortKey: -1743772609851
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.0.2
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Usuário
+        meta:
+          id: fld_49ffb1f69ccc402c8f11f39d6cc4890e
+          created: 1743938527939
+          modified: 1743938533067
+          sortKey: -1743775513490
+        children:
+          - url: "{{ base_url }}/usuarios/"
+            name: Criar Usuário
+            meta:
+              id: req_e9fd41ba2b804751a9120953eab13098
+              created: 1743938527942
+              modified: 1743938527942
+              isPrivate: false
+              sortKey: -1743938527942
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "nome": "João da Silva",
+                  "email": "joao@example.com",
+                  "senha": "123456",
+                  "cpf_cnpj": "12345678900",
+                  "telefone": "11999999999",
+                  "tipo_usuario": "cliente"
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/usuarios/
+            name: Listar Usuários Ativos
+            meta:
+              id: req_801279483bbe44e5ab289ffb61be193e
+              created: 1743938527946
+              modified: 1743938570477
+              isPrivate: false
+              sortKey: -1743938527946
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/usuarios/1"
+            name: Obter Usuário por ID
+            meta:
+              id: req_03e8aca19551415cbb0eab3911d0a6eb
+              created: 1743938527951
+              modified: 1743938527951
+              isPrivate: false
+              sortKey: -1743938527951
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/usuarios/1"
+            name: Atualizar Usuário
+            meta:
+              id: req_c310a8be077541e78056bea5fb00008d
+              created: 1743938527954
+              modified: 1743938527954
+              isPrivate: false
+              sortKey: -1743938527954
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "nome": "João Atualizado",
+                  "telefone": "11888888888"
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/usuarios/1"
+            name: Inativar Usuário
+            meta:
+              id: req_2d4529173532475ab1440d8686310ef7
+              created: 1743938527956
+              modified: 1743938527956
+              isPrivate: false
+              sortKey: -1743938527956
+            method: DELETE
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Produto Destaque
+        meta:
+          id: fld_d09802ca5d2d4b7fa55eab9dfd8df189
+          created: 1743943608955
+          modified: 1743943608955
+          sortKey: -1743943608955
+        children:
+          - url: "{{ base_url }}/1"
+            name: Remover Produto Destaque
+            meta:
+              id: req_0166bafabbe94a5eae34537be0112426
+              created: 1650000000000
+              modified: 1743943616963
+              isPrivate: false
+              sortKey: -1743943613317
+            method: DELETE
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/"
+            name: Adicionar Produto Destaque
+            meta:
+              id: req_1d78dc1e3f9d430388e6a3e57558e424
+              created: 1650000000000
+              modified: 1743943613381
+              isPrivate: false
+              sortKey: -1743943613217
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "produto_id": 1
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/"
+            name: Listar Produtos Destaque
+            meta:
+              id: req_bfeb01e3020343318d26e583ea88c7b2
+              created: 1650000000000
+              modified: 1743943622786
+              isPrivate: false
+              sortKey: -1743943613417
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Produto Imagem
+        meta:
+          id: fld_0b2a399a9e824ec0a205e2ad879b2205
+          created: 1743943769098
+          modified: 1743944117442
+          sortKey: -1743943609055
+        children:
+          - url: "{{ base_url }}/produto_imagem/"
+            name: Adicionar Imagem de Produto
+            meta:
+              id: req_15aa85aac7b04d7c9867bb6b0d1f3314
+              created: 1743943769100
+              modified: 1743943769100
+              isPrivate: false
+              sortKey: -1743943769100
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "produto_id": 1,
+                  "imagem_url": "https://meusite.com/imagens/produto1.jpg",
+                  "tipo": "galeria",
+                  "ordem": 1
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/produto_image/1
+            name: Listar Imagens de Produto
+            meta:
+              id: req_d85f355d8c374b7a99825fee53e717fc
+              created: 1743943769103
+              modified: 1743944158754
+              isPrivate: false
+              sortKey: -1743943769103
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/produto_imagem/1"
+            name: Remover Imagem de Produto
+            meta:
+              id: req_29d92037fb4d420d9cb058dc0cbb04a4
+              created: 1743943769106
+              modified: 1743943769106
+              isPrivate: false
+              sortKey: -1743943769106
+            method: DELETE
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
     id: jar_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1706532558533
-    modified: 1743169435415
+    modified: 1740741957399
   cookies:
     - key: JSESSIONID
       value: A9720FF77E9F05B738F4E14CFF81F4F9
@@ -712,7 +1055,7 @@ cookieJar:
       hostOnly: true
       creation: 2024-04-18T13:37:19.220Z
       lastAccessed: 2024-04-18T13:37:19.220Z
-      id: 7fa98f99-fc11-410d-a91e-0d9350afb32b
+      id: 238341de-fe83-409d-89b6-8ea3d45381ea
     - key: JSESSIONID
       value: A9720FF77E9F05B738F4E14CFF81F4F9.cge_prodesk_04
       domain: localhost
@@ -720,7 +1063,7 @@ cookieJar:
       hostOnly: true
       creation: 2024-05-07T12:53:39.132Z
       lastAccessed: 2024-05-07T12:53:39.132Z
-      id: 56abeadd-3145-4746-bca2-52e054ce26ac
+      id: eb1d357b-f366-4f8c-8d70-2c98504b6fce
     - key: csrftoken
       value: Bg7E5xJo9h2SITjrBzFuDqGzwzIRaLQs
       maxAge: 31449600
@@ -730,7 +1073,7 @@ cookieJar:
       creation: 2024-10-22T11:27:47.051Z
       lastAccessed: 2024-10-22T11:32:33.614Z
       sameSite: lax
-      id: 22b26271-440a-4aed-af8c-0096c47ea107
+      id: c1898701-e35a-4452-a4bb-cd3a71173b85
     - key: access_token
       value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwNzQ1NTU3LCJpYXQiOjE3NDA3NDE5NTcsImp0aSI6ImJkNDlhODE3NDZjMzRmOWU5NmI3N2RjNDFkY2VhYWUxIiwidXNlcl9pZCI6MX0.YuBuM6JDYx_fP1O78GtLv07MC5RYinHzZ7QhSragFtw
       domain: 127.0.0.1
@@ -741,15 +1084,7 @@ cookieJar:
       creation: 2025-02-26T14:25:01.225Z
       lastAccessed: 2025-02-28T11:25:57.398Z
       sameSite: strict
-      id: a17a3a42-e4c5-40bd-be36-6078dc07c276
-    - key: JSESSIONID
-      value: atiseip-app1
-      domain: sei.pi.gov.br
-      path: /
-      hostOnly: true
-      creation: 2025-03-28T13:43:55.414Z
-      lastAccessed: 2025-03-28T13:43:55.414Z
-      id: a75c7533-6672-4802-9341-539c572faa03
+      id: 9792fe01-2a7c-4ce7-ad97-8656462388d4
 environments:
   name: Base Environment
   meta:
@@ -771,6 +1106,26 @@ environments:
         senha: fab231282aila
         orgao: CGE-PI
         token: ZDczODQ4OTk5YmM3NzVmYjU5NzQwNmM0NGQwN2MzYjZhNGNiYjhhZmJWbzJaR3h3TmxKclNrOVhhbG8yTDI1S2FXRXdXU3RYTUZwcFVXbGtSMlJxVVQwOWZIeHRXalprZW1ONlQzcGpaazV1Y0dGVWJtYzlQWHg4Tlh4OA==
+    - name: sei
+      meta:
+        id: env_eaeb2bb7c5c14aa8b13af6fc2fc71567
+        created: 1738587953534
+        modified: 1739269571582
+        isPrivate: false
+        sortKey: 1738587953534
+      data:
+        base_url: https://dev.api.sead.pi.gov.br/sei/v1
+        usuario: fabianolira@cge.pi.gov.br
+        senha: fab231282aila
+        orgao: CGE-PI
+        token: ZDczODQ4OTk5YmM3NzVmYjU5NzQwNmM0NGQwN2MzYjZhNGNiYjhhZmJWbzJaR3h3TmxKclNrOVhhbG8yTDI1S2FXRXdXU3RYTUZwcFVXbGtSMlJxVVQwOWZIeHRXalprZW1ONlQzcGpaazV1Y0dGVWJtYzlQWHg4Tlh4OA==
+    - name: New Environment
+      meta:
+        id: env_9cba6a1351b14a42be6b98a95675ad12
+        created: 1740652674567
+        modified: 1740652674567
+        isPrivate: false
+        sortKey: 1740652674567
     - name: New Environment
       meta:
         id: env_d3ec1e6bf3df43a1be17bdcda87cf59e

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-from app.core.config import SECRET_KEY, ALGORITHM
+from app.core.config import settings
+from app.core.security import SECRET_KEY, ALGORITHM
+
 
 def criar_token_jwt(dados: dict, tempo_expiracao: int = 60):
     """Gera um token JWT válido por `tempo_expiracao` minutos."""

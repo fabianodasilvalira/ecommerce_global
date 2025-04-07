@@ -12,8 +12,7 @@ from app.services.categoria_service import (
     inativar_categoria_e_atualizar_produtos
 )
 
-router = APIRouter(prefix="/categorias", tags=["categorias"])
-
+router = APIRouter()
 @router.post("/", response_model=CategoriaResponse)
 async def criar_categoria_endpoint(categoria: CategoriaCreate, db: Session = Depends(get_db)):
     return criar_categoria(db, categoria)

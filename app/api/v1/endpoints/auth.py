@@ -35,7 +35,7 @@ class UserCreate(BaseModel):
 
     @validator("cpf_cnpj")
     def validar_cpf_cnpj(cls, value):
-        value = re.sub(r"\D", "", value)  # Remove caracteres não numéricos
+        value = re.sub(r"\D", "", value)
         if len(value) == 11 and CPF().validate(value):
             return value
         elif len(value) == 14 and CNPJ().validate(value):
@@ -44,7 +44,7 @@ class UserCreate(BaseModel):
 
     @validator("telefone")
     def validar_telefone(cls, value):
-        if not re.fullmatch(r"^\d{10,11}$", value):  # Aceita 10 ou 11 dígitos
+        if not re.fullmatch(r"^\d{10,11}$", value):
             raise ValueError("Telefone inválido. Use apenas números (DDD + número)")
         return value
 
@@ -73,11 +73,9 @@ class TokenRefresh(BaseModel):
 @router.post("/register", response_model=TokenSchema)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        # 🔹 Verifica se o e-mail já existe
         if db.query(Usuario).filter(Usuario.email == user.email).first():
             raise HTTPException(status_code=400, detail="E-mail já cadastrado")
 
-        # 🔹 Verifica se o CPF/CNPJ já existe
         if db.query(Usuario).filter(Usuario.cpf_cnpj == user.cpf_cnpj).first():
             raise HTTPException(status_code=400, detail="CPF/CNPJ já cadastrado")
 
@@ -95,14 +93,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
 
-        # Gera tokens
+        # ✅ Usa o ID do usuário como `sub` no token
         access_token = create_access_token(
-            data={"sub": db_user.email},
+            data={"sub": str(db_user.id)},
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
-        refresh_token = create_refresh_token(data={"sub": db_user.email})
+        refresh_token = create_refresh_token(data={"sub": str(db_user.id)})
 
-        # Salva o refresh token no banco
         db_user.refresh_token = refresh_token
         db.commit()
 
@@ -121,14 +118,13 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     if not db_user or not verify_password(user.senha, db_user.senha):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-    # Gera tokens
+    # ✅ Usa o ID do usuário no `sub`
     access_token = create_access_token(
-        data={"sub": db_user.email},
+        data={"sub": str(db_user.id)},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    refresh_token = create_refresh_token(data={"sub": db_user.email})
+    refresh_token = create_refresh_token(data={"sub": str(db_user.id)})
 
-    # Atualiza o refresh token no banco
     db_user.refresh_token = refresh_token
     db.commit()
     db.refresh(db_user)
@@ -145,14 +141,13 @@ def refresh_access_token(token_data: TokenRefresh, db: Session = Depends(get_db)
     if not db_user:
         raise HTTPException(status_code=401, detail="Refresh Token inválido")
 
-    # Gera novos tokens
+    # ✅ Usa o ID do usuário no `sub`
     new_access_token = create_access_token(
-        data={"sub": db_user.email},
+        data={"sub": str(db_user.id)},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    new_refresh_token = create_refresh_token(data={"sub": db_user.email})
+    new_refresh_token = create_refresh_token(data={"sub": str(db_user.id)})
 
-    # Atualiza o refresh token no banco
     db_user.refresh_token = new_refresh_token
     db.commit()
     db.refresh(db_user)
@@ -169,7 +164,6 @@ def logout_user(token_data: TokenRefresh, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=401, detail="Refresh Token inválido")
 
-    # Invalida o refresh token
     db_user.refresh_token = None
     db.commit()
     db.refresh(db_user)

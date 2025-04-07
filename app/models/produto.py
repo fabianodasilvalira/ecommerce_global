@@ -26,6 +26,7 @@ class Produto(Base):
     promocoes = relationship("Promocao", back_populates="produto", cascade="all, delete-orphan")
     categoria = relationship("Categoria", back_populates="produtos")
     itens_venda = relationship("ItemVenda", back_populates="produto", cascade="all, delete-orphan")
+    destaque = relationship("ProdutoDestaque", back_populates="produto")
 
     def calcular_preco_final(self):
         """Calcula o preço final do produto baseado na margem de lucro."""
