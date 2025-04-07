@@ -34,19 +34,6 @@ def listar_usuarios(
     return usuario_service.listar_usuarios(db, ativos)
 
 
-# 🔎 Obter usuário por ID
-@router.get("/{usuario_id}", response_model=UsuarioOut)
-def obter_usuario(
-        usuario_id: int,
-        db: Session = Depends(get_db),
-        usuario_logado: Usuario = Depends(obter_usuario_logado)  # Protegido por token
-):
-    usuario = usuario_service.obter_usuario(db, usuario_id)
-    if not usuario:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    return usuario
-
-
 # ✏️ Atualizar usuário (verifica se é o próprio usuário ou ADMIN)
 @router.put("/{usuario_id}", response_model=UsuarioOut)
 def atualizar_usuario(

@@ -30,7 +30,7 @@ class UsuarioUpdate(BaseModel):
     telefone: Optional[str] = None
     tipo_usuario: Optional[TipoUsuarioEnum] = None
     senha: Optional[str] = None
-
+    ativo: Optional[bool]  # 👈 Adicione este campo
 
     class Config:
         orm_mode = True

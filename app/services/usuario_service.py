@@ -59,6 +59,8 @@ def atualizar_usuario(
         usuario.tipo_usuario = dados.tipo_usuario  # Apenas admin pode alterar tipo
     if dados.senha is not None:
         usuario.senha = get_password_hash(dados.senha)
+    if dados.ativo is not None and usuario_logado.tipo_usuario == "admin":
+        usuario.ativo = dados.ativo
 
     db.commit()
     db.refresh(usuario)

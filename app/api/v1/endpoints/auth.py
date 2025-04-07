@@ -118,8 +118,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=TokenSchema)
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(Usuario).filter(Usuario.email == user.email).first()
+
     if not db_user or not verify_password(user.senha, db_user.senha):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+    # 🚫 Verifica se o usuário está inativo
+    if not db_user.ativo:
+        raise HTTPException(status_code=403, detail="Usuário inativo. Acesso negado.")
 
     # ✅ Usa o ID do usuário no `sub`
     access_token = create_access_token(
@@ -136,6 +141,7 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
         access_token=access_token,
         refresh_token=refresh_token
     )
+
 
 # 🔄 Endpoint para renovar o token de acesso
 @router.post("/refresh", response_model=TokenSchema)
