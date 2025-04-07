@@ -1,8 +1,8 @@
-"""cria enum status_venda_enum
+"""criando todas as tabelas
 
-Revision ID: d09dc0d8ed4e
+Revision ID: 13b20b3cb6d0
 Revises: 
-Create Date: 2025-04-06 18:06:03.154876
+Create Date: 2025-04-07 07:39:55.683458
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'd09dc0d8ed4e'
+revision: str = '13b20b3cb6d0'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

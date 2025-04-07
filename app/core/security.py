@@ -53,3 +53,19 @@ def decode_token(token: str) -> dict:
             detail="Token inválido ou expirado",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+# 🚀 Gera tokens com 'sub' automaticamente
+def gerar_tokens(usuario_id: int, tipo_usuario: str = None) -> dict:
+    payload = {"sub": str(usuario_id)}
+    if tipo_usuario:
+        payload["tipo_usuario"] = tipo_usuario
+
+    access_token = create_access_token(data=payload)
+    refresh_token = create_refresh_token(data=payload)
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }

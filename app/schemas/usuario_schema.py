@@ -24,24 +24,20 @@ class UsuarioCreate(UsuarioBase):
 
 
 class UsuarioUpdate(BaseModel):
-    nome: Optional[str]
-    telefone: Optional[str]
-    senha: Optional[str]
+    nome: Optional[str] = None
+    email: Optional[EmailStr] = None
+    cpf_cnpj: Optional[str] = None
+    telefone: Optional[str] = None
+    tipo_usuario: Optional[TipoUsuarioEnum] = None
+    senha: Optional[str] = None
+
 
     class Config:
         orm_mode = True
 
 
-class UsuarioUpdateAdmin(BaseModel):
-    nome: Optional[str]
-    telefone: Optional[str]
-    senha: Optional[str]
-    tipo_usuario: Optional[TipoUsuarioEnum]
-    email: Optional[EmailStr]
-    cpf_cnpj: Optional[str]
-
-    class Config:
-        orm_mode = True
+class UsuarioUpdateAdmin(UsuarioUpdate):
+    pass  # Herda tudo de UsuarioUpdate
 
 
 class UsuarioOut(UsuarioBase):

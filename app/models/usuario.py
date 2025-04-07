@@ -17,9 +17,9 @@ class Usuario(Base):
     nome = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False, index=True)
     senha = Column(String(255), nullable=False)
-    cpf_cnpj = Column(String(20), unique=True, nullable=False)
+    cpf_cnpj = Column(String(20), unique=True, nullable=False, index=True)
     telefone = Column(String(20), nullable=True)
-    tipo_usuario = Column(Enum(TipoUsuarioEnum), nullable=False)
+    tipo_usuario = Column(Enum(TipoUsuarioEnum, native_enum=False), nullable=False)
     refresh_token = Column(String(500), nullable=True)
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -30,3 +30,6 @@ class Usuario(Base):
     vendas = relationship("Venda", back_populates="usuario", cascade="all, delete-orphan")
     avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan")  # Adicionado
     lista_desejos = relationship("ListaDesejos", back_populates="usuario", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Usuario(id={self.id}, email='{self.email}', tipo='{self.tipo_usuario}')>"

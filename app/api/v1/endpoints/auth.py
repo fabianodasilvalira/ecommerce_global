@@ -35,11 +35,14 @@ class UserCreate(BaseModel):
 
     @validator("cpf_cnpj")
     def validar_cpf_cnpj(cls, value):
-        value = re.sub(r"\D", "", value)
-        if len(value) == 11 and CPF().validate(value):
-            return value
-        elif len(value) == 14 and CNPJ().validate(value):
-            return value
+        value = re.sub(r"\D", "", value or "")
+        try:
+            if len(value) == 11 and CPF().validate(value):
+                return value
+            elif len(value) == 14 and CNPJ().validate(value):
+                return value
+        except Exception:
+            pass
         raise ValueError("CPF ou CNPJ inválido")
 
     @validator("telefone")
