@@ -12,22 +12,22 @@ from app.services.estoque_service import (
 
 router = APIRouter()
 
-@router.post("/estoque/", response_model=EstoqueResponse)
+@router.post("/", response_model=EstoqueResponse)
 def adicionar_item_estoque(estoque_data: EstoqueCreate, db: Session = Depends(get_db)):
     return adicionar_estoque(db, estoque_data)
 
-@router.get("/estoque/{produto_id}/produto/", response_model=EstoqueResponse)
+@router.get("/{produto_id}/produto/", response_model=EstoqueResponse)
 def buscar_estoque(produto_id: int, db: Session = Depends(get_db)):
     return obter_estoque(db, produto_id)
 
-@router.get("/estoque/", response_model=list[EstoqueResponse])
+@router.get("/", response_model=list[EstoqueResponse])
 def listar_itens_estoque(db: Session = Depends(get_db)):
     return listar_estoque(db)
 
-@router.put("/estoque/{produto_id}", response_model=EstoqueResponse)
+@router.put("/{produto_id}", response_model=EstoqueResponse)
 def editar_estoque(produto_id: int, estoque_data: EstoqueUpdate, db: Session = Depends(get_db)):
     return atualizar_estoque(db, produto_id, estoque_data)
 
-@router.delete("/estoque/{produto_id}")
+@router.delete("/{produto_id}")
 def remover_item_estoque(produto_id: int, db: Session = Depends(get_db)):
     return deletar_estoque(db, produto_id)

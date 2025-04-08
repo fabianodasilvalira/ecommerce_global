@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
+from app.schemas.produto_schema import ProdutoOut
 
 class CupomCreate(BaseModel):
     codigo: str = Field(..., max_length=50)
@@ -23,3 +26,13 @@ class CupomResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class CupomOut(BaseModel):
+    id: int
+    codigo: str
+    desconto: float
+
+    class Config:
+        orm_mode = True

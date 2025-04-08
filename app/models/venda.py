@@ -1,5 +1,5 @@
 # Adicione no início do arquivo:
-from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, DECIMAL
+from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, DECIMAL, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import Base
@@ -20,6 +20,7 @@ class Venda(Base):
     total = Column(DECIMAL(10, 2), nullable=False, default=0.00)
     status = Column(Enum(StatusVendaEnum, name="status_venda_enum"), nullable=False, default=StatusVendaEnum.PENDENTE)
     data_venda = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+    is_ativo = Column(Boolean, default=True, nullable=False)  # 1 = ativo, 0 = inativo
 
     # Relacionamentos atualizados (usando string references)
     usuario = relationship("Usuario", back_populates="vendas")

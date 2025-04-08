@@ -40,11 +40,10 @@ class UsuarioUpdateAdmin(UsuarioUpdate):
     pass  # Herda tudo de UsuarioUpdate
 
 
-class UsuarioOut(UsuarioBase):
+class UsuarioOut(BaseModel):
     id: int
-    ativo: bool
-    criado_em: datetime
-    atualizado_em: datetime
+    nome: str
+    email: str
 
     class Config:
         orm_mode = True

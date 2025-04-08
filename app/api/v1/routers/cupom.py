@@ -9,7 +9,7 @@ from app.services.cupom_service import criar_cupom, listar_cupons, buscar_cupom_
 router = APIRouter()
 
 
-@router.post("/cupons/", response_model=CupomResponse)
+@router.post("/", response_model=CupomResponse)
 def adicionar_cupom(cupom_data: CupomCreate, db: Session = Depends(get_db)):
     """ Adiciona um novo cupom """
     if buscar_cupom_por_codigo(db, cupom_data.codigo):
@@ -19,7 +19,7 @@ def adicionar_cupom(cupom_data: CupomCreate, db: Session = Depends(get_db)):
 
 
 # ✅ Atualizar cupom por ID
-@router.put("/cupons/{cupom_id}", response_model=CupomResponse)
+@router.put("/{cupom_id}", response_model=CupomResponse)
 def editar_cupom_por_id(cupom_id: int, cupom_data: CupomUpdate, db: Session = Depends(get_db)):
     cupom = atualizar_cupom_por_id(db, cupom_id, cupom_data)
     if not cupom:
@@ -27,7 +27,7 @@ def editar_cupom_por_id(cupom_id: int, cupom_data: CupomUpdate, db: Session = De
     return cupom
 
 # ✅ Atualizar cupom por Código
-@router.put("/cupons/codigo/{codigo}", response_model=CupomResponse)
+@router.put("/codigo/{codigo}", response_model=CupomResponse)
 def editar_cupom_por_codigo(codigo: str, cupom_data: CupomUpdate, db: Session = Depends(get_db)):
     cupom = atualizar_cupom_por_codigo(db, codigo, cupom_data)
     if not cupom:
@@ -35,13 +35,13 @@ def editar_cupom_por_codigo(codigo: str, cupom_data: CupomUpdate, db: Session = 
     return cupom
 
 
-@router.get("/cupons/", response_model=list[CupomResponse])
+@router.get("/", response_model=list[CupomResponse])
 def listar_todos_cupons(db: Session = Depends(get_db)):
     """ Retorna todos os cupons cadastrados """
     return listar_cupons(db)
 
 
-@router.get("/cupons/{codigo}", response_model=CupomResponse)
+@router.get("/{codigo}", response_model=CupomResponse)
 def buscar_cupom(codigo: str, db: Session = Depends(get_db)):
     """ Busca um cupom pelo código """
     cupom = buscar_cupom_por_codigo(db, codigo)
@@ -51,7 +51,7 @@ def buscar_cupom(codigo: str, db: Session = Depends(get_db)):
     return cupom
 
 
-@router.put("/cupons/{cupom_id}/desativar", response_model=CupomResponse)
+@router.put("/{cupom_id}/desativar", response_model=CupomResponse)
 def desativar_cupom_por_id(cupom_id: int, db: Session = Depends(get_db)):
     """ Desativa um cupom existente """
     cupom = desativar_cupom(db, cupom_id)

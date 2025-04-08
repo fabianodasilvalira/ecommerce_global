@@ -25,14 +25,7 @@ class EnderecoOut(BaseModel):
     id: int
     logradouro: str
     numero: str
-    complemento: Optional[str] = None
-    bairro: str
     cidade: str
-    estado: str
-    cep: str
-    ativo: bool
-    criado_em: datetime
-    atualizado_em: datetime
 
     class Config:
         orm_mode = True

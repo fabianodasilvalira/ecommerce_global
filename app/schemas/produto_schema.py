@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -39,3 +41,12 @@ class ProdutoUpdate(BaseModel):
     ativo: Optional[bool] = None
     categoria_id: Optional[int] = None
     margem_lucro: Optional[float] = None
+
+
+class ProdutoOut(BaseModel):
+    id: int
+    nome: str
+    preco_final: Decimal
+
+    class Config:
+        orm_mode = True
