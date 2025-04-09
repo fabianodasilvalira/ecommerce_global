@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS "alembic_version" (
 	PRIMARY KEY ("version_num")
 );
 
--- Copiando dados para a tabela public.alembic_version: 0 rows
+-- Copiando dados para a tabela public.alembic_version: 1 rows
 /*!40000 ALTER TABLE "alembic_version" DISABLE KEYS */;
-INSERT IGNORE INTO "alembic_version" ("version_num") VALUES
-	('13b20b3cb6d0');
+REPLACE INTO "alembic_version" ("version_num") VALUES
+	('xxxxxxxxxxxx');
 /*!40000 ALTER TABLE "alembic_version" ENABLE KEYS */;
 
 -- Copiando estrutura para tabela public.avaliacao
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS "categorias" (
 
 -- Copiando dados para a tabela public.categorias: 0 rows
 /*!40000 ALTER TABLE "categorias" DISABLE KEYS */;
-INSERT IGNORE INTO "categorias" ("id", "nome", "descricao", "imagem_url", "cor_destaque", "ativo") VALUES
+REPLACE INTO "categorias" ("id", "nome", "descricao", "imagem_url", "cor_destaque", "ativo") VALUES
 	(1, 'Feminino', 'Produtos feminino', 'https://example.com/img.jpg', '#ff00ff', 'true');
 /*!40000 ALTER TABLE "categorias" ENABLE KEYS */;
 
@@ -93,9 +93,9 @@ CREATE TABLE IF NOT EXISTS "cupom" (
 	KEY ("id")
 );
 
--- Copiando dados para a tabela public.cupom: 1 rows
+-- Copiando dados para a tabela public.cupom: 0 rows
 /*!40000 ALTER TABLE "cupom" DISABLE KEYS */;
-INSERT IGNORE INTO "cupom" ("id", "codigo", "desconto", "validade", "criado_em", "ativo") VALUES
+REPLACE INTO "cupom" ("id", "codigo", "desconto", "validade", "criado_em", "ativo") VALUES
 	(1, 'DESCONTO10', 20, '2025-12-31 23:59:59', '2025-04-08 12:34:32.562114', 'true');
 /*!40000 ALTER TABLE "cupom" ENABLE KEYS */;
 
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "endereco" (
 
 -- Copiando dados para a tabela public.endereco: 0 rows
 /*!40000 ALTER TABLE "endereco" DISABLE KEYS */;
-INSERT IGNORE INTO "endereco" ("id", "usuario_id", "logradouro", "numero", "complemento", "bairro", "cidade", "estado", "cep", "criado_em", "atualizado_em", "ativo") VALUES
+REPLACE INTO "endereco" ("id", "usuario_id", "logradouro", "numero", "complemento", "bairro", "cidade", "estado", "cep", "criado_em", "atualizado_em", "ativo") VALUES
 	(1, 1, 'Rua das Flores', '123', 'Apto 101', 'Centro', 'Cidade', 'SP', '12345-678', '2025-04-08 12:33:25.601402', '2025-04-08 12:33:25.601402', 'true'),
 	(2, 1, 'Rua das Flores', '123', 'Apto 101', 'Centro', 'Cidade', 'SP', '12345-678', '2025-04-08 12:33:32.715763', '2025-04-08 12:33:32.715763', 'true');
 /*!40000 ALTER TABLE "endereco" ENABLE KEYS */;
@@ -186,9 +186,9 @@ CREATE TABLE IF NOT EXISTS "estoque" (
 
 -- Copiando dados para a tabela public.estoque: 0 rows
 /*!40000 ALTER TABLE "estoque" DISABLE KEYS */;
-INSERT IGNORE INTO "estoque" ("id", "produto_id", "quantidade", "criado_em", "atualizado_em") VALUES
+REPLACE INTO "estoque" ("id", "produto_id", "quantidade", "criado_em", "atualizado_em") VALUES
 	(1, 1, 15, '2025-04-08 12:44:05.967641', '2025-04-08 13:03:18.926516'),
-	(2, 2, 13, '2025-04-08 13:02:29.699748', '2025-04-08 13:14:52.646332');
+	(2, 2, 8, '2025-04-08 13:02:29.699748', '2025-04-09 09:14:01.512676');
 /*!40000 ALTER TABLE "estoque" ENABLE KEYS */;
 
 -- Copiando estrutura para tabela public.historico_pagamento
@@ -223,12 +223,17 @@ CREATE TABLE IF NOT EXISTS "item_venda" (
 	CONSTRAINT "item_venda_venda_id_fkey" FOREIGN KEY ("venda_id") REFERENCES "venda" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Copiando dados para a tabela public.item_venda: 3 rows
+-- Copiando dados para a tabela public.item_venda: 0 rows
 /*!40000 ALTER TABLE "item_venda" DISABLE KEYS */;
-INSERT IGNORE INTO "item_venda" ("id", "venda_id", "produto_id", "quantidade", "preco_unitario", "criado_em", "atualizado_em") VALUES
+REPLACE INTO "item_venda" ("id", "venda_id", "produto_id", "quantidade", "preco_unitario", "criado_em", "atualizado_em") VALUES
 	(8, 8, 2, 1, 1000, '2025-04-08 13:12:13.789921', '2025-04-08 13:12:13.789921'),
 	(9, 9, 2, 1, 1125, '2025-04-08 13:14:37.704266', '2025-04-08 13:14:37.704266'),
-	(10, 10, 2, 1, 1000, '2025-04-08 13:14:52.646332', '2025-04-08 13:14:52.646332');
+	(10, 10, 2, 1, 1000, '2025-04-08 13:14:52.646332', '2025-04-08 13:14:52.646332'),
+	(11, 11, 2, 1, 1250, '2025-04-09 08:18:24.211126', '2025-04-09 08:18:24.211126'),
+	(12, 12, 2, 1, 1162.5, '2025-04-09 08:25:22.358891', '2025-04-09 08:25:22.358891'),
+	(13, 13, 2, 1, 1500, '2025-04-09 09:02:24.333565', '2025-04-09 09:02:24.333565'),
+	(14, 14, 2, 1, 1125, '2025-04-09 09:12:48.268364', '2025-04-09 09:12:48.268364'),
+	(15, 15, 2, 1, 999.99, '2025-04-09 09:14:01.512676', '2025-04-09 09:14:01.512676');
 /*!40000 ALTER TABLE "item_venda" ENABLE KEYS */;
 
 -- Copiando estrutura para tabela public.lista_desejos
@@ -305,7 +310,7 @@ CREATE TABLE IF NOT EXISTS "produto" (
 
 -- Copiando dados para a tabela public.produto: 0 rows
 /*!40000 ALTER TABLE "produto" DISABLE KEYS */;
-INSERT IGNORE INTO "produto" ("id", "sku", "nome", "descricao", "preco", "volume", "unidade_medida", "ativo", "categoria_id", "margem_lucro", "preco_final") VALUES
+REPLACE INTO "produto" ("id", "sku", "nome", "descricao", "preco", "volume", "unidade_medida", "ativo", "categoria_id", "margem_lucro", "preco_final") VALUES
 	(1, 'FAB-FEM-7071', 'fabio', 'Notbook com GPU dedicada', 5999.90, NULL, NULL, 'true', 1, 20.00, 7199.88),
 	(2, 'CSA-FEM-1019', 'csa', 'casa com GPU dedicada', 1000.00, NULL, NULL, 'true', 1, 25.00, 1250.00);
 /*!40000 ALTER TABLE "produto" ENABLE KEYS */;
@@ -361,8 +366,10 @@ CREATE TABLE IF NOT EXISTS "promocao" (
 	CONSTRAINT "check_preco_promocional" CHECK ((((preco_promocional IS NULL) OR (preco_promocional > (0)::numeric))))
 );
 
--- Copiando dados para a tabela public.promocao: 0 rows
+-- Copiando dados para a tabela public.promocao: 1 rows
 /*!40000 ALTER TABLE "promocao" DISABLE KEYS */;
+REPLACE INTO "promocao" ("id", "produto_id", "desconto_percentual", "preco_promocional", "data_inicio", "data_fim", "ativo", "criado_em") VALUES
+	(1, 2, NULL, 999.99, '2025-04-06 00:00:00', '2025-06-06 23:59:59', 'true', '2025-04-09 07:44:12.063218');
 /*!40000 ALTER TABLE "promocao" ENABLE KEYS */;
 
 -- Copiando estrutura para tabela public.rastreamento_entrega
@@ -402,9 +409,9 @@ CREATE TABLE IF NOT EXISTS "usuario" (
 
 -- Copiando dados para a tabela public.usuario: 0 rows
 /*!40000 ALTER TABLE "usuario" DISABLE KEYS */;
-INSERT IGNORE INTO "usuario" ("id", "nome", "email", "senha", "cpf_cnpj", "telefone", "tipo_usuario", "refresh_token", "criado_em", "atualizado_em", "ativo") VALUES
+REPLACE INTO "usuario" ("id", "nome", "email", "senha", "cpf_cnpj", "telefone", "tipo_usuario", "refresh_token", "criado_em", "atualizado_em", "ativo") VALUES
 	(2, 'João Silva', 'anovos@email.com', '$2b$12$CsbhRIoTLIM113JsIb5FyekD8vwonRQgcRf/ccmOZgUeOF7ia9QFS', '123.456.789-09', '11987654321', 'ADMIN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzQ0NjM0MjI5fQ.nvEkCGEZobDbUhnU1vByej6bLILGH8Hmn7vzVu4Wm-o', '2025-04-07 07:51:18.103978', '2025-04-07 10:04:37.187244', 'true'),
-	(1, 'Novo Nomes', 'josao@email.com', '$2b$12$cCBSRsJpH0s9ls/JeyIfRuKVCHJPrICaM7ytgeyhfp0aDHzKlRJNi', '12345678909', '11999999999s2', 'ADMIN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0NzM0MzY4fQ.QWXkzoz-27sQRbbvdLhTuWW1yRiaeAmXr03CgusgigA', '2025-04-07 07:40:56.228734', '2025-04-08 13:26:08.547009', 'true');
+	(1, 'Novo Nomes', 'josao@email.com', '$2b$12$cCBSRsJpH0s9ls/JeyIfRuKVCHJPrICaM7ytgeyhfp0aDHzKlRJNi', '12345678909', '11999999999s2', 'ADMIN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0ODA1NDUzfQ.QWl3QWoJM6v7Tm9CscL0J5ogBxMkNqSGUP8H-Ef0Vro', '2025-04-07 07:40:56.228734', '2025-04-09 09:10:53.592139', 'true');
 /*!40000 ALTER TABLE "usuario" ENABLE KEYS */;
 
 -- Copiando estrutura para tabela public.venda
@@ -417,6 +424,9 @@ CREATE TABLE IF NOT EXISTS "venda" (
 	"status" UNKNOWN NOT NULL,
 	"data_venda" TIMESTAMP NOT NULL DEFAULT now(),
 	"is_ativo" BOOLEAN NULL DEFAULT true,
+	"valor_total_bruto" NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+	"valor_desconto" NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+	"tipo_desconto" UNKNOWN NOT NULL,
 	PRIMARY KEY ("id"),
 	KEY ("id"),
 	CONSTRAINT "venda_cupom_id_fkey" FOREIGN KEY ("cupom_id") REFERENCES "cupom" ("id") ON UPDATE NO ACTION ON DELETE SET NULL,
@@ -424,19 +434,17 @@ CREATE TABLE IF NOT EXISTS "venda" (
 	CONSTRAINT "venda_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuario" ("id") ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
--- Copiando dados para a tabela public.venda: 0 rows
+-- Copiando dados para a tabela public.venda: 8 rows
 /*!40000 ALTER TABLE "venda" DISABLE KEYS */;
-INSERT IGNORE INTO "venda" ("id", "usuario_id", "endereco_id", "cupom_id", "total", "status", "data_venda", "is_ativo") VALUES
-	(1, 1, 1, 1, 10799.82, 'PENDENTE', '2025-04-08 12:51:50.670434', 'true'),
-	(2, 1, 1, 1, 10799.82, 'PENDENTE', '2025-04-08 12:53:42.413455', 'true'),
-	(3, 1, 1, 1, 5399.91, 'PENDENTE', '2025-04-08 13:03:18.926516', 'true'),
-	(4, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:03:29.679711', 'true'),
-	(5, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:08:04.923645', 'true'),
-	(6, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:11:16.039655', 'true'),
-	(7, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:11:19.780273', 'true'),
-	(8, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:12:13.789921', 'true'),
-	(9, 1, 1, 1, 1125.00, 'PENDENTE', '2025-04-08 13:14:37.704266', 'true'),
-	(10, 1, 1, 1, 1000.00, 'PENDENTE', '2025-04-08 13:14:52.646332', 'true');
+REPLACE INTO "venda" ("id", "usuario_id", "endereco_id", "cupom_id", "total", "status", "data_venda", "is_ativo", "valor_total_bruto", "valor_desconto", "tipo_desconto") VALUES
+	(8, 1, 1, 1, 900.00, 'PENDENTE', '2025-04-08 13:12:13.789921', 'true', 0.00, 0.00, 'NENHUM'),
+	(9, 1, 1, 1, 1125.00, 'PENDENTE', '2025-04-08 13:14:37.704266', 'true', 0.00, 0.00, 'NENHUM'),
+	(10, 1, 1, 1, 1000.00, 'PENDENTE', '2025-04-08 13:14:52.646332', 'true', 0.00, 0.00, 'NENHUM'),
+	(11, 1, 1, NULL, 1250.00, 'PENDENTE', '2025-04-09 08:18:24.211126', 'true', 0.00, 0.00, 'NENHUM'),
+	(12, 1, 1, NULL, 1162.50, 'PENDENTE', '2025-04-09 08:25:22.358891', 'true', 0.00, 0.00, 'NENHUM'),
+	(13, 1, 1, NULL, 1500.00, 'PENDENTE', '2025-04-09 09:02:24.333565', 'true', 1250.00, -250.00, 'PROMOCAO'),
+	(14, 1, 1, NULL, 1125.00, 'PENDENTE', '2025-04-09 09:12:48.268364', 'true', 1250.00, 125.00, 'PROMOCAO'),
+	(15, 1, 1, NULL, 999.99, 'PENDENTE', '2025-04-09 09:14:01.512676', 'true', 1250.00, 250.01, 'PROMOCAO');
 /*!40000 ALTER TABLE "venda" ENABLE KEYS */;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

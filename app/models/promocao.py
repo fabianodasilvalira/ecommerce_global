@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, 
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
+from datetime import datetime
 
 class Promocao(Base):
     __tablename__ = "promocao"
@@ -23,9 +24,7 @@ class Promocao(Base):
         CheckConstraint("data_fim > data_inicio", name="check_datas_promocao"),
     )
 
-    @property
-    def esta_ativa(self):
+    def esta_ativa(self) -> bool:
         """Verifica se a promoção está ativa considerando o período e status."""
-        return (self.ativo and
-                self.data_inicio <= func.now() and
-                self.data_fim >= func.now())
+        agora = datetime.utcnow()
+        return self.ativo and self.data_inicio <= agora <= self.data_fim

@@ -24,7 +24,7 @@ class ItemVendaCreate(BaseModel):
 
 class VendaCreate(BaseModel):
     endereco_id: Optional[int]
-    cupom_id: Optional[int]
+    cupom_id: Optional[int] = None  # ✅ Torna opcional
     itens: List[ItemVendaCreate]
 
 

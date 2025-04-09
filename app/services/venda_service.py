@@ -1,34 +1,42 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session, load_only, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
-from decimal import Decimal
-from sqlalchemy.orm import joinedload
-from app.models import Usuario, ItemVenda
-from app.models import Produto
-from app.models import Cupom
-from app.models.venda import StatusVendaEnum, Venda
+from decimal import Decimal, ROUND_HALF_UP
+
+from app.models import Usuario, ItemVenda, Produto, Cupom
+from app.models.venda import StatusVendaEnum, Venda, TipoDescontoEnum
 from app.schemas.venda_schema import VendaCreate
 
 
-def criar_venda(db: Session, venda: VendaCreate, usuario: Usuario) -> Venda:
+def produto_possui_promocao_ativa(produto: Produto) -> bool:
+    agora = datetime.now()
+    return any(p.ativo and p.data_inicio <= agora <= p.data_fim for p in produto.promocoes)
+
+
+def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
     try:
         nova_venda = Venda(
             usuario_id=usuario.id,
             endereco_id=venda.endereco_id,
             cupom_id=venda.cupom_id,
-            status=StatusVendaEnum.PENDENTE
+            status=StatusVendaEnum.PENDENTE.value,
         )
 
-        total_venda = Decimal("0.00")
+        total_bruto = Decimal("0.00")
+        total_com_desconto = Decimal("0.00")
+        valor_desconto = Decimal("0.00")
+        tipo_desconto = TipoDescontoEnum.NENHUM.value
         desconto_percentual = Decimal("0.00")
 
-        # Validação e cálculo do cupom
         if venda.cupom_id:
             cupom = db.query(Cupom).filter(Cupom.id == venda.cupom_id).first()
             if not cupom:
                 raise HTTPException(status_code=404, detail="Cupom não encontrado.")
             if cupom.desconto:
                 desconto_percentual = Decimal(str(cupom.desconto)) / Decimal("100.00")
+                tipo_desconto = TipoDescontoEnum.CUPOM.value
 
         for item in venda.itens:
             produto = (
@@ -47,29 +55,46 @@ def criar_venda(db: Session, venda: VendaCreate, usuario: Usuario) -> Venda:
             if not produto:
                 raise HTTPException(status_code=404, detail=f"Produto ID {item.produto_id} não encontrado.")
 
-            if not produto.estoque:
-                raise HTTPException(status_code=400, detail=f"Produto '{produto.nome}' está sem estoque cadastrado.")
-
-            if produto.estoque.quantidade < item.quantidade:
+            if not produto.estoque or produto.estoque.quantidade < item.quantidade:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Estoque insuficiente para '{produto.nome}'. Quantidade disponível: {produto.estoque.quantidade}."
+                    detail=f"Estoque insuficiente para '{produto.nome}'. Quantidade disponível: {produto.estoque.quantidade if produto.estoque else 0}."
                 )
 
-            # Validação: se cupom está presente, não pode ter promoção ativa
-            if venda.cupom_id and produto.promocoes:
-                for promocao in produto.promocoes:
-                    if promocao.ativo and promocao.data_inicio <= datetime.now() <= promocao.data_fim:
-                        raise HTTPException(
-                            status_code=400,
-                            detail=f"Produto '{produto.nome}' está com promoção ativa. Não é permitido usar cupom junto com promoção."
-                        )
+            if venda.cupom_id and produto.promocoes and produto_possui_promocao_ativa(produto):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Produto '{produto.nome}' está com promoção ativa. Não é permitido usar cupom junto com promoção."
+                )
 
-            preco_com_desconto = produto.preco_final * (Decimal("1.00") - desconto_percentual)
-            preco_unitario = preco_com_desconto.quantize(Decimal("0.01"))
+            preco_bruto = Decimal(str(produto.preco_final))
+            preco_unitario = preco_bruto
 
-            subtotal = preco_unitario * item.quantidade
-            total_venda += subtotal
+            if produto.promocoes and produto_possui_promocao_ativa(produto):
+                promocao = produto.promocoes[0]
+                tipo_desconto = TipoDescontoEnum.PROMOCAO.value
+
+                if promocao.preco_promocional is not None:
+                    preco_unitario = Decimal(str(promocao.preco_promocional))
+                elif promocao.desconto_percentual is not None:
+                    percentual = Decimal(str(promocao.desconto_percentual)) / Decimal("100.00")
+                    preco_unitario = preco_bruto * (Decimal("1.00") - percentual)
+                else:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Produto '{produto.nome}' está com promoção ativa, mas sem valor de desconto válido (nem preço promocional, nem percentual)."
+                    )
+
+            elif desconto_percentual > 0:
+                preco_unitario = preco_bruto * (Decimal("1.00") - desconto_percentual)
+
+            preco_unitario = preco_unitario.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            subtotal_bruto = preco_bruto * item.quantidade
+            subtotal_com_desconto = preco_unitario * item.quantidade
+
+            total_bruto += subtotal_bruto
+            total_com_desconto += subtotal_com_desconto
 
             item_venda = ItemVenda(
                 produto_id=produto.id,
@@ -78,11 +103,14 @@ def criar_venda(db: Session, venda: VendaCreate, usuario: Usuario) -> Venda:
             )
 
             nova_venda.itens.append(item_venda)
-
-            # Atualiza estoque
             produto.estoque.quantidade -= item.quantidade
 
-        nova_venda.total = total_venda.quantize(Decimal("0.01"))
+        valor_desconto = (total_bruto - total_com_desconto).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        nova_venda.valor_total_bruto = total_bruto.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        nova_venda.total = total_com_desconto.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        nova_venda.valor_desconto = valor_desconto
+        nova_venda.tipo_desconto = tipo_desconto
 
         db.add(nova_venda)
         db.commit()
@@ -92,7 +120,7 @@ def criar_venda(db: Session, venda: VendaCreate, usuario: Usuario) -> Venda:
 
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Erro ao processar venda no banco de dados: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar venda: {str(e)}")
 
 
 def cancelar_venda(db: Session, venda_id: int, usuario: Usuario):
@@ -129,8 +157,6 @@ def listar_vendas_usuario(db: Session, usuario: Usuario):
         raise HTTPException(status_code=500, detail=f"Erro ao listar vendas: {str(e)}")
 
 
-
-
 def detalhar_venda(db: Session, venda_id: int, usuario: Usuario):
     try:
         venda = (
@@ -146,8 +172,6 @@ def detalhar_venda(db: Session, venda_id: int, usuario: Usuario):
         )
         if not venda:
             raise HTTPException(status_code=404, detail="Venda não encontrada.")
-        return venda  # vai retornar com todos os relacionamentos carregados
+        return venda
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Erro ao detalhar venda: {str(e)}")
-
-

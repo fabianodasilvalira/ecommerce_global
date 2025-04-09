@@ -13,27 +13,22 @@ from app.schemas.promocao_schema import PromocaoCreate, PromocaoResponse, Promoc
 
 router = APIRouter()
 
-# Criar uma nova promoção
 @router.post("/", response_model=PromocaoResponse)
 def criar_promocao(promocao: PromocaoCreate, db: Session = Depends(get_db)):
     return criar_promocao_service(db, promocao)
 
-# Listar todas as promoções ativas
 @router.get("/", response_model=List[PromocaoResponse])
 def listar_promocoes_ativas(db: Session = Depends(get_db)):
     return listar_promocoes_ativas_service(db)
 
-# Buscar promoção por ID
 @router.get("/{promocao_id}", response_model=PromocaoResponse)
 def buscar_promocao(promocao_id: int, db: Session = Depends(get_db)):
     return buscar_promocao_service(db, promocao_id)
 
-# Editar uma promoção
 @router.put("/{promocao_id}/editar", response_model=PromocaoResponse)
 def editar_promocao(promocao_id: int, update_data: PromocaoUpdate, db: Session = Depends(get_db)):
     return editar_promocao_service(db, promocao_id, update_data)
 
-# Inativar uma promoção
 @router.put("/{promocao_id}/inativar", response_model=PromocaoResponse)
 def inativar_promocao(promocao_id: int, db: Session = Depends(get_db)):
     return inativar_promocao_service(db, promocao_id)

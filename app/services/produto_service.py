@@ -5,6 +5,8 @@ from app.models.produto import Produto
 from app.models.categoria import Categoria
 from app.schemas.produto_schema import ProdutoResponse, ProdutoCreate
 from app.models.promocao import Promocao
+from datetime import datetime  # ✅ Importado para verificar data atual
+
 
 import random
 import string
