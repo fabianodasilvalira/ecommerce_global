@@ -27,6 +27,8 @@ class ProdutoResponse(BaseModel):
     categoria_id: int
     margem_lucro: float
     preco_final: float  # Preço final já calculado
+    preco_com_promocao: Optional[Decimal]  # <- Adiciona isso aqui
+
 
     class Config:
         from_attributes = True  # ✅ Correção para Pydantic v2

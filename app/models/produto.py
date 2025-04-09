@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, Float, Boolean
 from sqlalchemy.orm import relationship
 from decimal import Decimal
+from datetime import datetime
 
 from app.db.database import Base
 
@@ -38,5 +39,22 @@ class Produto(Base):
         """Atualiza o campo preco_final no banco de dados."""
         self.preco_final = self.calcular_preco_final()
 
+    @property
+    def preco_com_promocao(self):
+        """Retorna o preço com promoção, se houver uma ativa."""
+        agora = datetime.utcnow()
+        promocao_ativa = next(
+            (promo for promo in self.promocoes if promo.ativo and promo.data_inicio <= agora <= promo.data_fim),
+            None
+        )
+
+        if promocao_ativa:
+            if promocao_ativa.preco_promocional:
+                return promocao_ativa.preco_promocional
+            elif promocao_ativa.desconto_percentual:
+                desconto = self.preco_final * (promocao_ativa.desconto_percentual / Decimal(100))
+                return self.preco_final - desconto
+
+        return self.preco_final  # Sem promoção
     def __repr__(self):
         return f"<Produto(id={self.id}, nome='{self.nome}', sku='{self.sku}')>"

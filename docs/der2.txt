@@ -1,0 +1,104 @@
++---------------------+       +---------------------+       +---------------------+
+|      USUARIO        |       |     ENTREGADOR      |       |      ENDERECO       |
++---------------------+       +---------------------+       +---------------------+
+| PK: id              |------>| PK,FK: usuario_id   |<------| PK: id              |
+|     nome            |       |     cnh             |       | FK: usuario_id      |
+|     email           |       |     veiculo         |       |     cep             |
+|     senha           |       |     status          |       |     logradouro      |
+|     tipo            |       +---------------------+       |     cidade          |
+|     data_cadastro   |               ^                    +---------------------+
++---------------------+               |                             ^
+       |                              |                             |
+       |                              |                             |
+       v                              |                             |
++---------------------+               |                             |
+|      VENDA          |               |                             |
++---------------------+               |                             |
+| PK: id              |               |                             |
+| FK: usuario_id      |               |                             |
+| FK: endereco_id     |               |                             |
+|     data            |               |                             |
+|     status          |               |                             |
+|     valor_total     |               |                             |
++---------------------+               |                             |
+       |                              |                             |
+       |                              |                             |
+       v                              |                             |
++---------------------+       +---------------------+       +---------------------+
+|    ITEMVENDA        |       |     PRODUTO         |       |     CATEGORIA       |
++---------------------+       +---------------------+       +---------------------+
+| PK: id              |------>| PK: id              |<------| PK: id              |
+| FK: venda_id        |       | FK: categoria_id    |       |     nome            |
+| FK: produto_id      |       |     nome            |       |     descricao       |
+|     quantidade      |       |     descricao       |       +---------------------+
+|     preco_unitario  |       |     preco           |               ^
+|     desconto        |       |     estoque_atual   |               |
++---------------------+       +---------------------+               |
+       ^                              ^                             |
+       |                              |                             |
+       |                              v                             |
++---------------------+       +---------------------+               |
+|   LISTADESEJOS      |       |   PRODUTO_IMAGEM    |               |
++---------------------+       +---------------------+               |
+| PK: id              |       | PK: id              |               |
+| FK: usuario_id      |       | FK: produto_id      |               |
+| FK: produto_id      |       |     url             |               |
+|     data_adicao     |       |     ordem           |               |
++---------------------+       +---------------------+               |
+       ^                                                           |
+       |                                                           |
++---------------------+                                  +---------------------+
+|    AVALIACAO        |                                  |  CATEGORIA_IMAGEM   |
++---------------------+                                  +---------------------+
+| PK: id              |                                  | PK: id              |
+| FK: usuario_id      |                                  | FK: categoria_id    |
+| FK: produto_id      |                                  |     url             |
+|     nota            |                                  |     ordem           |
+|     comentario      |                                  +---------------------+
+|     data            |
++---------------------+
+
++---------------------+       +---------------------+       +---------------------+
+|      ESTOQUE        |       | MOVIMENTACAO_ESTOQUE|       |    PROMOCAO         |
++---------------------+       +---------------------+       +---------------------+
+| PK: id              |<------| PK: id              |       | PK: id              |
+| FK: produto_id      |       | FK: estoque_id      |       | FK: produto_id      |
+|     quantidade      |       |     tipo            |       |     desconto        |
+|     estoque_minimo  |       |     quantidade      |       |     data_inicio     |
++---------------------+       |     data            |       |     data_fim        |
+                             |     motivo          |       |     ativo           |
+                             +---------------------+       +---------------------+
+
++---------------------+       +---------------------+       +---------------------+
+|     PAGAMENTO       |       |HISTORICO_PAGAMENTO  |       |      ENTREGA        |
++---------------------+       +---------------------+       +---------------------+
+| PK: id              |------>| PK: id              |<------| PK: id              |
+| FK: venda_id        |       | FK: pagamento_id    |       | FK: venda_id        |
+|     metodo          |       |     status          |       | FK: entregador_id   |
+|     valor           |       |     data            |       |     status          |
+|     status          |       |     detalhes        |       |     data_prevista   |
+|     data            |       +---------------------+       |     data_entrega    |
++---------------------+                                    +---------------------+
+                                                                  |
+                                                                  |
+                                                                  v
++---------------------+       +---------------------+       +---------------------+
+| ENTREGA_CANDIDATO   |       |RASTREAMENTO_ENTREGA |       |    PRODUTO_DESTAQUE |
++---------------------+       +---------------------+       +---------------------+
+| PK: id              |<------| PK: id              |       | PK: id              |
+| FK: entrega_id      |       | FK: entrega_id      |       | FK: produto_id      |
+| FK: entregador_id   |       |     localizacao     |       |     posicao         |
+|     status          |       |     data            |       |     data_inicio     |
+|     data_candidatura|       |     status          |       |     data_fim        |
++---------------------+       +---------------------+       +---------------------+
+
++---------------------+
+|       CUPOM         |
++---------------------+
+| PK: id              |
+|     codigo          |
+|     desconto        |
+|     data_validade   |
+|     usos_maximos    |
+|     usos_atual      |
++---------------------+
