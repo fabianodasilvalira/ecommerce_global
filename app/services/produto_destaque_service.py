@@ -1,21 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from typing import List
 
-from app.db.database import get_db
-from app.schemas.produto_destaque import ProdutoDestaqueCreate, ProdutoDestaqueResponse
-from app.services import produto_destaque_service as service
+from sqlalchemy.orm import Session, joinedload
 
-router = APIRouter()
+from app.models import ProdutoDestaque
+from app.schemas.produto_destaque_schema import ProdutoDestaqueCreate, ProdutoDestaqueResponse
 
-@router.post("/", response_model=ProdutoDestaqueResponse)
-def adicionar_destaque(destaque: ProdutoDestaqueCreate, db: Session = Depends(get_db)):
-    return service.adicionar_produto_destaque(db, destaque)
 
-@router.delete("/{produto_id}", status_code=204)
-def remover_destaque(produto_id: int, db: Session = Depends(get_db)):
-    if not service.remover_produto_destaque(db, produto_id):
-        raise HTTPException(status_code=404, detail="Produto destaque não encontrado")
+def listar_destaques(db: Session) -> List[ProdutoDestaqueResponse]:
+    destaques = db.query(ProdutoDestaque).options(joinedload(ProdutoDestaque.produto)).all()
+    return [ProdutoDestaqueResponse.model_validate(d) for d in destaques]
 
-@router.get("/", response_model=list[ProdutoDestaqueResponse])
-def listar_destaques(db: Session = Depends(get_db)):
-    return service.listar_destaques(db)
+def criar_destaque(db: Session, dados: ProdutoDestaqueCreate):
+    destaque = ProdutoDestaque(produto_id=dados.produto_id)
+    db.add(destaque)
+    db.commit()
+    db.refresh(destaque)
+    return destaque
+
+def remover_destaque(db: Session, id: int):
+    destaque = db.query(ProdutoDestaque).filter(ProdutoDestaque.id == id).first()
+    if destaque:
+        db.delete(destaque)
+        db.commit()
+        return True
+    return False

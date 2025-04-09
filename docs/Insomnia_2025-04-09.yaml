@@ -11,12 +11,6 @@ collection:
       created: 1738587841691
       modified: 1738681966180
       sortKey: -1738587841691
-  - name: leitura_facil
-    meta:
-      id: fld_d6b2fe7ab7774edcaf9ed514d1f5cdb4
-      created: 1738681938204
-      modified: 1738681964695
-      sortKey: -1738681938204
   - name: Curso Alura
     meta:
       id: fld_8093b6fb7d3545488c069f7fe97986dd
@@ -35,12 +29,6 @@ collection:
       created: 1743168289512
       modified: 1743168289512
       sortKey: -1743168289512
-  - name: SeiService
-    meta:
-      id: fld_12cd62821c4440a9b176536647b1404a
-      created: 1743169396300
-      modified: 1743169396300
-      sortKey: -1743169387255
   - name: SeiService
     meta:
       id: fld_62934b1c0b224889b896099b6d490314
@@ -697,6 +685,18 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
+          - name: Promocoes
+            meta:
+              id: ws-req_618fe984e43d4f5989fc15ddeebffd6b
+              created: 1743776459948
+              modified: 1744214311571
+              sortKey: -1743772609951
+            settings:
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
       - name: Venda
         meta:
           id: fld_3e4d5dfdf3b14841a6f328639e0ecb32
@@ -1041,18 +1041,73 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-      - name: Promocoes
+      - name: ProdutoDestaque
         meta:
-          id: ws-req_618fe984e43d4f5989fc15ddeebffd6b
-          created: 1743776459948
-          modified: 1743776459948
-          sortKey: -1743776459948
-        settings:
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
+          id: fld_3b63df144ce14582aa832ebbc36d1d22
+          created: 1744214442894
+          modified: 1744214446271
+          sortKey: -1744119676133
+        children:
+          - url: http://127.0.0.1:8000/api/v1/produto_destaque/
+            name: Listar Destaques
+            meta:
+              id: req_a94f5ebb23c24787ba236fbf4edd3ff5
+              created: 1744214442896
+              modified: 1744214442896
+              isPrivate: false
+              sortKey: 1
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/produto_destaque/
+            name: Criar Destaque
+            meta:
+              id: req_a1568dfd0ce742b499de301dfac967fd
+              created: 1744214442898
+              modified: 1744214442898
+              isPrivate: false
+              sortKey: 2
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "produto_id": 1
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://127.0.0.1:8000/api/v1/produto_destaque/1
+            name: Deletar Destaque
+            meta:
+              id: req_6af6068db5374981916e1bb8cc33f740
+              created: 1744214442901
+              modified: 1744214442901
+              isPrivate: false
+              sortKey: 3
+            method: DELETE
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:

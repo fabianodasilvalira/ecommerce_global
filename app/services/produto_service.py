@@ -115,6 +115,18 @@ def listar_produtos_service(db: Session) -> List[ProdutoResponse]:
     return [ProdutoResponse.model_validate(prod) for prod in produtos]
 
 
+def listar_produtos_com_destaques_service(db: Session) -> Dict[str, List[ProdutoResponse]]:
+    produtos_ativos = db.query(Produto).filter(Produto.ativo == True).all()
+
+    # Separar os produtos em destaque (tem um ProdutoDestaque associado)
+    destaques = [p for p in produtos_ativos if p.destaque is not None]
+    comuns = [p for p in produtos_ativos if p.destaque is None]
+
+    return {
+        "destaques": [ProdutoResponse.model_validate(p) for p in destaques],
+        "produtos": [ProdutoResponse.model_validate(p) for p in comuns]
+    }
+
 def buscar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
     produto = db.query(Produto).filter(Produto.id == produto_id, Produto.ativo == True).first()
     if not produto:
