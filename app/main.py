@@ -17,6 +17,7 @@ from app.api.v1.routers.usuario import router as usuario_router
 from app.api.v1.routers.historico_pagamento import router as historico_pagamento_router
 from app.api.v1.routers.relatorios import router as relatorios_router
 from app.api.v1.routers.venda import router as venda_router
+from app.api.v1.routers.carrinho import router as carrinho_router
 from app.api.v1.routers.produto_destaque import router as produto_destaque_router
 
 app = FastAPI()
@@ -60,4 +61,5 @@ app.include_router(usuario_router, prefix="/api/v1/usuarios", tags=["usuários"]
 app.include_router(historico_pagamento_router, prefix="/api/v1/historico_pagamento", tags=["historico_pagamento"])
 app.include_router(relatorios_router, prefix="/api/v1/relatorios", tags=["relatorios"])
 app.include_router(venda_router, prefix="/api/v1/vendas", tags=["vendas"])
+app.include_router(carrinho_router, prefix="/api/v1/carrinho", tags=["carrinho"])
 app.include_router(produto_destaque_router, prefix="/api/v1/produto_destaque", tags=["produto_destaque"])

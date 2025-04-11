@@ -1,12 +1,15 @@
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime
+from typing import Optional
+
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload, load_only
 from app.models import Venda, ItemVenda, Produto, Cupom, Estoque, Pagamento
+from app.models.carrinho import Carrinho
 from app.models.pagamento import MetodoPagamentoEnum
 from app.schemas.relatorio_pagamento import StatusPagamentoEnum
-from app.schemas.venda_schema import VendaCreate
+from app.schemas.venda_schema import VendaCreate, ItemVendaCreate
 from app.models.venda import StatusVendaEnum, TipoDescontoEnum
 from app.models.movimentacao_estoque import MovimentacaoEstoque, TipoMovimentoEnum
 from app.models import Usuario, ItemVenda, Produto, Cupom
@@ -154,6 +157,41 @@ def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao processar venda: {str(e)}")
+
+def criar_venda_a_partir_do_carrinho(
+    db: Session,
+    usuario: Usuario,
+    endereco_id: int,
+    cupom_id: Optional[int] = None
+) -> Venda:
+    carrinho = (
+        db.query(Carrinho)
+        .filter(Carrinho.usuario_id == usuario.id, Carrinho.is_finalizado == True)
+        .order_by(Carrinho.data_criacao.desc())
+        .first()
+    )
+
+    if not carrinho:
+        raise HTTPException(status_code=404, detail="Carrinho finalizado não encontrado.")
+
+    if not carrinho.itens:
+        raise HTTPException(status_code=400, detail="Carrinho está vazio.")
+
+    # Criando o DTO de venda baseado nos itens do carrinho
+    venda_dto = VendaCreate(
+        endereco_id=endereco_id,
+        cupom_id=cupom_id,
+        itens=[
+            ItemVendaCreate(
+                produto_id=item.produto_id,
+                quantidade=item.quantidade
+            ) for item in carrinho.itens
+        ]
+    )
+
+    # Usa a função principal que já processa a venda
+    return criar_venda(db=db, venda=venda_dto, usuario=usuario)
+
 
 
 def cancelar_venda(db: Session, venda_id: int, usuario: Usuario):

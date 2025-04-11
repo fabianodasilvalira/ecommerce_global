@@ -25,6 +25,8 @@ from app.models.promocao import Promocao
 from app.models.estoque import Estoque
 from app.models.movimentacao_estoque import MovimentacaoEstoque
 from app.models.venda import Venda
+from app.models.carrinho import Carrinho
+from app.models.item_carrinho import ItemCarrinho
 from app.models.pagamento import Pagamento
 from app.models.itemVenda import ItemVenda
 from app.models.entrega import Entrega

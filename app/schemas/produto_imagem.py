@@ -24,3 +24,13 @@ class ProdutoImagemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ProdutoImagemOut(BaseModel):
+    id: int
+    imagem_url: HttpUrl
+    tipo: Optional[str] = None
+    ordem: Optional[int] = None
+
+    class Config:
+        from_attributes = True

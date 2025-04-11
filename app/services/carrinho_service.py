@@ -3,7 +3,8 @@ from fastapi import HTTPException
 from app.models import carrinho as carrinho_model
 from app.models import item_carrinho as item_model
 from app.models import produto as produto_model
-from schemas.carrinho_schema import ItemCarrinhoBase
+from app.models.carrinho import Carrinho
+from app.schemas.carrinho_schema import ItemCarrinhoBase
 
 
 def buscar_ou_criar_carrinho(db: Session, usuario_id: int):
@@ -105,7 +106,38 @@ def limpar_carrinho(db: Session, usuario_id: int):
 
 def ver_carrinho(db: Session, usuario_id: int):
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
-    return calcular_totais(carrinho)
+    itens = carrinho.itens
+
+    subtotal = sum(item.valor_total for item in itens)
+
+    itens_response = []
+    for item in itens:
+        produto = item.produto
+        imagem_url = produto.imagens[0].url if produto.imagens else ""
+
+        itens_response.append({
+            "id": item.id,
+            "quantidade": item.quantidade,
+            "valor_unitario": float(item.valor_unitario),
+            "valor_total": float(item.valor_total),
+            "produto": {
+                "id": produto.id,
+                "nome": produto.nome,
+                "descricao": produto.descricao,
+                "preco": float(produto.preco_final),
+                "imagem_url": imagem_url,
+                "categoria": produto.categoria.nome if produto.categoria else ""
+            }
+        })
+
+    return {
+        "id": carrinho.id,
+        "usuario_id": carrinho.usuario_id,
+        "is_finalizado": carrinho.is_finalizado,
+        "itens": itens_response,
+        "subtotal": float(subtotal)
+    }
+
 
 
 def finalizar_carrinho(db: Session, usuario_id: int):
