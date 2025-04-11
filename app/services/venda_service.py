@@ -1,10 +1,14 @@
-from datetime import datetime
-
-from sqlalchemy.orm import Session, load_only, joinedload
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException
 from decimal import Decimal, ROUND_HALF_UP
-
+from datetime import datetime
+from fastapi import HTTPException
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, joinedload, load_only
+from app.models import Venda, ItemVenda, Produto, Cupom, Estoque, Pagamento
+from app.models.pagamento import MetodoPagamentoEnum
+from app.schemas.relatorio_pagamento import StatusPagamentoEnum
+from app.schemas.venda_schema import VendaCreate
+from app.models.venda import StatusVendaEnum, TipoDescontoEnum
+from app.models.movimentacao_estoque import MovimentacaoEstoque, TipoMovimentoEnum
 from app.models import Usuario, ItemVenda, Produto, Cupom
 from app.models.venda import StatusVendaEnum, Venda, TipoDescontoEnum
 from app.schemas.venda_schema import VendaCreate
@@ -14,6 +18,15 @@ def produto_possui_promocao_ativa(produto: Produto) -> bool:
     agora = datetime.now()
     return any(p.ativo and p.data_inicio <= agora <= p.data_fim for p in produto.promocoes)
 
+
+
+from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
+from sqlalchemy.orm import Session, joinedload, load_only
+from fastapi import HTTPException
+from sqlalchemy.exc import SQLAlchemyError
+
+# Assuma que as importações das models e enums já estão feitas corretamente
 
 def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
     try:
@@ -82,9 +95,8 @@ def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
                 else:
                     raise HTTPException(
                         status_code=500,
-                        detail=f"Produto '{produto.nome}' está com promoção ativa, mas sem valor de desconto válido (nem preço promocional, nem percentual)."
+                        detail=f"Produto '{produto.nome}' está com promoção ativa, mas sem valor de desconto válido."
                     )
-
             elif desconto_percentual > 0:
                 preco_unitario = preco_bruto * (Decimal("1.00") - desconto_percentual)
 
@@ -101,9 +113,18 @@ def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
                 quantidade=item.quantidade,
                 preco_unitario=preco_unitario
             )
-
             nova_venda.itens.append(item_venda)
+
             produto.estoque.quantidade -= item.quantidade
+
+            movimento = MovimentacaoEstoque(
+                produto_id=produto.id,
+                tipo_movimentacao=TipoMovimentoEnum.SAIDA,
+                quantidade=item.quantidade,
+                data=datetime.utcnow(),
+                venda=nova_venda
+            )
+            db.add(movimento)
 
         valor_desconto = (total_bruto - total_com_desconto).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
@@ -113,6 +134,18 @@ def criar_venda(db: Session, venda: VendaCreate, usuario) -> Venda:
         nova_venda.tipo_desconto = tipo_desconto
 
         db.add(nova_venda)
+        db.flush()  # garante o ID da venda para uso no pagamento
+
+        # 4. Criar o pagamento após a venda estar salva (mas antes do commit final)
+        pagamento = Pagamento(
+            venda_id=nova_venda.id,
+            valor=nova_venda.total,
+            metodo_pagamento=MetodoPagamentoEnum.PIX,
+            status=StatusPagamentoEnum.PENDENTE
+        )
+        db.add(pagamento)
+        db.add(pagamento)
+
         db.commit()
         db.refresh(nova_venda)
 

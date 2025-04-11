@@ -8,6 +8,7 @@ from app.api.v1.routers.produto import router as produto_router
 from app.api.v1.routers.produto_imagem import router as produto_imagem_router
 from app.api.v1.routers.categoria import router as categoria_router
 from app.api.v1.routers.estoque import router as estoque_router
+from app.api.v1.routers.movimentacao_estoque import router as movimentacao_estoque_router
 from app.api.v1.routers.cupom import router as cupom_router
 from app.api.v1.routers.promocao import router as promocao_router
 from app.api.v1.routers.endereco import router as endereco_router
@@ -51,6 +52,7 @@ app.include_router(produto_imagem_router, prefix="/api/v1/produto_imagem", tags=
 app.include_router(produto_destaque_router, prefix="/api/v1/produto_destaque", tags=["produto_destaque"])
 app.include_router(categoria_router, prefix="/api/v1/categorias", tags=["categorias"])
 app.include_router(estoque_router, prefix="/api/v1/estoque", tags=["estoque"])
+app.include_router(movimentacao_estoque_router, prefix="/api/v1/movimentacao_estoque", tags=["movimentacao_estoque"])
 app.include_router(cupom_router, prefix="/api/v1/cupons", tags=["cupons"])
 app.include_router(promocao_router, prefix="/api/v1/promocao", tags=["promocao"])
 app.include_router(endereco_router, prefix="/api/v1/endereco", tags=["endereco"])

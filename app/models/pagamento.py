@@ -4,6 +4,11 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import Base
 
+class MetodoPagamentoEnum(enum.Enum):
+    PIX = "PIX"
+    CARTAO = "CARTAO"
+    BOLETO = "BOLETO"
+
 
 class StatusPagamento(enum.Enum):
     PENDENTE = "PENDENTE"
@@ -20,7 +25,7 @@ class Pagamento(Base):
     valor = Column(DECIMAL(10, 2), nullable=False)
     status = Column(Enum(StatusPagamento), nullable=False)
 
-    metodo_pagamento = Column(String(30), nullable=False)         # PIX, cartão, boleto etc.
+    metodo_pagamento = Column(Enum(MetodoPagamentoEnum), nullable=False)
     transacao_id = Column(String(100), nullable=True)             # ID retornado pelo gateway
 
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
