@@ -28,8 +28,9 @@ class Usuario(Base):
     # Relacionamentos corrigidos
     enderecos = relationship("Endereco", back_populates="usuario", cascade="all, delete-orphan")
     vendas = relationship("Venda", back_populates="usuario", cascade="all, delete-orphan")
-    avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan")  # Adicionado
+    avaliacoes = relationship("Avaliacao", back_populates="usuario", cascade="all, delete-orphan") 
     lista_desejos = relationship("ListaDesejos", back_populates="usuario", cascade="all, delete-orphan")
+    carrinho = relationship("Carrinho", back_populates="usuario", uselist=False)
 
     def __repr__(self):
         return f"<Usuario(id={self.id}, email='{self.email}', tipo='{self.tipo_usuario}')>"

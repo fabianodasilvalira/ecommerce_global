@@ -48,7 +48,10 @@ class ProdutoUpdate(BaseModel):
 class ProdutoOut(BaseModel):
     id: int
     nome: str
-    preco_final: Decimal
+    descricao: str
+    preco: float
+    imagem_url: str
+    categoria: str
 
     class Config:
         orm_mode = True

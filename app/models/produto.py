@@ -26,6 +26,7 @@ class Produto(Base):
     categoria = relationship("Categoria", back_populates="produtos")
     itens_venda = relationship("ItemVenda", back_populates="produto", cascade="all, delete-orphan")
     destaque = relationship("ProdutoDestaque", back_populates="produto")
+    itens_carrinho = relationship("ItemCarrinho", back_populates="produto")
 
     def calcular_preco_final(self):
         preco_decimal = Decimal(str(self.preco))

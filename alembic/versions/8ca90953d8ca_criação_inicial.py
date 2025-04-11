@@ -1,8 +1,8 @@
-"""criando todas as tabelas
+"""Criação inicial
 
-Revision ID: 9b6a484b0cc6
+Revision ID: 8ca90953d8ca
 Revises: 
-Create Date: 2025-04-10 20:38:22.245399
+Create Date: 2025-04-11 10:44:16.353427
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9b6a484b0cc6'
+revision: str = '8ca90953d8ca'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -243,7 +243,7 @@ def upgrade() -> None:
     sa.Column('venda_id', sa.Integer(), nullable=False),
     sa.Column('valor', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('status', sa.Enum('PENDENTE', 'APROVADO', 'CANCELADO', name='statuspagamento'), nullable=False),
-    sa.Column('metodo_pagamento', sa.String(length=30), nullable=False),
+    sa.Column('metodo_pagamento', sa.Enum('PIX', 'CARTAO', 'BOLETO', name='metodopagamentoenum'), nullable=False),
     sa.Column('transacao_id', sa.String(length=100), nullable=True),
     sa.Column('criado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.Column('atualizado_em', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
