@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from app.schemas.categoria_schema import CategoriaSimpleResponse
-from app.schemas.produto_imagem import ProdutoImagemResponse
+from app.schemas.produto_imagem_schema import ProdutoImagemResponse
 
 
 class ProdutoCreate(BaseModel):

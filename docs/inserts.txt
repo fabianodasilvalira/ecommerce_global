@@ -1,135 +1,38 @@
 taskkill /F /IM uvicorn.exe
 
-
--- Categoria Masculino
-INSERT INTO categorias (
-    nome,
-    slug,
-    descricao,
-    imagem_url,
-    cor_destaque,
-    ordem,
-    meta_title,
-    meta_description,
-    ativo
-) VALUES (
-    'Masculino',
-    'masculino',
-    'Roupas, calçados e acessórios para homens',
-    'https://exemplo.com/categorias/masculino.jpg',
-    '#2E86C1',
-    1,
-    'Moda Masculina | Loja Virtual',
-    'Encontre as melhores roupas e acessórios masculinos com os melhores preços',
-    TRUE
-);
-
--- Categoria Feminino
-INSERT INTO categorias (
-    nome,
-    slug,
-    descricao,
-    imagem_url,
-    cor_destaque,
-    ordem,
-    meta_title,
-    meta_description,
-    ativo
-) VALUES (
-    'Feminino',
-    'feminino',
-    'Roupas, calçados e acessórios para mulheres',
-    'https://exemplo.com/categorias/feminino.jpg',
-    '#E74C3C',
-    2,
-    'Moda Feminina | Loja Virtual',
-    'Descubra nossa coleção de roupas e acessórios femininos',
-    TRUE
-);
-
--- Categoria Infantil
-INSERT INTO categorias (
-    nome,
-    slug,
-    descricao,
-    imagem_url,
-    cor_destaque,
-    ordem,
-    meta_title,
-    meta_description,
-    ativo
-) VALUES (
-    'Infantil',
-    'infantil',
-    'Roupas e acessórios para crianças de 0 a 12 anos',
-    'https://exemplo.com/categorias/infantil.jpg',
-    '#F39C12',
-    3,
-    'Moda Infantil | Loja Virtual',
-    'Tudo para o look dos pequenos com conforto e qualidade',
-    TRUE
-);
-
--- Categoria Unisex
-INSERT INTO categorias (
-    nome,
-    slug,
-    descricao,
-    imagem_url,
-    cor_destaque,
-    ordem,
-    meta_title,
-    meta_description,
-    ativo
-) VALUES (
-    'Unisex',
-    'unisex',
-    'Produtos que servem para ambos os sexos',
-    'https://exemplo.com/categorias/unisex.jpg',
-    '#27AE60',
-    4,
-    'Produtos Unissex | Loja Virtual',
-    'Itens que combinam com qualquer estilo',
-    TRUE
-);
+-- Categorias
+INSERT INTO categorias (nome, slug, descricao, imagem_url, cor_destaque, ordem, meta_title, meta_description, ativo) VALUES
+('Masculino', 'masculino', 'Roupas, calçados e acessórios para homens', 'https://exemplo.com/categorias/masculino.jpg', '#2E86C1', 1, 'Moda Masculina | Loja Virtual', 'Encontre as melhores roupas e acessórios masculinos com os melhores preços', TRUE),
+('Feminino', 'feminino', 'Roupas, calçados e acessórios para mulheres', 'https://exemplo.com/categorias/feminino.jpg', '#E74C3C', 2, 'Moda Feminina | Loja Virtual', 'Descubra nossa coleção de roupas e acessórios femininos', TRUE),
+('Infantil', 'infantil', 'Roupas e acessórios para crianças de 0 a 12 anos', 'https://exemplo.com/categorias/infantil.jpg', '#F39C12', 3, 'Moda Infantil | Loja Virtual', 'Tudo para o look dos pequenos com conforto e qualidade', TRUE),
+('Unisex', 'unisex', 'Produtos que servem para ambos os sexos', 'https://exemplo.com/categorias/unisex.jpg', '#27AE60', 4, 'Produtos Unissex | Loja Virtual', 'Itens que combinam com qualquer estilo', TRUE);
 
 
+-- Produtos Masculino (categoria_id 1)
+INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro, preco_final) VALUES
+('M001', 'Camisa Social Branca', 'Camisa social manga longa 100% algodão', 129.90, NULL, NULL, TRUE, 1, 30.00, 168.87),
+('M002', 'Calça Jeans Slim', 'Calça jeans masculina modelo slim fit', 159.90, NULL, NULL, TRUE, 1, 35.00, 215.87),
+('M003', 'Tênis Casual', 'Tênis masculino couro sintético', 199.90, NULL, NULL, TRUE, 1, 25.00, 249.88),
+('M004', 'Cueca Boxer Algodão', 'Pack com 3 cuecas boxer cotton', 49.90, NULL, NULL, TRUE, 1, 40.00, 69.86);
+
+-- Produtos Feminino (categoria_id 2)
+INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro, preco_final) VALUES
+('F001', 'Vestido Midi Floral', 'Vestido floral com decote V', 139.90, NULL, NULL, TRUE, 2, 35.00, 188.87),
+('F002', 'Blusa Feminina Renda', 'Blusa manga longa com detalhes em renda', 89.90, NULL, NULL, TRUE, 2, 40.00, 125.86),
+('F003', 'Saia Jeans', 'Saia jeans midi com cós alto', 79.90, NULL, NULL, TRUE, 2, 30.00, 103.87),
+('F004', 'Bolsa Transversal', 'Bolsa feminina em couro sintético', 119.90, NULL, NULL, TRUE, 2, 25.00, 149.88),
+('F005', 'Conjunto Pijama', 'Conjunto pijama algodão estampado', 69.90, NULL, NULL, TRUE, 2, 35.00, 94.37);
+
+-- Produtos Infantil (categoria_id 3)
+INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro, preco_final) VALUES
+('I001', 'Conjunto Moletom Infantil', 'Conjunto moletom com estampa divertida', 59.90, NULL, NULL, TRUE, 3, 30.00, 77.87),
+('I002', 'Body Bebê Algodão', 'Pack com 3 bodies manga curta', 39.90, NULL, NULL, TRUE, 3, 35.00, 53.87),
+('I003', 'Tênis Infantil LED', 'Tênis infantil com luzes LED', 89.90, NULL, NULL, TRUE, 3, 25.00, 112.38);
+
+-- Produtos Unisex (categoria_id 4)
+INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro, preco_final) VALUES
+('U001', 'Boné Ajustável', 'Boné unissex em algodão', 39.90, NULL, NULL, TRUE, 4, 25.00, 49.88),
+('U002', 'Meias Cano Alto', 'Pack com 5 pares de meias', 29.90, NULL, NULL, TRUE, 4, 40.00, 41.86),
+('U003', 'Mochila Escolar', 'Mochila resistente para notebooks', 99.90, NULL, NULL, TRUE, 4, 30.00, 129.87);
 
 
-
-
-
-
-
-
-
-INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro)
-VALUES
-    -- Masculino
-    ('PM-001', 'Perfume Masculino Premium', 'Fragrância amadeirada com notas de bergamota', 120.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 25.00),
-    ('PM-002', 'Desodorante Colônia', 'Desodorante masculino de longa duração', 45.50, 150, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 20.00),
-    ('PM-003', 'Gel de Banho', 'Gel de banho com aroma refrescante', 32.90, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 15.00),
-    ('PM-004', 'Loção Pós-Barba', 'Hidratante pós-barba com aloe vera', 58.00, 75, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 30.00),
-    ('PM-005', 'Kit Presente Masculino', 'Kit com perfume e loção pós-barba', 199.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Masculino'), 25.00),
-    -- Feminino
-    ('PF-001', 'Perfume Feminino Floral', 'Fragrância floral com notas de jasmim', 135.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 30.00),
-    ('PF-002', 'Água de Colônia', 'Versão leve do perfume feminino', 75.00, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 25.00),
-    ('PF-003', 'Creme Corporal', 'Hidratante com aroma suave', 42.00, 250, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 20.00),
-    ('PF-004', 'Óleo Perfumado', 'Óleo corporal perfumado', 68.00, 50, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 35.00),
-    ('PF-005', 'Kit Presente Feminino', 'Kit com perfume e creme corporal', 229.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Feminino'), 30.00),
-    -- Infantil
-    ('PI-001', 'Colônia Infantil', 'Fragrância suave para crianças', 39.90, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 15.00),
-    ('PI-002', 'Shampoo Infantil', 'Shampoo sem lágrimas', 28.50, 300, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
-    ('PI-003', 'Sabonete Líquido', 'Sabonete suave para bebês', 22.00, 500, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
-    ('PI-004', 'Talco Infantil', 'Talco perfumado para bebês', 18.00, 200, 'g', true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 10.00),
-    ('PI-005', 'Kit Bebê', 'Kit com shampoo, sabonete e talco', 79.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Infantil'), 15.00),
-    -- Unissex
-    ('PU-001', 'Perfume Unissex', 'Fragrância neutra para todos', 110.00, 100, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 20.00),
-    ('PU-002', 'Desodorante Roll-On', 'Desodorante sem perfume', 35.00, 50, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 15.00),
-    ('PU-003', 'Sabonete Líquido Neutro', 'Sabonete para peles sensíveis', 26.00, 300, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 10.00),
-    ('PU-004', 'Hidratante Corporal', 'Hidratante sem fragrância', 48.00, 200, 'ml', true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 25.00),
-    ('PU-005', 'Kit Viagem Unissex', 'Kit com produtos de viagem', 89.90, NULL, NULL, true, (SELECT id FROM categoria_ids WHERE nome = 'Unissex'), 20.00);
-
--- Imagens para os produtos
-INSERT INTO produto_imagem (produto_id, imagem_url, tipo, ordem)
-SELECT id, 'https://exemplo.com/imagens/' || sku || '.jpg', 'destaque', 1 FROM produto;
