@@ -4,7 +4,10 @@ from typing import Optional
 
 class CategoriaBase(BaseModel):
     nome: str
-    slug: str = Field(..., pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+    slug: str = Field(
+        pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$',
+        example="categoria-exemplo"
+    )
     descricao: Optional[str] = None
     imagem_url: Optional[str] = None
     cor_destaque: Optional[str] = Field(None, pattern=r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')
