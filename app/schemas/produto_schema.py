@@ -1,7 +1,10 @@
 from decimal import Decimal
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
+
+from app.schemas.categoria_schema import CategoriaSimpleResponse
+from app.schemas.produto_imagem import ProdutoImagemResponse
 
 
 class ProdutoCreate(BaseModel):
@@ -28,8 +31,8 @@ class ProdutoResponse(BaseModel):
     margem_lucro: float
     preco_final: float
     preco_com_promocao: Optional[float] = None
-    imagens: List[ImagemResponse] = []  # Lista de imagens do produto
-    promocoes_ativas: List[PromocaoResponse] = []  # Lista de promoções ativas
+    imagens: List[ProdutoImagemResponse] = []  # Lista de imagens do produto
+    promocoes_ativas: List[ProdutoImagemResponse] = []  # Lista de promoções ativas
     estoque_disponivel: Optional[int] = None  # Quantidade em estoque
 
     class Config:
