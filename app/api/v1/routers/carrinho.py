@@ -58,10 +58,23 @@ def finalizar_e_criar_venda_a_partir_do_carrinho(
     return venda
 
 
-@router.post("/finalizar", response_model=schemas.CarrinhoOut)
-def finalizar_carrinho(usuario_id: int, db: Session = Depends(get_db)):
-    return carrinho_service.finalizar_carrinho(db, usuario_id)
+@router.post("/finalizar", response_model=VendaResponse)
+def finalizar_carrinho(
+        usuario_id: int,
+        endereco_id: int,
+        cupom_id: Optional[int] = None,
+        db: Session = Depends(get_db)
+):
+    usuario = db.query(Usuario).get(usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
+    return carrinho_service.finalizar_carrinho_e_criar_venda(
+        db=db,
+        usuario_id=usuario_id,
+        endereco_id=endereco_id,
+        cupom_id=cupom_id
+    )
 
 @router.get("/historico", response_model=list[schemas.CarrinhoOut])
 def listar_historico(usuario_id: int, db: Session = Depends(get_db)):

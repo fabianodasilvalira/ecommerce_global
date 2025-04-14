@@ -1,7 +1,10 @@
 from decimal import Decimal
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
+
+from app.schemas.categoria_schema import CategoriaSimpleResponse
+from app.schemas.produto_imagem import ProdutoImagemResponse
 
 
 class ProdutoCreate(BaseModel):
@@ -21,17 +24,19 @@ class ProdutoResponse(BaseModel):
     nome: str
     descricao: str
     preco: float
-    volume: Optional[float] = None  # Mantém consistência com ProdutoCreate
-    unidade_medida: Optional[str] = None  # Evita usar string vazia como padrão
+    volume: Optional[float] = None
+    unidade_medida: Optional[str] = None
     ativo: bool
-    categoria_id: int
+    categoria: CategoriaSimpleResponse  # Mudar de categoria_id para o objeto categoria
     margem_lucro: float
-    preco_final: float  # Preço final já calculado
-    preco_com_promocao: Optional[Decimal]  # <- Adiciona isso aqui
-
+    preco_final: float
+    preco_com_promocao: Optional[float] = None
+    imagens: List[ProdutoImagemResponse] = []  # Lista de imagens do produto
+    promocoes_ativas: List[ProdutoImagemResponse] = []  # Lista de promoções ativas
+    estoque_disponivel: Optional[int] = None  # Quantidade em estoque
 
     class Config:
-        from_attributes = True  # ✅ Correção para Pydantic v2
+        from_attributes = True
 
 
 class ProdutoUpdate(BaseModel):

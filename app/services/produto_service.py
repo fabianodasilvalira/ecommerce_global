@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from app.models.produto import Produto
@@ -127,12 +127,38 @@ def listar_produtos_com_destaques_service(db: Session) -> Dict[str, List[Produto
         "produtos": [ProdutoResponse.model_validate(p) for p in comuns]
     }
 
+
 def buscar_produto_service(db: Session, produto_id: int) -> ProdutoResponse:
-    produto = db.query(Produto).filter(Produto.id == produto_id, Produto.ativo == True).first()
+    produto = (
+        db.query(Produto)
+        .options(
+            joinedload(Produto.categoria),
+            joinedload(Produto.imagens),
+            joinedload(Produto.promocoes),
+            joinedload(Produto.estoque)
+        )
+        .filter(Produto.id == produto_id, Produto.ativo == True)
+        .first()
+    )
+
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado ou inativo")
 
-    return ProdutoResponse.model_validate(produto)
+    # Prepara os dados para a resposta
+    produto_data = ProdutoResponse.model_validate(produto)
+
+    # Adiciona informações de estoque se existir
+    if produto.estoque:
+        produto_data.estoque_disponivel = produto.estoque.quantidade
+
+    # Filtra apenas promoções ativas
+    agora = datetime.utcnow()
+    produto_data.promocoes_ativas = [
+        promocao for promocao in produto.promocoes
+        if promocao.ativo and promocao.data_inicio <= agora <= promocao.data_fim
+    ]
+
+    return produto_data
 
 def atualizar_produto_service(db: Session, produto_id: int, update_data: Dict[str, Any]) -> ProdutoResponse:
     produto = db.query(Produto).filter(Produto.id == produto_id).first()

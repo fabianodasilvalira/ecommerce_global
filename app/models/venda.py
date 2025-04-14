@@ -22,6 +22,7 @@ class Venda(Base):
     usuario_id = Column(Integer, ForeignKey("usuario.id", ondelete="CASCADE"), nullable=False)
     endereco_id = Column(Integer, ForeignKey("endereco.id", ondelete="SET NULL"), nullable=True)
     cupom_id = Column(Integer, ForeignKey("cupom.id", ondelete="SET NULL"), nullable=True)
+    carrinho_id = Column(Integer, ForeignKey("carrinho.id", ondelete="SET NULL"), nullable=True)
 
     total = Column(DECIMAL(10, 2), nullable=False, default=0.00)
     valor_total_bruto = Column(DECIMAL(10, 2), nullable=False, default=0.00)
@@ -49,3 +50,4 @@ class Venda(Base):
     cupom = relationship("Cupom", back_populates="vendas")
     entrega = relationship("Entrega", back_populates="venda", uselist=False)
     pagamentos = relationship("Pagamento", back_populates="venda")
+    carrinho = relationship("Carrinho", back_populates="venda")

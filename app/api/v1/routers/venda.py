@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -10,7 +11,7 @@ from app.models.usuario import Usuario
 
 router = APIRouter()
 
-@router.post("/", response_model=VendaResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def criar_venda_endpoint(
     venda: VendaCreate,
     db: Session = Depends(get_db),
