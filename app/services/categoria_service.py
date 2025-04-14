@@ -1,51 +1,80 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.categoria import Categoria
-from app.models.produto import Produto  # Importar o modelo Produto
+from app.models.produto import Produto
 from app.schemas.categoria_schema import CategoriaCreate, CategoriaUpdate
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def criar_categoria(db: Session, categoria: CategoriaCreate):
-    # Verifica se já existe uma categoria com o mesmo nome
-    categoria_existente = db.query(Categoria).filter(Categoria.nome == categoria.nome).first()
+    # Verifica se já existe uma categoria com o mesmo nome ou slug
+    categoria_existente = db.query(Categoria).filter(
+        (Categoria.nome == categoria.nome) |
+        (Categoria.slug == categoria.slug)
+    ).first()
 
     if categoria_existente:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Categoria com esse nome já existe"
+            detail="Categoria com esse nome ou slug já existe"
         )
 
-    nova_categoria = Categoria(
-        nome=categoria.nome,
-        descricao=categoria.descricao,
-        imagem_url=categoria.imagem_url,
-        cor_destaque=categoria.cor_destaque,
-        ativo=categoria.ativo
-    )
-
+    nova_categoria = Categoria(**categoria.model_dump())
     db.add(nova_categoria)
     db.commit()
     db.refresh(nova_categoria)
     return nova_categoria
 
 
-# Função para listar categorias ativas
-def listar_categorias(db: Session):
-    return db.query(Categoria).filter(Categoria.ativo == True).all()
+def listar_categorias(db: Session, incluir_inativas: bool = False):
+    query = db.query(Categoria)
+    if not incluir_inativas:
+        query = query.filter(Categoria.ativo == True)
+
+    categorias = query.order_by(Categoria.ordem).all()
+
+    # Adiciona contagem de produtos
+    for cat in categorias:
+        cat.produtos_count = db.query(Produto).filter(
+            Produto.categoria_id == cat.id,
+            Produto.ativo == True
+        ).count()
+
+    return categorias
 
 
-# Função para buscar uma categoria por ID
 def buscar_categoria(db: Session, categoria_id: int):
-    return db.query(Categoria).filter(Categoria.id == categoria_id, Categoria.ativo == True).first()
+    categoria = db.query(Categoria).get(categoria_id)
+    if categoria:
+        categoria.produtos_count = db.query(Produto).filter(
+            Produto.categoria_id == categoria.id,
+            Produto.ativo == True
+        ).count()
+    return categoria
 
 
 def atualizar_categoria(db: Session, categoria_id: int, categoria_dados: CategoriaUpdate):
-    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
+    categoria = db.query(Categoria).get(categoria_id)
     if not categoria:
-        return None  # Retorna None para indicar que não encontrou a categoria
+        return None
 
-    # Atualizando os campos fornecidos
-    for key, value in categoria_dados.dict(exclude_unset=True).items():
+    update_data = categoria_dados.model_dump(exclude_unset=True)
+
+    # Verifica se o novo slug já existe
+    if 'slug' in update_data:
+        slug_existente = db.query(Categoria).filter(
+            Categoria.slug == update_data['slug'],
+            Categoria.id != categoria_id
+        ).first()
+        if slug_existente:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Já existe uma categoria com este slug"
+            )
+
+    for key, value in update_data.items():
         setattr(categoria, key, value)
 
     db.commit()
@@ -55,46 +84,43 @@ def atualizar_categoria(db: Session, categoria_id: int, categoria_dados: Categor
 
 def inativar_categoria_e_atualizar_produtos(db: Session, categoria_id: int):
     try:
-        # Recupera a categoria a ser inativada
-        categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
+        db.begin()
 
+        categoria = db.query(Categoria).get(categoria_id)
         if not categoria:
             raise HTTPException(status_code=404, detail="Categoria não encontrada")
 
-        # Marcar a categoria como inativa
         categoria.ativo = False
-        db.commit()
 
-        # Buscar a categoria padrão (não atribuída)
-        categoria_padrao = db.query(Categoria).filter(Categoria.nome == "Categoria Não Atribuída").first()
+        # Buscar ou criar categoria padrão
+        categoria_padrao = db.query(Categoria).filter(
+            Categoria.nome == "Sem Categoria",
+            Categoria.slug == "sem-categoria"
+        ).first()
 
         if not categoria_padrao:
-            # Criar categoria padrão se não existir
             categoria_padrao = Categoria(
-                nome="Categoria Não Atribuída",
-                descricao="Categoria padrão para produtos sem categoria válida",
+                nome="Sem Categoria",
+                slug="sem-categoria",
+                descricao="Produtos sem categoria atribuída",
                 ativo=True
             )
             db.add(categoria_padrao)
             db.commit()
             db.refresh(categoria_padrao)
 
-        # Atualizar os produtos relacionados à categoria inativa
-        produtos = db.query(Produto).filter(Produto.categoria_id == categoria_id).all()
-
-        for produto in produtos:
-            produto.categoria_id = categoria_padrao.id  # Atribui a categoria padrão aos produtos
-            db.add(produto)
+        # Atualizar produtos
+        db.query(Produto).filter(
+            Produto.categoria_id == categoria_id
+        ).update({"categoria_id": categoria_padrao.id})
 
         db.commit()
-
-        return {"detail": "Categoria inativada e produtos atualizados para a categoria padrão."}
+        return categoria
 
     except Exception as e:
         db.rollback()
-        logger.error(f"Erro ao inativar categoria e atualizar produtos: {str(e)}")
+        logger.error(f"Erro ao inativar categoria: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail="Erro ao inativar categoria e atualizar produtos"
+            detail="Erro ao processar inativação da categoria"
         )
-

@@ -6,7 +6,7 @@ from app.db.database import get_db
 from app.schemas.movimentacao_estoque import MovimentacaoEstoqueOut, MovimentacaoEstoqueCreate
 from app.services import movimentacao_estoque as service
 
-router = APIRouter(prefix="/movimentacoes-estoque", tags=["Movimentação de Estoque"])
+router = APIRouter()
 
 @router.post("/", response_model=MovimentacaoEstoqueOut, status_code=status.HTTP_201_CREATED)
 def criar_movimentacao(movimentacao: MovimentacaoEstoqueCreate, db: Session = Depends(get_db)):

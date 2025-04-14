@@ -1,20 +1,108 @@
 taskkill /F /IM uvicorn.exe
 
 
+-- Categoria Masculino
+INSERT INTO categorias (
+    nome,
+    slug,
+    descricao,
+    imagem_url,
+    cor_destaque,
+    ordem,
+    meta_title,
+    meta_description,
+    ativo
+) VALUES (
+    'Masculino',
+    'masculino',
+    'Roupas, calçados e acessórios para homens',
+    'https://exemplo.com/categorias/masculino.jpg',
+    '#2E86C1',
+    1,
+    'Moda Masculina | Loja Virtual',
+    'Encontre as melhores roupas e acessórios masculinos com os melhores preços',
+    TRUE
+);
 
--- Insere as 4 categorias (execute no seu cliente de banco de dados: pgAdmin, DBeaver, MySQL Workbench, etc.)
-INSERT INTO categorias (nome, descricao, cor_destaque, ativo)
-VALUES
-    ('Masculino', 'Perfumes e produtos para homens', '#1E3A8A', true),
-    ('Feminino', 'Perfumes e produtos para mulheres', '#BE185D', true),
-    ('Infantil', 'Produtos para crianças', '#047857', true),
-    ('Unissex', 'Produtos para todos os gêneros', '#6B7280', true)
-ON CONFLICT (nome) DO NOTHING;  -- Evita duplicatas (PostgreSQL)
+-- Categoria Feminino
+INSERT INTO categorias (
+    nome,
+    slug,
+    descricao,
+    imagem_url,
+    cor_destaque,
+    ordem,
+    meta_title,
+    meta_description,
+    ativo
+) VALUES (
+    'Feminino',
+    'feminino',
+    'Roupas, calçados e acessórios para mulheres',
+    'https://exemplo.com/categorias/feminino.jpg',
+    '#E74C3C',
+    2,
+    'Moda Feminina | Loja Virtual',
+    'Descubra nossa coleção de roupas e acessórios femininos',
+    TRUE
+);
 
--- Produtos para cada categoria
-WITH categoria_ids AS (
-    SELECT id, nome FROM categorias
-)
+-- Categoria Infantil
+INSERT INTO categorias (
+    nome,
+    slug,
+    descricao,
+    imagem_url,
+    cor_destaque,
+    ordem,
+    meta_title,
+    meta_description,
+    ativo
+) VALUES (
+    'Infantil',
+    'infantil',
+    'Roupas e acessórios para crianças de 0 a 12 anos',
+    'https://exemplo.com/categorias/infantil.jpg',
+    '#F39C12',
+    3,
+    'Moda Infantil | Loja Virtual',
+    'Tudo para o look dos pequenos com conforto e qualidade',
+    TRUE
+);
+
+-- Categoria Unisex
+INSERT INTO categorias (
+    nome,
+    slug,
+    descricao,
+    imagem_url,
+    cor_destaque,
+    ordem,
+    meta_title,
+    meta_description,
+    ativo
+) VALUES (
+    'Unisex',
+    'unisex',
+    'Produtos que servem para ambos os sexos',
+    'https://exemplo.com/categorias/unisex.jpg',
+    '#27AE60',
+    4,
+    'Produtos Unissex | Loja Virtual',
+    'Itens que combinam com qualquer estilo',
+    TRUE
+);
+
+
+
+
+
+
+
+
+
+
+
 INSERT INTO produto (sku, nome, descricao, preco, volume, unidade_medida, ativo, categoria_id, margem_lucro)
 VALUES
     -- Masculino
