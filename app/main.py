@@ -64,4 +64,3 @@ app.include_router(historico_pagamento_router, prefix="/api/v1/historico_pagamen
 app.include_router(relatorios_router, prefix="/api/v1/relatorios", tags=["relatorios"])
 app.include_router(venda_router, prefix="/api/v1/vendas", tags=["vendas"])
 app.include_router(carrinho_router, prefix="/api/v1/carrinho", tags=["carrinho"])
-app.include_router(produto_destaque_router, prefix="/api/v1/produto_destaque", tags=["produto_destaque"])

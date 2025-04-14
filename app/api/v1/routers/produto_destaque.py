@@ -5,10 +5,7 @@ from app.db.database import get_db
 from app.schemas.produto_destaque_schema import ProdutoDestaqueCreate, ProdutoDestaqueResponse, ProdutoDestaqueUpdate, ProdutoDestaqueComProduto
 from app.services.produto_destaque_service import ProdutoDestaqueService
 
-router = APIRouter(
-    prefix="/api/destaques",
-    tags=["Produtos em Destaque"]
-)
+router = APIRouter()
 
 @router.post("/", response_model=ProdutoDestaqueResponse, status_code=status.HTTP_201_CREATED)
 def criar_destaque(destaque: ProdutoDestaqueCreate, db: Session = Depends(get_db)):
