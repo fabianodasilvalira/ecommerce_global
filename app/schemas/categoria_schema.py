@@ -21,3 +21,13 @@ class CategoriaResponse(CategoriaCreate):
 
     class Config:
         from_attributes = True
+
+
+class CategoriaSimpleResponse(BaseModel):
+    id: int
+    nome: str
+    descricao: Optional[str]
+    ativo: bool
+
+    class Config:
+        from_attributes = True

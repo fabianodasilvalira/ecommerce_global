@@ -66,6 +66,20 @@ class VendaOut(BaseModel):
     status: str
     data_venda: datetime
     itens: List[ItemVendaOut]
+    carrinho_id: Optional[int] = None
+    # Novo: Dados básicos do carrinho de origem
+    carrinho: Optional[dict] = None
 
     class Config:
         orm_mode = True
+
+    @classmethod
+    def from_orm(cls, obj):
+        # Adiciona dados do carrinho se existir
+        if obj.carrinho:
+            obj.carrinho = {
+                "id": obj.carrinho.id,
+                "criado_em": obj.carrinho.criado_em,
+                "finalizado_em": obj.carrinho.atualizado_em
+            }
+        return super().from_orm(obj)

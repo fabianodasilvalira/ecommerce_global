@@ -21,17 +21,19 @@ class ProdutoResponse(BaseModel):
     nome: str
     descricao: str
     preco: float
-    volume: Optional[float] = None  # Mantém consistência com ProdutoCreate
-    unidade_medida: Optional[str] = None  # Evita usar string vazia como padrão
+    volume: Optional[float] = None
+    unidade_medida: Optional[str] = None
     ativo: bool
-    categoria_id: int
+    categoria: CategoriaSimpleResponse  # Mudar de categoria_id para o objeto categoria
     margem_lucro: float
-    preco_final: float  # Preço final já calculado
-    preco_com_promocao: Optional[Decimal]  # <- Adiciona isso aqui
-
+    preco_final: float
+    preco_com_promocao: Optional[float] = None
+    imagens: List[ImagemResponse] = []  # Lista de imagens do produto
+    promocoes_ativas: List[PromocaoResponse] = []  # Lista de promoções ativas
+    estoque_disponivel: Optional[int] = None  # Quantidade em estoque
 
     class Config:
-        from_attributes = True  # ✅ Correção para Pydantic v2
+        from_attributes = True
 
 
 class ProdutoUpdate(BaseModel):

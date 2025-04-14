@@ -1,8 +1,8 @@
-"""Criação inicial
+"""criando todas as tabelas
 
-Revision ID: 7622b25f3b71
+Revision ID: 783138781da1
 Revises: 
-Create Date: 2025-04-11 12:23:40.742202
+Create Date: 2025-04-13 09:30:46.917042
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7622b25f3b71'
+revision: str = '783138781da1'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -66,6 +66,16 @@ def upgrade() -> None:
     op.create_index(op.f('ix_usuario_cpf_cnpj'), 'usuario', ['cpf_cnpj'], unique=True)
     op.create_index(op.f('ix_usuario_email'), 'usuario', ['email'], unique=True)
     op.create_index(op.f('ix_usuario_id'), 'usuario', ['id'], unique=False)
+    op.create_table('carrinho',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=True),
+    sa.Column('criado_em', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('atualizado_em', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('is_finalizado', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_carrinho_id'), 'carrinho', ['id'], unique=False)
     op.create_table('categoria_imagem',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('categoria_id', sa.Integer(), nullable=False),
@@ -134,6 +144,18 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_estoque_id'), 'estoque', ['id'], unique=False)
+    op.create_table('item_carrinho',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('carrinho_id', sa.Integer(), nullable=True),
+    sa.Column('produto_id', sa.Integer(), nullable=True),
+    sa.Column('quantidade', sa.Integer(), nullable=True),
+    sa.Column('valor_unitario', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('valor_total', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.ForeignKeyConstraint(['carrinho_id'], ['carrinho.id'], ),
+    sa.ForeignKeyConstraint(['produto_id'], ['produto.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_item_carrinho_id'), 'item_carrinho', ['id'], unique=False)
     op.create_table('lista_desejos',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
@@ -315,6 +337,8 @@ def downgrade() -> None:
     op.drop_table('produto_destaque')
     op.drop_index(op.f('ix_lista_desejos_id'), table_name='lista_desejos')
     op.drop_table('lista_desejos')
+    op.drop_index(op.f('ix_item_carrinho_id'), table_name='item_carrinho')
+    op.drop_table('item_carrinho')
     op.drop_index(op.f('ix_estoque_id'), table_name='estoque')
     op.drop_table('estoque')
     op.drop_index(op.f('ix_avaliacao_id'), table_name='avaliacao')
@@ -326,6 +350,8 @@ def downgrade() -> None:
     op.drop_table('endereco')
     op.drop_index(op.f('ix_categoria_imagem_id'), table_name='categoria_imagem')
     op.drop_table('categoria_imagem')
+    op.drop_index(op.f('ix_carrinho_id'), table_name='carrinho')
+    op.drop_table('carrinho')
     op.drop_index(op.f('ix_usuario_id'), table_name='usuario')
     op.drop_index(op.f('ix_usuario_email'), table_name='usuario')
     op.drop_index(op.f('ix_usuario_cpf_cnpj'), table_name='usuario')

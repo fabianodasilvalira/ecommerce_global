@@ -1,15 +1,18 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.produto_schema import ProdutoResponse
+
+
 class ProdutoDestaqueBase(BaseModel):
     produto_id: int
 
 class ProdutoDestaqueCreate(ProdutoDestaqueBase):
     pass
 
-class ProdutoDestaqueResponse(ProdutoDestaqueBase):
+class ProdutoDestaqueResponse(BaseModel):
     id: int
-    criado_em: datetime
+    produto: ProdutoResponse  # Embed full product data
 
     class Config:
-        orm_mode = True
+        from_attributes = True

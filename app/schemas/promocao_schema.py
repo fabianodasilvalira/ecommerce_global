@@ -20,9 +20,16 @@ class PromocaoUpdate(BaseModel):
     data_fim: Optional[datetime] = None
     ativo: Optional[bool] = None
 
-class PromocaoResponse(PromocaoBase):
+
+class PromocaoResponse(BaseModel):
     id: int
-    criado_em: datetime
+    nome: str
+    descricao: Optional[str]
+    preco_promocional: Optional[float]
+    desconto_percentual: Optional[float]
+    data_inicio: datetime
+    data_fim: datetime
+    ativo: bool
 
     class Config:
         from_attributes = True

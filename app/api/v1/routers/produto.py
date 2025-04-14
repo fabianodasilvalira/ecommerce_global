@@ -28,6 +28,10 @@ def listar_produtos(db: Session = Depends(get_db)):
 def buscar_produto(produto_id: int, db: Session = Depends(get_db)):
     return buscar_produto_service(db, produto_id)
 
+@router.get("/{produto_id}/completo", response_model=ProdutoResponse)
+def buscar_produto_completo(produto_id: int, db: Session = Depends(get_db)):
+    return buscar_produto_service(db, produto_id)
+
 # Editar um produto
 @router.put("/{produto_id}/editar", response_model=ProdutoResponse)
 def editar_produto(produto_id: int, update_data: ProdutoUpdate, db: Session = Depends(get_db)):
