@@ -1,7 +1,5 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from starlette.staticfiles import StaticFiles
 
 from app.api.v1.endpoints import auth
 from app.api.v1.routers.produto import router as produto_router
@@ -19,7 +17,6 @@ from app.api.v1.routers.historico_pagamento import router as historico_pagamento
 from app.api.v1.routers.relatorios import router as relatorios_router
 from app.api.v1.routers.venda import router as venda_router
 from app.api.v1.routers.carrinho import router as carrinho_router
-from app.api.v1.routers.produto_destaque import router as produto_destaque_router
 
 app = FastAPI()
 
