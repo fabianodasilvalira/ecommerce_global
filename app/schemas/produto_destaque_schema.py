@@ -1,12 +1,30 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional
+from enum import Enum
+
+
+class TipoDestaqueEnum(str, Enum):
+    principal = "principal"
+    secundario = "secundario"
+    promocional = "promocional"
+    novidade = "novidade"
+    oferta = "oferta"
 
 
 class ProdutoDestaqueBase(BaseModel):
     produto_id: int = Field(..., description="ID do produto a ser destacado")
-    posicao: Optional[int] = Field(None, description="Posição de exibição")
-    tipo_destaque: Optional[str] = Field('principal', description="Tipo de destaque")
+    posicao: Optional[int] = Field(None, description="Posição de exibição (1-99)")
+    tipo_destaque: Optional[TipoDestaqueEnum] = Field(
+        TipoDestaqueEnum.principal,
+        description="Tipo de destaque"
+    )
+
+    @validator('posicao')
+    def validar_posicao(cls, v):
+        if v is not None and (v < 1 or v > 99):
+            raise ValueError("A posição deve estar entre 1 e 99")
+        return v
 
 
 class ProdutoDestaqueCreate(ProdutoDestaqueBase):
@@ -14,9 +32,18 @@ class ProdutoDestaqueCreate(ProdutoDestaqueBase):
 
 
 class ProdutoDestaqueUpdate(BaseModel):
-    posicao: Optional[int] = None
-    ativo: Optional[bool] = None
-    tipo_destaque: Optional[str] = None
+    posicao: Optional[int] = Field(None, description="Posição de exibição (1-99)")
+    ativo: Optional[bool] = Field(None, description="Status do destaque")
+    tipo_destaque: Optional[TipoDestaqueEnum] = Field(
+        None,
+        description="Tipo de destaque"
+    )
+
+    @validator('posicao')
+    def validar_posicao(cls, v):
+        if v is not None and (v < 1 or v > 99):
+            raise ValueError("A posição deve estar entre 1 e 99")
+        return v
 
 
 class ProdutoDestaqueResponse(ProdutoDestaqueBase):
@@ -26,7 +53,13 @@ class ProdutoDestaqueResponse(ProdutoDestaqueBase):
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 
 class ProdutoDestaqueComProduto(ProdutoDestaqueResponse):
-    produto: dict  # Ou use um schema de produto se já tiver
+    produto: dict  # Substituir por ProdutoResponse se disponível
+
+    class Config:
+        from_attributes = True

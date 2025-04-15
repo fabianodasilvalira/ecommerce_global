@@ -38,7 +38,7 @@ from app.models.produto_destaque import ProdutoDestaque
 from app.models.avaliacao import Avaliacao
 from app.models.historico_pagamento import HistoricoPagamento
 from app.models.listaDesejos import ListaDesejos
-from app.models.entregador import Entregador
+from app.models.entregadorInfo import EntregadorInfo
 
 
 target_metadata = Base.metadata

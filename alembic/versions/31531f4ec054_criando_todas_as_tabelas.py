@@ -1,14 +1,8 @@
 """criando todas as tabelas
 
-<<<<<<<< HEAD:alembic/versions/5726d183f8f0_criação_inicial.py
-Revision ID: 5726d183f8f0
+Revision ID: 31531f4ec054
 Revises: 
-Create Date: 2025-04-14 10:34:09.262471
-========
-Revision ID: 783138781da1
-Revises: 
-Create Date: 2025-04-13 09:30:46.917042
->>>>>>>> 985443b9a2055fae267b881771cc81624ef27424:alembic/versions/783138781da1_criando_todas_as_tabelas.py
+Create Date: 2025-04-14 20:40:49.162702
 
 """
 from typing import Sequence, Union
@@ -18,11 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:alembic/versions/5726d183f8f0_criação_inicial.py
-revision: str = '5726d183f8f0'
-========
-revision: str = '783138781da1'
->>>>>>>> 985443b9a2055fae267b881771cc81624ef27424:alembic/versions/783138781da1_criando_todas_as_tabelas.py
+revision: str = '31531f4ec054'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -58,12 +48,6 @@ def upgrade() -> None:
     sa.UniqueConstraint('codigo')
     )
     op.create_index(op.f('ix_cupom_id'), 'cupom', ['id'], unique=False)
-    op.create_table('entregador',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('nome', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_entregador_id'), 'entregador', ['id'], unique=False)
     op.create_table('usuario',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
@@ -119,6 +103,16 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_endereco_id'), 'endereco', ['id'], unique=False)
+    op.create_table('entregador_info',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=True),
+    sa.Column('placa', sa.String(length=10), nullable=True),
+    sa.Column('cnh', sa.String(length=20), nullable=True),
+    sa.Column('endereco', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('usuario_id')
+    )
     op.create_table('produto',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('sku', sa.String(length=50), nullable=False),
@@ -166,7 +160,7 @@ def upgrade() -> None:
     sa.Column('quantidade', sa.Integer(), nullable=True),
     sa.Column('valor_unitario', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('valor_total', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.ForeignKeyConstraint(['carrinho_id'], ['carrinho.id'], ),
+    sa.ForeignKeyConstraint(['carrinho_id'], ['carrinho.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['produto_id'], ['produto.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -185,6 +179,9 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('produto_id', sa.Integer(), nullable=False),
     sa.Column('criado_em', sa.DateTime(), nullable=True),
+    sa.Column('posicao', sa.Integer(), nullable=True, comment='Ordem de exibição no destaque'),
+    sa.Column('ativo', sa.Boolean(), nullable=True),
+    sa.Column('tipo_destaque', sa.String(length=20), nullable=True, comment="Ex: 'principal', 'secundario', 'promocional'"),
     sa.ForeignKeyConstraint(['produto_id'], ['produto.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('produto_id')
@@ -226,6 +223,7 @@ def upgrade() -> None:
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('endereco_id', sa.Integer(), nullable=True),
     sa.Column('cupom_id', sa.Integer(), nullable=True),
+    sa.Column('carrinho_id', sa.Integer(), nullable=True),
     sa.Column('total', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('valor_total_bruto', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.Column('valor_desconto', sa.DECIMAL(precision=10, scale=2), nullable=False),
@@ -233,6 +231,7 @@ def upgrade() -> None:
     sa.Column('status', sa.Enum('PENDENTE', 'PAGO', 'CANCELADO', name='status_venda_enum', create_constraint=True), nullable=False),
     sa.Column('data_venda', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.Column('is_ativo', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['carrinho_id'], ['carrinho.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['cupom_id'], ['cupom.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['endereco_id'], ['endereco.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ondelete='CASCADE'),
@@ -294,11 +293,11 @@ def upgrade() -> None:
     op.create_table('entrega_candidato',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('entrega_id', sa.Integer(), nullable=False),
-    sa.Column('entregador_id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('data_interesse', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('status', sa.Enum('pendente', 'aceita', 'recusada', name='statusentregacandidato'), nullable=False),
     sa.ForeignKeyConstraint(['entrega_id'], ['entrega.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['entregador_id'], ['entregador.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_entrega_candidato_id'), 'entrega_candidato', ['id'], unique=False)
@@ -365,6 +364,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_produto_sku'), table_name='produto')
     op.drop_index(op.f('ix_produto_id'), table_name='produto')
     op.drop_table('produto')
+    op.drop_table('entregador_info')
     op.drop_index(op.f('ix_endereco_id'), table_name='endereco')
     op.drop_table('endereco')
     op.drop_index(op.f('ix_categoria_imagem_id'), table_name='categoria_imagem')
@@ -375,8 +375,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_usuario_email'), table_name='usuario')
     op.drop_index(op.f('ix_usuario_cpf_cnpj'), table_name='usuario')
     op.drop_table('usuario')
-    op.drop_index(op.f('ix_entregador_id'), table_name='entregador')
-    op.drop_table('entregador')
     op.drop_index(op.f('ix_cupom_id'), table_name='cupom')
     op.drop_table('cupom')
     op.drop_index(op.f('ix_categorias_id'), table_name='categorias')

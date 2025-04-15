@@ -12,11 +12,17 @@ class ProdutoDestaque(Base):
     criado_em = Column(DateTime, default=datetime.utcnow)
     posicao = Column(Integer, nullable=True, comment="Ordem de exibição no destaque")
     ativo = Column(Boolean, default=True)
-    tipo_destaque = Column(String(20), default='principal',
-                           comment="Ex: 'principal', 'secundario', 'promocional'")
+    tipo_destaque = Column(
+        String(20),
+        default='principal',
+        comment="Tipos: 'principal', 'secundario', 'promocional', 'novidade', 'oferta'"
+    )
 
     # Relacionamento
     produto = relationship("Produto", back_populates="destaque")
 
     def __repr__(self):
-        return f"<ProdutoDestaque(id={self.id}, produto_id={self.produto_id}, posicao={self.posicao})>"
+        return (
+            f"<ProdutoDestaque(id={self.id}, produto_id={self.produto_id}, "
+            f"posicao={self.posicao}, ativo={self.ativo}, tipo_destaque='{self.tipo_destaque}')>"
+        )
