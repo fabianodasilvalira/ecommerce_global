@@ -1,8 +1,8 @@
-"""criando todas as tabelas
+"""Criação inicial
 
-Revision ID: 31531f4ec054
+Revision ID: fcc41d2fcc1c
 Revises: 
-Create Date: 2025-04-14 20:40:49.162702
+Create Date: 2025-04-15 07:21:20.714577
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '31531f4ec054'
+revision: str = 'fcc41d2fcc1c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -181,7 +181,7 @@ def upgrade() -> None:
     sa.Column('criado_em', sa.DateTime(), nullable=True),
     sa.Column('posicao', sa.Integer(), nullable=True, comment='Ordem de exibição no destaque'),
     sa.Column('ativo', sa.Boolean(), nullable=True),
-    sa.Column('tipo_destaque', sa.String(length=20), nullable=True, comment="Ex: 'principal', 'secundario', 'promocional'"),
+    sa.Column('tipo_destaque', sa.String(length=20), nullable=True, comment="Tipos: 'principal', 'secundario', 'promocional', 'novidade', 'oferta'"),
     sa.ForeignKeyConstraint(['produto_id'], ['produto.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('produto_id')

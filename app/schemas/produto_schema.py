@@ -23,12 +23,10 @@ class ProdutoResponse(BaseModel):
     sku: str
     nome: str
     descricao: str
-    preco: float
     volume: Optional[float] = None
     unidade_medida: Optional[str] = None
     ativo: bool
     categoria: CategoriaSimpleResponse  # Mudar de categoria_id para o objeto categoria
-    margem_lucro: float
     preco_final: float
     preco_com_promocao: Optional[float] = None
     imagens: List[ProdutoImagemResponse] = []  # Lista de imagens do produto

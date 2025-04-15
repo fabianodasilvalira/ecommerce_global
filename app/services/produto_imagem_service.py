@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.produto_imagem import ProdutoImagem  # ou onde estiver seu modelo
+
+from app.models.produto_imagem import ProdutoImagem
 from app.schemas.produto_imagem_schema import ProdutoImagemCreate, ProdutoImagemUpdate
 from sqlalchemy import func
 

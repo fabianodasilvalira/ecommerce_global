@@ -28,26 +28,30 @@ class ProdutoImagemCreate(ProdutoImagemBase):
             "visivel": self.visivel
         }
 
-class ProdutoImagemResponse(ProdutoImagemBase):
+class ProdutoImagemResponse(BaseModel):
     id: int
+    imagem_url: str
     produto_id: int
-    criado_em: str
-    atualizado_em: str | None = None
+    tipo: str
+    ordem: Optional[int] = None
+    visivel: bool
+    criado_em: str  # Mantém como string
+    atualizado_em: Optional[str] = None
 
-    @validator("criado_em", pre=True)
-    def format_criado_em(cls, v):
-        if isinstance(v, datetime):
-            return v.strftime("%Y-%m-%dT%H:%M:%S")
-        return v
+    @validator('criado_em', pre=True)
+    def format_criado_em(cls, value):
+        if isinstance(value, datetime):
+            return value.isoformat()  # Converte para string ISO 8601
+        return value
 
-    @validator("atualizado_em", pre=True)
-    def format_atualizado_em(cls, v):
-        if isinstance(v, datetime):
-            return v.strftime("%Y-%m-%dT%H:%M:%S")
-        return v
+    @validator('atualizado_em', pre=True)
+    def format_atualizado_em(cls, value):
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return value
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProdutoImagemUpdate(BaseModel):

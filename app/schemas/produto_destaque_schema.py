@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field, validator
 from typing import Optional
 from enum import Enum
 
+from app.schemas.produto_schema import ProdutoResponse
+
 
 class TipoDestaqueEnum(str, Enum):
     principal = "principal"
@@ -59,7 +61,7 @@ class ProdutoDestaqueResponse(ProdutoDestaqueBase):
 
 
 class ProdutoDestaqueComProduto(ProdutoDestaqueResponse):
-    produto: dict  # Substituir por ProdutoResponse se disponível
+    produto: ProdutoResponse  # ✅ CORRETO AGORA
 
     class Config:
         from_attributes = True
