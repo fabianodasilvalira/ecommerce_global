@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.schemas.venda_schema import VendaResponse  # 👈 adicione isso
 
@@ -83,4 +83,22 @@ def listar_historico(usuario_id: int, db: Session = Depends(get_db)):
 
 @router.get("/item/{produto_id}", response_model=schemas.ItemCarrinhoOut)
 def ver_item_carrinho(produto_id: int, usuario_id: int, db: Session = Depends(get_db)):
-    return carrinho_service.buscar_item_do_carrinho(db, usuario_id, produto_id)
+    return carrinho_service.ver_item_especifico(db, usuario_id, produto_id)
+
+
+@router.get("/finalizados", response_model=List[schemas.CarrinhoOut])
+def listar_carrinhos_finalizados(
+        usuario_id: int = Query(..., description="ID do usuário"),
+        skip: int = Query(0, description="Pular registros"),
+        limit: int = Query(100, description="Limite de registros por página"),
+        db: Session = Depends(get_db)
+):
+    """
+    Lista todos os carrinhos finalizados de um usuário específico.
+
+    Parâmetros:
+    - usuario_id: ID do usuário (obrigatório)
+    - skip: Número de registros para pular (para paginação)
+    - limit: Número máximo de registros por página (padrão 100)
+    """
+    return carrinho_service.listar_carrinhos_finalizados(db, usuario_id, skip, limit)

@@ -1,8 +1,11 @@
+from datetime import datetime
 from typing import Optional, Dict, Any
 
 from sqlalchemy import func, and_
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
+
+from app import models
 from app.models import carrinho as carrinho_model, Venda, Produto
 from app.models import item_carrinho as item_model
 from app.models import produto as produto_model
@@ -13,31 +16,61 @@ from app.schemas.venda_schema import VendaCreate, ItemVendaCreate
 from app.services import venda_service
 from app.services.produto_service import logger
 
-
 def buscar_ou_criar_carrinho(db: Session, usuario_id: int):
-    carrinho = (
-        db.query(carrinho_model.Carrinho)
-        .options(joinedload(carrinho_model.Carrinho.itens).joinedload(item_model.ItemCarrinho.produto))
+    return (
+        db.query(Carrinho)
+        .options(
+            joinedload(Carrinho.itens)
+            .joinedload(ItemCarrinho.produto)
+            .joinedload(Produto.imagens),
+            joinedload(Carrinho.itens)
+            .joinedload(ItemCarrinho.produto)
+            .joinedload(Produto.categoria)
+        )
         .filter_by(usuario_id=usuario_id, is_finalizado=False)
         .first()
     )
-    if not carrinho:
-        carrinho = carrinho_model.Carrinho(usuario_id=usuario_id)
-        db.add(carrinho)
-        db.commit()
-        db.refresh(carrinho)
-        carrinho.itens = []
-    return carrinho
 
 
 def calcular_totais(carrinho):
-    total_valor = sum(float(item.valor_total) for item in carrinho.itens)
-    carrinho.subtotal = round(total_valor, 2)
-    return carrinho
+    # Formata os itens do carrinho
+    itens_formatados = []
+    for item in carrinho.itens:
+        itens_formatados.append({
+            "id": item.id,
+            "quantidade": item.quantidade,
+            "valor_unitario": float(item.valor_unitario),
+            "valor_total": float(item.valor_total),
+            "produto": formatar_produto(item.produto)
+        })
+
+    # Calcula totais
+    subtotal = sum(float(item.valor_total) for item in carrinho.itens)
+    # Se houver taxas ou descontos, ajuste aqui
+    total = subtotal  # Ou subtotal + taxas - descontos
+
+    return {
+        "id": carrinho.id,
+        "usuario_id": carrinho.usuario_id,
+        "itens": itens_formatados,
+        "subtotal": float(subtotal),  # Adicionado este campo
+        "total": float(total),
+        "is_finalizado": carrinho.is_finalizado
+    }
 
 
 def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarrinhoBase):
+    if item_data.quantidade <= 0:
+        raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
+
     produto = db.query(produto_model.Produto).filter_by(id=item_data.produto_id).first()
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    # Verificar estoque se necessário
+    if hasattr(produto, 'estoque_disponivel') and produto.estoque_disponivel < item_data.quantidade:
+        raise HTTPException(status_code=400, detail="Quantidade indisponível em estoque")
+
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
@@ -112,40 +145,58 @@ def limpar_carrinho(db: Session, usuario_id: int):
 
 
 def ver_carrinho(db: Session, usuario_id: int) -> Dict[str, Any]:
-    """
-    Retorna o carrinho do usuário com formatação padronizada
-    """
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
+    if not carrinho:
+        carrinho = Carrinho(usuario_id=usuario_id)
+        db.add(carrinho)
+        db.commit()
+        db.refresh(carrinho)
 
+    itens_formatados = []
+    for item in carrinho.itens:
+        produto_formatado = formatar_produto(item.produto)
+        itens_formatados.append({
+            "id": item.id,
+            "quantidade": item.quantidade,
+            "valor_unitario": float(item.valor_unitario),
+            "valor_total": float(item.valor_total),
+            "produto": produto_formatado
+        })
+    import json
+    print("Dados do carrinho:", json.dumps({
+        "itens": itens_formatados,
+        "subtotal": sum(item.valor_total for item in carrinho.itens)
+    }, indent=2, default=str))
     return {
         "id": carrinho.id,
         "usuario_id": carrinho.usuario_id,
         "is_finalizado": carrinho.is_finalizado,
-        "itens": [
-            {
-                "id": item.id,
-                "quantidade": item.quantidade,
-                "valor_unitario": float(item.valor_unitario),
-                "valor_total": float(item.valor_total),
-                "produto": formatar_produto(item.produto)
-            } for item in carrinho.itens
-        ],
+        "itens": itens_formatados,
         "subtotal": float(sum(item.valor_total for item in carrinho.itens))
     }
 
 
-# Alterado: Função auxiliar nova para formatar produtos
 def formatar_produto(produto: Produto) -> Dict[str, Any]:
-    """Formata os dados do produto de forma consistente"""
+    """Formata os dados do produto para o schema"""
+
+    # Verifica se há imagens e pega a primeira URL
+    imagem_url = ""
+    if produto.imagens and len(produto.imagens) > 0:
+        imagem_url = produto.imagens[0].imagem_url  # Pega a URL da primeira imagem
+
+    # Obtém o nome da categoria ou string vazia
+    categoria_nome = ""
+    if produto.categoria:
+        categoria_nome = produto.categoria.nome  # Acessa o atributo 'nome' do objeto Categoria
+
     return {
         "id": produto.id,
         "nome": produto.nome,
         "descricao": produto.descricao,
-        "preco": float(produto.preco_final),
-        "imagem_url": produto.imagens[0].url if produto.imagens else "",
-        "categoria": produto.categoria.nome if produto.categoria else ""
+        "preco": float(produto.preco),  # Ou preco_final, conforme o modelo
+        "imagem_url": imagem_url,  # Agora sempre será uma string
+        "categoria": categoria_nome  # Agora sempre será uma string (nome da categoria)
     }
-
 
 
 def finalizar_carrinho(db: Session, usuario_id: int):
@@ -164,18 +215,45 @@ def finalizar_carrinho(db: Session, usuario_id: int):
     return calcular_totais(carrinho)
 
 
-def listar_carrinhos_finalizados(db: Session, usuario_id: int):
-    carrinhos = (
-        db.query(carrinho_model.Carrinho)
-        .options(joinedload(carrinho_model.Carrinho.itens).joinedload(item_model.ItemCarrinho.produto))
-        .filter_by(usuario_id=usuario_id, is_finalizado=True)
-        .all()
-    )
+def listar_carrinhos_finalizados(
+    db: Session,
+    usuario_id: int,
+    skip: int = 0,
+    limit: int = 100
+):
+    try:
+        carrinhos = (
+            db.query(models.Carrinho)
+            .options(
+                joinedload(models.Carrinho.itens)
+                .joinedload(models.ItemCarrinho.produto)
+                .joinedload(models.Produto.imagens),
+                joinedload(models.Carrinho.itens)
+                .joinedload(models.ItemCarrinho.produto)
+                .joinedload(models.Produto.categoria)
+            )
+            .filter(
+                models.Carrinho.usuario_id == usuario_id,
+                models.Carrinho.is_finalizado == True
+            )
+            .order_by(models.Carrinho.data_finalizacao.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
-    for carrinho in carrinhos:
-        calcular_totais(carrinho)
+        if not carrinhos:
+            raise HTTPException(
+                status_code=404,
+                detail="Nenhum carrinho finalizado encontrado para este usuário"
+            )
 
-    return carrinhos
+        return [calcular_totais(carrinho) for carrinho in carrinhos]
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao listar carrinhos finalizados: {str(e)}"
+        )
 
 
 def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
@@ -183,7 +261,12 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
 
     item = (
         db.query(item_model.ItemCarrinho)
-        .options(joinedload(item_model.ItemCarrinho.produto))
+        .options(
+            joinedload(item_model.ItemCarrinho.produto)
+            .joinedload(produto_model.Produto.imagens),
+            joinedload(item_model.ItemCarrinho.produto)
+            .joinedload(produto_model.Produto.categoria)
+        )
         .filter_by(carrinho_id=carrinho.id, produto_id=produto_id)
         .first()
     )
@@ -191,7 +274,21 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
     if not item:
         raise HTTPException(status_code=404, detail="Item não encontrado")
 
-    return item
+    # Formatar a resposta conforme o schema esperado
+    return {
+        "id": item.id,
+        "quantidade": item.quantidade,
+        "valor_unitario": float(item.valor_unitario),
+        "valor_total": float(item.valor_total),
+        "produto": {
+            "id": item.produto.id,
+            "nome": item.produto.nome,
+            "descricao": item.produto.descricao,
+            "preco": float(item.produto.preco),
+            "imagem_url": item.produto.imagens[0].imagem_url if item.produto.imagens else "",
+            "categoria": item.produto.categoria.nome if item.produto.categoria else ""
+        }
+    }
 
 
 def finalizar_carrinho_e_criar_venda(
@@ -226,6 +323,7 @@ def finalizar_carrinho_e_criar_venda(
 
         # Finaliza carrinho
         carrinho.is_finalizado = True
+        carrinho.data_finalizacao = datetime.utcnow()  # Adicione esta linha
         carrinho.atualizado_em = func.now()
 
         # Cria venda

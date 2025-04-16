@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from app.schemas.produto_schema import ProdutoOut
 
 
@@ -25,6 +27,8 @@ class CarrinhoOut(BaseModel):
     is_finalizado: bool
     itens: List[ItemCarrinhoOut]
     subtotal: float  # campo adicional com o valor total do carrinho
+    is_finalizado: bool
+    data_finalizacao: Optional[datetime]  # Adicione este campo se ainda não existir
 
     class Config:
         orm_mode = True

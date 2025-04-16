@@ -12,6 +12,8 @@ class Carrinho(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
     atualizado_em = Column(DateTime(timezone=True), onupdate=func.now())
     is_finalizado = Column(Boolean, default=False)
+    data_finalizacao = Column(DateTime, nullable=True)  # Será preenchido quando finalizado
+
 
     # Alterado: Adicionei cascade para evitar problemas de deleção
     venda = relationship("Venda", back_populates="carrinho", uselist=False, cascade="save-update")
@@ -25,7 +27,12 @@ class Carrinho(Base):
         order_by="ItemCarrinho.id"
     )
 
-    # Alterado: Adicionei método para calcular subtotal
     @property
     def subtotal(self) -> float:
         return sum(float(item.valor_total) for item in self.itens)
+
+    @subtotal.setter
+    def subtotal(self, value: float):
+        # Isso permite que o valor seja definido, mas na prática não armazena
+        # pois é uma propriedade calculada
+        pass

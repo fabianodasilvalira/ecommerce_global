@@ -1137,7 +1137,7 @@ collection:
             meta:
               id: req_c14f568fbe9a4f15b21e37a4d8997a05
               created: 1744381852331
-              modified: 1744381884022
+              modified: 1744804965180
               isPrivate: false
               sortKey: -1744381880959
             method: POST
@@ -1145,7 +1145,7 @@ collection:
               mimeType: application/json
               text: |-
                 {
-                  "produto_id": 1,
+                  "produto_id": 5,
                   "quantidade": 2
                 }
             settings:
@@ -1173,12 +1173,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/remover/1?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/remover/2?usuario_id=1"
             name: Remover Item
             meta:
               id: req_9a89c46c2b75419aa9ab09f7cc85b72d
               created: 1744381852334
-              modified: 1744381886611
+              modified: 1744804955363
               isPrivate: false
               sortKey: -1744381881059
             method: DELETE
@@ -1190,12 +1190,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/atualizar/1?usuario_id=1&quantidade=5"
+          - url: "{{ base_url }}/carrinho/atualizar/5?usuario_id=1&quantidade=89"
             name: Atualizar Quantidade
             meta:
               id: req_2dd03eadf435474ba31f7feb6ac3a8e2
               created: 1744381852335
-              modified: 1744381888645
+              modified: 1744805019102
               isPrivate: false
               sortKey: -1744381881159
             method: PUT
@@ -1246,7 +1246,7 @@ collection:
             meta:
               id: req_7125c13b9f994fb2a800fc332c7e5ce8
               created: 1744381852338
-              modified: 1744381895797
+              modified: 1744805207188
               isPrivate: false
               sortKey: -1744381881121.5
             method: GET
@@ -1258,12 +1258,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/item/1?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/item/2?usuario_id=1"
             name: Ver Item Específico
             meta:
               id: req_df5d3ee9e5be462f81ed46020428871e
               created: 1744381852338
-              modified: 1744381894245
+              modified: 1744805167169
               isPrivate: false
               sortKey: -1744381881134
             method: GET
@@ -1576,7 +1576,7 @@ collection:
             meta:
               id: req_186bd5fffe9a4a838816609c26450c67
               created: 1744713856693
-              modified: 1744714733744
+              modified: 1744800775558
               isPrivate: false
               sortKey: -1744713856693
             method: GET
@@ -1587,7 +1587,7 @@ collection:
               - id: pair_f96851bf1d7648c9859bf34a446a9db5
                 name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0NzE2NDY1fQ.TsIZmEZp5lLNuJq6Sgapf4LaIFbqImmLZVD6Jgz0Qek
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0ODAyNTYwfQ.oh38zMWrZ5XKNYoFaS9jgCLWDqu9GlEp5hanjJWWUUo
                 disabled: false
             settings:
               renderRequestBody: true
