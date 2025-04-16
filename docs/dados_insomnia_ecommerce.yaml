@@ -248,7 +248,7 @@ collection:
             meta:
               id: req_fc8c1789f3544236b9bfe978abb31a7d
               created: 1743772541780
-              modified: 1744379244559
+              modified: 1744813621434
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -256,7 +256,7 @@ collection:
               mimeType: application/json
               text: |
                 {
-                  "produto_id": 1,
+                  "produto_id": 2,
                   "quantidade": 20
                 }
             headers:
@@ -521,7 +521,7 @@ collection:
             meta:
               id: req_f955c381207b432caeb29075e8f4c770
               created: 1743601564489
-              modified: 1744714200232
+              modified: 1744818363391
               isPrivate: false
               sortKey: -1743775521823
             method: POST
@@ -677,7 +677,7 @@ collection:
             meta:
               id: req_f310fa480cf84910b20aa65741860bae
               created: 1744119666509
-              modified: 1744379255208
+              modified: 1744818371802
               isPrivate: false
               sortKey: -1744119678865
             method: POST
@@ -696,9 +696,11 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_c826a1ff481849a78847b4e12561ceb6
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0MzgwOTQxfQ.L5d4YSlT6iLmiA29rHegu8apbI40kNxvhB5ZRa51v_w
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0ODIwMTY0fQ.th_3ah_edp47OAsbQaabqti1Va8eqU2mgt7O9RrE4C4
+                id: pair_9599da96c0094c7ea181eeba0c9a72c0
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1137,7 +1139,7 @@ collection:
             meta:
               id: req_c14f568fbe9a4f15b21e37a4d8997a05
               created: 1744381852331
-              modified: 1744804965180
+              modified: 1744814511518
               isPrivate: false
               sortKey: -1744381880959
             method: POST
@@ -1145,7 +1147,7 @@ collection:
               mimeType: application/json
               text: |-
                 {
-                  "produto_id": 5,
+                  "produto_id": 1,
                   "quantidade": 2
                 }
             settings:
@@ -1161,7 +1163,7 @@ collection:
             meta:
               id: req_674ddbb4529c42cf96bd6886c8091dcf
               created: 1744381852333
-              modified: 1744381881011
+              modified: 1744816468601
               isPrivate: false
               sortKey: -1744381880859
             method: GET
@@ -1190,15 +1192,30 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/atualizar/5?usuario_id=1&quantidade=89"
+          - url: "{{ base_url }}/carrinho/atualizar/1/produto"
             name: Atualizar Quantidade
             meta:
               id: req_2dd03eadf435474ba31f7feb6ac3a8e2
               created: 1744381852335
-              modified: 1744805019102
+              modified: 1744815945430
               isPrivate: false
               sortKey: -1744381881159
             method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "usuario_id": 1,
+                  "itens": [
+                    {
+                      "produto_id": 1,
+                      "quantidade": 20
+                    }
+                  ]
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1224,12 +1241,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/finalizar?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/finalizar?usuario_id=1&endereco_id=1"
             name: Finalizar Carrinho
             meta:
               id: req_dde477ca73dd4c77880327015870590a
               created: 1744381852337
-              modified: 1744381892594
+              modified: 1744816177050
               isPrivate: false
               sortKey: -1744381881084
             method: POST
@@ -1258,12 +1275,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/item/2?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/item/1?usuario_id=1"
             name: Ver Item Específico
             meta:
               id: req_df5d3ee9e5be462f81ed46020428871e
               created: 1744381852338
-              modified: 1744805167169
+              modified: 1744815645216
               isPrivate: false
               sortKey: -1744381881134
             method: GET
