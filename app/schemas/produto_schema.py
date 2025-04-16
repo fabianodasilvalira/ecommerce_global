@@ -53,18 +53,8 @@ class ProdutoOut(BaseModel):
     nome: str
     descricao: str
     preco: float
-    imagem_url: str  # Campo obrigatório
-    categoria: str   # Deve ser string, não objeto
+    imagem_url: str
+    categoria: str
 
     class Config:
-        from_attributes = True
-
-
-class CarrinhoResponse(BaseModel):
-    id: int
-    usuario_id: int
-    itens: List[ProdutoResponse]  # A lista de produtos no carrinho
-    subtotal: float
-
-    class Config:
-        from_attributes = True
+        orm_mode = True

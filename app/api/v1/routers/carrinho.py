@@ -2,6 +2,8 @@ from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
+from app.schemas.carrinho_schema import CarrinhoAtualizarInput
 from app.schemas.venda_schema import VendaResponse  # 👈 adicione isso
 
 from app.db.database import get_db
@@ -29,8 +31,17 @@ def remover_item(produto_id: int, usuario_id: int, db: Session = Depends(get_db)
     return carrinho_service.remover_item_do_carrinho(db, usuario_id, produto_id)
 
 
-@router.put("/atualizar/{produto_id}", response_model=schemas.CarrinhoOut)
-def atualizar_quantidade(produto_id: int, quantidade: int, usuario_id: int, db: Session = Depends(get_db)):
+@router.put("/atualizar/{produto_id}/produto", response_model=schemas.CarrinhoOut)
+def atualizar_quantidade(
+        produto_id: int,
+        dados: CarrinhoAtualizarInput,  # Recebe dados no corpo da requisição (JSON)
+        db: Session = Depends(get_db)
+):
+    usuario_id = dados.usuario_id  # Obtém o usuario_id do corpo da requisição
+    quantidade = dados.itens[
+        0].quantidade  # Aqui, pegamos a quantidade do primeiro item (poderia ter lógica para múltiplos itens)
+
+    # Chama o serviço que trata a lógica de atualizar o carrinho
     return carrinho_service.atualizar_quantidade_item(db, usuario_id, produto_id, quantidade)
 
 

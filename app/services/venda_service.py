@@ -15,7 +15,7 @@ from app.models import (
 )
 from app.models.pagamento import MetodoPagamentoEnum
 from app.schemas.relatorio_pagamento import StatusPagamentoEnum
-from app.schemas.venda_schema import VendaCreate, ItemVendaCreate
+from app.schemas.venda_schema import VendaCreate, ItemVendaCreate, VendaOut
 from app.models.venda import StatusVendaEnum, TipoDescontoEnum
 from app.models.movimentacao_estoque import TipoMovimentoEnum
 
@@ -40,8 +40,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
     - Criação de pagamento
     """
     try:
-        # Inicia a transação
-        db.begin()
 
         nova_venda = Venda(
             usuario_id=usuario.id,
@@ -94,7 +92,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
 
             # Cálculo de preços
             preco_bruto = Decimal(str(produto.preco_final))
-            preco_unitario = self._calcular_preco_com_desconto(
+            preco_unitario = calcular_preco_com_desconto(
                 preco_bruto, produto, desconto_percentual
             )
 
@@ -144,7 +142,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         ))
 
         db.commit()
-        return nova_venda
+        return VendaOut.from_orm(nova_venda)
 
     except HTTPException:
         db.rollback()
@@ -158,7 +156,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         )
 
 
-def _calcular_preco_com_desconto(
+def calcular_preco_com_desconto(
         preco_bruto: Decimal,
         produto: Produto,
         desconto_percentual: Decimal

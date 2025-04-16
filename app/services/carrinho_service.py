@@ -46,45 +46,50 @@ def calcular_totais(carrinho):
 
     # Calcula totais
     subtotal = sum(float(item.valor_total) for item in carrinho.itens)
-    # Se houver taxas ou descontos, ajuste aqui
     total = subtotal  # Ou subtotal + taxas - descontos
+    data_finalizacao = carrinho.data_finalizacao if carrinho.data_finalizacao else None  # Garante que será None se não finalizado
 
     return {
         "id": carrinho.id,
         "usuario_id": carrinho.usuario_id,
         "itens": itens_formatados,
-        "subtotal": float(subtotal),  # Adicionado este campo
+        "subtotal": float(subtotal),
         "total": float(total),
-        "is_finalizado": carrinho.is_finalizado
+        "is_finalizado": carrinho.is_finalizado,
+        "data_finalizacao": data_finalizacao  # Retorna o campo de data_finalizacao
     }
 
 
+
 def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarrinhoBase):
+    # Verificar se a quantidade é válida
     if item_data.quantidade <= 0:
         raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
 
+    # Buscar o produto
     produto = db.query(produto_model.Produto).filter_by(id=item_data.produto_id).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-    # Verificar estoque se necessário
+    # Verificar estoque, se o produto possui o atributo de estoque
     if hasattr(produto, 'estoque_disponivel') and produto.estoque_disponivel < item_data.quantidade:
         raise HTTPException(status_code=400, detail="Quantidade indisponível em estoque")
 
-    if not produto:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-
+    # Buscar ou criar o carrinho do usuário
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
 
+    # Verificar se o item já está no carrinho
     item = db.query(item_model.ItemCarrinho).filter_by(
         carrinho_id=carrinho.id,
         produto_id=item_data.produto_id
     ).first()
 
+    # Se o item já existe no carrinho, apenas atualiza a quantidade e o valor total
     if item:
         item.quantidade += item_data.quantidade
         item.valor_total = item.quantidade * item.valor_unitario
     else:
+        # Caso o item não exista no carrinho, cria um novo item
         item = item_model.ItemCarrinho(
             carrinho_id=carrinho.id,
             produto_id=item_data.produto_id,
@@ -94,13 +99,18 @@ def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarr
         )
         db.add(item)
 
+    # Salvar as alterações no banco de dados
     db.commit()
     db.refresh(carrinho)
+
+    # Calcular os totais atualizados do carrinho
     return calcular_totais(buscar_ou_criar_carrinho(db, usuario_id))
 
 
 def remover_item_do_carrinho(db: Session, usuario_id: int, produto_id: int):
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
+    if not carrinho:
+        raise HTTPException(status_code=404, detail="Carrinho não encontrado")
 
     item = db.query(item_model.ItemCarrinho).filter_by(
         carrinho_id=carrinho.id,
@@ -172,7 +182,9 @@ def ver_carrinho(db: Session, usuario_id: int) -> Dict[str, Any]:
         "usuario_id": carrinho.usuario_id,
         "is_finalizado": carrinho.is_finalizado,
         "itens": itens_formatados,
-        "subtotal": float(sum(item.valor_total for item in carrinho.itens))
+        "subtotal": float(sum(item.valor_total for item in carrinho.itens)),
+        "data_finalizacao": carrinho.data_finalizacao if carrinho.data_finalizacao else None
+
     }
 
 
@@ -210,6 +222,7 @@ def finalizar_carrinho(db: Session, usuario_id: int):
         raise HTTPException(status_code=400, detail="Carrinho vazio ou não encontrado")
 
     carrinho.is_finalizado = True
+    carrinho.data_finalizacao = func.now()  # Preenche com a data e hora atual
     db.commit()
     db.refresh(carrinho)
     return calcular_totais(carrinho)
@@ -300,13 +313,14 @@ def finalizar_carrinho_e_criar_venda(
     """
     Fluxo completo e transacional para finalizar carrinho e criar venda.
     Lança HTTPException em caso de erro com rollback automático.
+
+    Corrigido o problema de FOR UPDATE com OUTER JOIN:
+    - Primeiro busca e bloqueia apenas o carrinho
+    - Depois carrega os relacionamentos necessários
     """
     try:
-        # Busca carrinho com lock para evitar concorrência
-        carrinho = db.query(Carrinho).options(
-            joinedload(Carrinho.itens).joinedload(ItemCarrinho.produto),
-            joinedload(Carrinho.usuario)
-        ).filter(
+        # 1. Busca e bloqueia APENAS o carrinho (sem joins)
+        carrinho = db.query(Carrinho).filter(
             and_(
                 Carrinho.usuario_id == usuario_id,
                 Carrinho.is_finalizado == False
@@ -315,15 +329,19 @@ def finalizar_carrinho_e_criar_venda(
 
         if not carrinho:
             raise HTTPException(status_code=404, detail="Carrinho ativo não encontrado")
+
+        # 2. Agora carrega os relacionamentos necessários
+        carrinho = db.query(Carrinho).options(
+            joinedload(Carrinho.itens).joinedload(ItemCarrinho.produto),
+            joinedload(Carrinho.usuario)
+        ).filter(Carrinho.id == carrinho.id).first()
+
         if not carrinho.itens:
             raise HTTPException(status_code=400, detail="Carrinho vazio")
 
-        # Inicia transação explícita
-        db.begin()
-
         # Finaliza carrinho
         carrinho.is_finalizado = True
-        carrinho.data_finalizacao = datetime.utcnow()  # Adicione esta linha
+        carrinho.data_finalizacao = func.now()
         carrinho.atualizado_em = func.now()
 
         # Cria venda

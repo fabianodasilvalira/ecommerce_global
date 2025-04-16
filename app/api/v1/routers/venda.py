@@ -13,11 +13,11 @@ router = APIRouter()
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def criar_venda_endpoint(
-    venda: VendaCreate,
+    venda_data: VendaCreate,
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(get_current_user)
 ):
-    return criar_venda(db=db, venda=venda, usuario=usuario)
+    return criar_venda(db=db, venda=venda_data, usuario=usuario)
 
 @router.get("/usuario", response_model=List[VendaResponse])
 def listar_vendas_usuario_endpoint(
