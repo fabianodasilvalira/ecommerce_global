@@ -54,7 +54,9 @@ class ProdutoOut(BaseModel):
     descricao: str
     preco: float
     imagem_url: str
-    categoria: str
+    categoria: CategoriaSimpleResponse
+    imagem_url: Optional[str] = None
+
 
     class Config:
-        orm_mode = True
+        from_attributes = True

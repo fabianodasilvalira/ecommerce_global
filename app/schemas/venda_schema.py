@@ -24,7 +24,7 @@ class ItemVendaCreate(BaseModel):
 
 class VendaCreate(BaseModel):
     endereco_id: Optional[int]
-    cupom_id: Optional[int] = None  # ✅ Torna opcional
+    cupom_id: Optional[int] = None
     itens: List[ItemVendaCreate]
 
 
@@ -35,7 +35,7 @@ class ItemVendaResponse(BaseModel):
     preco_unitario: condecimal(max_digits=10, decimal_places=2)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class VendaResponse(BaseModel):
@@ -49,12 +49,11 @@ class VendaResponse(BaseModel):
     itens: List[ItemVendaResponse]
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Corrigido aqui também
 
 
 class VendaDetalhadaResponse(VendaResponse):
-    # Pode-se adicionar mais campos específicos para o detalhamento aqui se necessário
-    pass
+    pass  # Herda de VendaResponse, já configurado corretamente
 
 
 class VendaOut(BaseModel):
@@ -67,19 +66,18 @@ class VendaOut(BaseModel):
     data_venda: datetime
     itens: List[ItemVendaOut]
     carrinho_id: Optional[int] = None
-    # Novo: Dados básicos do carrinho de origem
     carrinho: Optional[dict] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     @classmethod
     def from_orm(cls, obj):
-        # Adiciona dados do carrinho se existir
+        data = super().from_orm(obj)
         if obj.carrinho:
-            obj.carrinho = {
+            data.carrinho = {
                 "id": obj.carrinho.id,
                 "criado_em": obj.carrinho.criado_em,
                 "finalizado_em": obj.carrinho.atualizado_em
             }
-        return super().from_orm(obj)
+        return data

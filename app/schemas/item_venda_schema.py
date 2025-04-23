@@ -11,4 +11,4 @@ class ItemVendaOut(BaseModel):
     produto: ProdutoOut
 
     class Config:
-        orm_mode = True
+        from_attributes = True
