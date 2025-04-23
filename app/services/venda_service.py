@@ -31,16 +31,15 @@ def produto_possui_promocao_ativa(produto: Produto) -> bool:
     )
 
 
-def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda:
+def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> VendaOut:
     """
-    Cria uma nova venda com tratamento completo de:
-    - Validação de estoque
-    - Cálculo de descontos (cupom/promoção)
+    Cria uma nova venda com validações:
+    - Estoque
+    - Cupom/promoção (não acumulativos)
     - Movimentação de estoque
-    - Criação de pagamento
+    - Pagamento pendente
     """
     try:
-
         nova_venda = Venda(
             usuario_id=usuario.id,
             endereco_id=venda_data.endereco_id,
@@ -50,7 +49,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
 
         total_bruto = Decimal("0.00")
         total_com_desconto = Decimal("0.00")
-        valor_desconto = Decimal("0.00")
         tipo_desconto = TipoDescontoEnum.NENHUM.value
         desconto_percentual = Decimal("0.00")
 
@@ -63,7 +61,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
                 desconto_percentual = Decimal(str(cupom.desconto)) / Decimal("100.00")
                 tipo_desconto = TipoDescontoEnum.CUPOM.value
 
-        # Processamento dos itens
         for item in venda_data.itens:
             produto = db.query(Produto).options(
                 load_only(Produto.id, Produto.nome, Produto.preco_final),
@@ -74,7 +71,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             if not produto:
                 raise HTTPException(status_code=404, detail=f"Produto ID {item.produto_id} não encontrado")
 
-            # Validação de estoque
+            # Valida estoque
             estoque_disponivel = produto.estoque.quantidade if produto.estoque else 0
             if estoque_disponivel < item.quantidade:
                 raise HTTPException(
@@ -82,27 +79,24 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
                     detail=f"Estoque insuficiente para '{produto.nome}'. Disponível: {estoque_disponivel}"
                 )
 
-            # Valida conflito cupom/promoção
-            if (venda_data.cupom_id and produto.promocoes
-                    and produto_possui_promocao_ativa(produto)):
+            # Conflito cupom + promoção
+            if venda_data.cupom_id and produto_possui_promocao_ativa(produto):
                 raise HTTPException(
                     status_code=400,
                     detail=f"Não é permitido usar cupom em produto com promoção ativa: {produto.nome}"
                 )
 
-            # Cálculo de preços
-            preco_bruto = Decimal(str(produto.preco_final))
             preco_unitario = calcular_preco_com_desconto(
-                preco_bruto, produto, desconto_percentual
+                preco_bruto=Decimal(str(produto.preco_final)),
+                produto=produto,
+                desconto_percentual=desconto_percentual
             )
 
-            # Atualiza totais
-            subtotal_bruto = preco_bruto * item.quantidade
+            subtotal_bruto = Decimal(str(produto.preco_final)) * item.quantidade
             subtotal_com_desconto = preco_unitario * item.quantidade
             total_bruto += subtotal_bruto
             total_com_desconto += subtotal_com_desconto
 
-            # Cria item da venda
             item_venda = ItemVenda(
                 produto_id=produto.id,
                 quantidade=item.quantidade,
@@ -113,7 +107,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             # Atualiza estoque
             produto.estoque.quantidade -= item.quantidade
 
-            # Registra movimentação
+            # Movimentação de estoque
             db.add(MovimentacaoEstoque(
                 produto_id=produto.id,
                 tipo_movimentacao=TipoMovimentoEnum.SAIDA,
@@ -122,7 +116,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
                 venda=nova_venda
             ))
 
-        # Finaliza totais da venda
         valor_desconto = (total_bruto - total_com_desconto).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         nova_venda.valor_total_bruto = total_bruto.quantize(Decimal("0.01"))
@@ -133,7 +126,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         db.add(nova_venda)
         db.flush()
 
-        # Cria pagamento
         db.add(Pagamento(
             venda_id=nova_venda.id,
             valor=nova_venda.total,
@@ -142,6 +134,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         ))
 
         db.commit()
+        db.refresh(nova_venda)
         return VendaOut.from_orm(nova_venda)
 
     except HTTPException:
@@ -157,24 +150,28 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
 
 
 def calcular_preco_com_desconto(
-        preco_bruto: Decimal,
-        produto: Produto,
-        desconto_percentual: Decimal
+    preco_bruto: Decimal,
+    produto: Produto,
+    desconto_percentual: Decimal
 ) -> Decimal:
-    """Calcula o preço final considerando promoções e cupons."""
+    """
+    Retorna o preço com desconto de promoção ou cupom (não acumulativo).
+    Promoção tem prioridade.
+    """
     preco_final = preco_bruto
 
     if produto_possui_promocao_ativa(produto):
-        promocao = next(p for p in produto.promocoes if p.ativo)
+        promocao = next(p for p in produto.promocoes if p.ativo and p.data_inicio <= datetime.now() <= p.data_fim)
         if promocao.preco_promocional:
             preco_final = Decimal(str(promocao.preco_promocional))
         elif promocao.desconto_percentual:
-            percentual = Decimal(str(promocao.desconto_percentual)) / 100
+            percentual = Decimal(str(promocao.desconto_percentual)) / Decimal("100.00")
             preco_final *= (1 - percentual)
     elif desconto_percentual > 0:
         preco_final *= (1 - desconto_percentual)
 
     return preco_final.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
 
 
 def cancelar_venda(db: Session, venda_id: int, usuario: Usuario) -> None:

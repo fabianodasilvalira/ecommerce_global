@@ -8,6 +8,7 @@ from decimal import Decimal
 from app.schemas.usuario_schema import UsuarioOut
 from app.schemas.endereco import EnderecoOut
 from app.schemas.cupom_schema import CupomOut
+from app.schemas.promocao_schema import PromocaoOut
 from app.schemas.item_venda_schema import ItemVendaOut
 
 
@@ -61,6 +62,7 @@ class VendaOut(BaseModel):
     usuario: UsuarioOut
     endereco: EnderecoOut
     cupom: Optional[CupomOut]
+    promocoes: Optional[List[PromocaoOut]] = []  # Torna o campo opcional
     total: Decimal
     status: str
     data_venda: datetime
