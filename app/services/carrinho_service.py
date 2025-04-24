@@ -207,8 +207,12 @@ def formatar_produto(produto: Produto) -> Dict[str, Any]:
         "descricao": produto.descricao,
         "preco": float(produto.preco),  # Ou preco_final, conforme o modelo
         "imagem_url": imagem_url,  # Agora sempre será uma string
-        "categoria": categoria_nome  # Agora sempre será uma string (nome da categoria)
-    }
+        "categoria": {
+            "id": produto.categoria.id,
+            "nome": produto.categoria.nome,
+            "descricao": produto.categoria.descricao,
+            "ativo": produto.categoria.ativo
+        } if produto.categoria else None    }
 
 
 def finalizar_carrinho(db: Session, usuario_id: int):
@@ -299,8 +303,12 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
             "descricao": item.produto.descricao,
             "preco": float(item.produto.preco),
             "imagem_url": item.produto.imagens[0].imagem_url if item.produto.imagens else "",
-            "categoria": item.produto.categoria.nome if item.produto.categoria else ""
-        }
+            "categoria": {
+                "id": item.produto.categoria.id,
+                "nome": item.produto.categoria.nome,
+                "descricao": item.produto.categoria.descricao,
+                "ativo": item.produto.categoria.ativo
+            } if item.produto.categoria else None        }
     }
 
 
@@ -310,14 +318,14 @@ def finalizar_carrinho_e_criar_venda(
         endereco_id: int,
         cupom_id: Optional[int] = None
 ) -> Venda:
-    """
-    Fluxo completo e transacional para finalizar carrinho e criar venda.
-    Lança HTTPException em caso de erro com rollback automático.
 
-    Corrigido o problema de FOR UPDATE com OUTER JOIN:
-    - Primeiro busca e bloqueia apenas o carrinho
-    - Depois carrega os relacionamentos necessários
-    """
+    carrinho = db.query(Carrinho).filter(
+        Carrinho.usuario_id == usuario_id,
+        Carrinho.is_finalizado == False
+    ).first()
+    if not carrinho:
+        raise HTTPException(status_code=404, detail="Carrinho não encontrado ou já finalizado")
+
     try:
         # 1. Busca e bloqueia APENAS o carrinho (sem joins)
         carrinho = db.query(Carrinho).filter(

@@ -45,6 +45,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             endereco_id=venda_data.endereco_id,
             cupom_id=venda_data.cupom_id,
             status=StatusVendaEnum.PENDENTE.value,
+            data_venda=datetime.utcnow()
         )
 
         total_bruto = Decimal("0.00")
@@ -124,8 +125,9 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         nova_venda.tipo_desconto = tipo_desconto
 
         db.add(nova_venda)
-        db.flush()
+        db.flush()  # gera o ID da venda para o pagamento
 
+        # Cria o pagamento
         db.add(Pagamento(
             venda_id=nova_venda.id,
             valor=nova_venda.total,
@@ -135,7 +137,8 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
 
         db.commit()
         db.refresh(nova_venda)
-        return VendaOut.from_orm(nova_venda)
+
+        return nova_venda  # retorna o modelo SQLAlchemy
 
     except HTTPException:
         db.rollback()
@@ -147,6 +150,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro ao processar venda"
         )
+
 
 
 def calcular_preco_com_desconto(
@@ -287,9 +291,6 @@ def criar_venda_a_partir_do_carrinho(
                 status_code=400,
                 detail="Carrinho vazio"
             )
-
-        # Inicia transação
-        db.begin()
 
         # Marca carrinho como finalizado
         carrinho.is_finalizado = True

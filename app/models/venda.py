@@ -50,4 +50,9 @@ class Venda(Base):
     cupom = relationship("Cupom", back_populates="vendas")
     entrega = relationship("Entrega", back_populates="venda", uselist=False)
     pagamentos = relationship("Pagamento", back_populates="venda")
-    carrinho = relationship("Carrinho", back_populates="venda")
+    carrinho = relationship(
+        "Carrinho",
+        back_populates="venda",
+        uselist=False,
+        post_update=True  # Importante para relações one-to-one bidirecionais
+    )

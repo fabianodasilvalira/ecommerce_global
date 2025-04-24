@@ -49,25 +49,6 @@ def atualizar_quantidade(
 def limpar_carrinho(usuario_id: int, db: Session = Depends(get_db)):
     return carrinho_service.limpar_carrinho(db, usuario_id)
 
-@router.post("/finalizar-e-criar-venda", response_model=VendaResponse)
-def finalizar_e_criar_venda_a_partir_do_carrinho(
-    usuario_id: int,
-    endereco_id: int,
-    cupom_id: Optional[int] = None,
-    db: Session = Depends(get_db),
-):
-    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if not usuario:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
-
-    venda = service_venda.criar_venda_a_partir_do_carrinho(
-        db=db,
-        usuario=usuario,
-        endereco_id=endereco_id,
-        cupom_id=cupom_id
-    )
-    return venda
-
 
 @router.post("/finalizar", response_model=VendaResponse)
 def finalizar_carrinho(

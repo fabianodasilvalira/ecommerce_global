@@ -521,7 +521,7 @@ collection:
             meta:
               id: req_f955c381207b432caeb29075e8f4c770
               created: 1743601564489
-              modified: 1744818363391
+              modified: 1745499961075
               isPrivate: false
               sortKey: -1743775521823
             method: POST
@@ -557,7 +557,7 @@ collection:
             meta:
               id: req_031845d331f44340b4de32ba6c407ef1
               created: 1743776513738
-              modified: 1744379232337
+              modified: 1745407092474
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -565,8 +565,8 @@ collection:
               mimeType: application/json
               text: |
                 {
-                  "produto_id": 1,
-                  "desconto_percentual": 15.00,
+                  "produto_id": 5,
+                  "preco_promocional": 50.00,
                   "data_inicio": "2025-05-06T00:00:00",
                   "data_fim": "2025-06-06T23:59:59",
                   "ativo": true
@@ -677,7 +677,7 @@ collection:
             meta:
               id: req_f310fa480cf84910b20aa65741860bae
               created: 1744119666509
-              modified: 1744818371802
+              modified: 1745409699756
               isPrivate: false
               sortKey: -1744119678865
             method: POST
@@ -686,6 +686,7 @@ collection:
               text: |
                 {
                   "endereco_id": 1,
+                	"promocao_id": 1,
                   "itens": [
                     {
                       "produto_id": 1,
@@ -699,7 +700,7 @@ collection:
                 id: pair_c826a1ff481849a78847b4e12561ceb6
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0ODIwMTY0fQ.th_3ah_edp47OAsbQaabqti1Va8eqU2mgt7O9RrE4C4
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NDEwOTczfQ.E5IGvXCDPU_GDV16dXqVMPrTCSkhFYpOZqwvCvtY5Ws
                 id: pair_9599da96c0094c7ea181eeba0c9a72c0
             settings:
               renderRequestBody: true
@@ -714,7 +715,7 @@ collection:
             meta:
               id: req_4e0e18455f3c4be7825906375568feab
               created: 1744119666518
-              modified: 1744122768324
+              modified: 1744819418555
               isPrivate: false
               sortKey: -1744119678965
             method: GET
@@ -729,12 +730,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: http://127.0.0.1:8000/api/v1/vendas/8
+          - url: http://127.0.0.1:8000/api/v1/vendas/1
             name: Detalhar Venda
             meta:
               id: req_089c7fbf091c4aa8b41f6a6cd94ad984
               created: 1744119666524
-              modified: 1744129576536
+              modified: 1745404869250
               isPrivate: false
               sortKey: -1744119679065
             method: GET
@@ -743,9 +744,11 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_674fda56be1e46ed87c2d6eb820e1f58
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0MTMxMzY4fQ.gtV84XaHygjfsJ0BTfCU31J364vLDdPt7rvqHSQbbNw
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NDA2NjU4fQ.nH17GG-3E85oXLYFgU-_BbXrVMdTuL-62gMMEDINfcs
+                id: pair_445e10d446bd4735a489a0ba6ec62c9b
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1139,7 +1142,7 @@ collection:
             meta:
               id: req_c14f568fbe9a4f15b21e37a4d8997a05
               created: 1744381852331
-              modified: 1744814511518
+              modified: 1745502063768
               isPrivate: false
               sortKey: -1744381880959
             method: POST
@@ -1163,7 +1166,7 @@ collection:
             meta:
               id: req_674ddbb4529c42cf96bd6886c8091dcf
               created: 1744381852333
-              modified: 1744816468601
+              modified: 1745500163724
               isPrivate: false
               sortKey: -1744381880859
             method: GET
@@ -1175,12 +1178,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/remover/2?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/remover/1?usuario_id=1"
             name: Remover Item
             meta:
               id: req_9a89c46c2b75419aa9ab09f7cc85b72d
               created: 1744381852334
-              modified: 1744804955363
+              modified: 1745500564922
               isPrivate: false
               sortKey: -1744381881059
             method: DELETE
@@ -1197,7 +1200,7 @@ collection:
             meta:
               id: req_2dd03eadf435474ba31f7feb6ac3a8e2
               created: 1744381852335
-              modified: 1744815945430
+              modified: 1745504425260
               isPrivate: false
               sortKey: -1744381881159
             method: PUT
@@ -1209,7 +1212,7 @@ collection:
                   "itens": [
                     {
                       "produto_id": 1,
-                      "quantidade": 20
+                      "quantidade": 4
                     }
                   ]
                 }
@@ -1246,7 +1249,7 @@ collection:
             meta:
               id: req_dde477ca73dd4c77880327015870590a
               created: 1744381852337
-              modified: 1744816177050
+              modified: 1745503832086
               isPrivate: false
               sortKey: -1744381881084
             method: POST
