@@ -272,12 +272,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: http://127.0.0.1:8000/api/v1/estoque/11
+          - url: http://127.0.0.1:8000/api/v1/estoque/2
             name: Editar Estoque
             meta:
               id: req_189bb0f3842b400fa5e9fecc38424315
               created: 1743772555573
-              modified: 1743773331606
+              modified: 1745505180846
               isPrivate: false
               sortKey: -1743725380324.5
             method: PUT
@@ -521,7 +521,7 @@ collection:
             meta:
               id: req_f955c381207b432caeb29075e8f4c770
               created: 1743601564489
-              modified: 1745499961075
+              modified: 1745586665753
               isPrivate: false
               sortKey: -1743775521823
             method: POST
@@ -677,7 +677,7 @@ collection:
             meta:
               id: req_f310fa480cf84910b20aa65741860bae
               created: 1744119666509
-              modified: 1745409699756
+              modified: 1745586713938
               isPrivate: false
               sortKey: -1744119678865
             method: POST
@@ -700,7 +700,7 @@ collection:
                 id: pair_c826a1ff481849a78847b4e12561ceb6
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NDEwOTczfQ.E5IGvXCDPU_GDV16dXqVMPrTCSkhFYpOZqwvCvtY5Ws
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NTg4NDY2fQ.mfiOSgNkZmmpUSKIFvbI-EWQ07dlZv2lYjZWsBgXju0
                 id: pair_9599da96c0094c7ea181eeba0c9a72c0
             settings:
               renderRequestBody: true
@@ -1530,12 +1530,12 @@ collection:
           modified: 1744713850229
           sortKey: -1744713850229
         children:
-          - url: http://127.0.0.1:8000/api/v1/lista_desejos/1
+          - url: http://127.0.0.1:8000/api/v1/lista_desejos/2
             name: Apagar produto da lista de desejo
             meta:
               id: req_6abd2620308347fda07c6306ef1defd8
               created: 1744713853440
-              modified: 1744714683352
+              modified: 1745505421058
               isPrivate: false
               sortKey: -1744713853440
             method: DELETE
@@ -1546,7 +1546,7 @@ collection:
               - id: pair_52fb1c45dc3d4e7a9b0f7e7fff16615b
                 name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0NzE2NDY1fQ.TsIZmEZp5lLNuJq6Sgapf4LaIFbqImmLZVD6Jgz0Qek
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NTA3MDIxfQ.NcFlmV9N2JfeSY3gx3TKzlOU3Lc7NrnxxFpbh5JA2i4
                 disabled: false
             settings:
               renderRequestBody: true
@@ -1561,7 +1561,7 @@ collection:
             meta:
               id: req_6af6ba26dfd347eabe683b370cfab2d5
               created: 1744713855163
-              modified: 1744714651738
+              modified: 1745586692839
               isPrivate: false
               sortKey: -1744713855163
             method: POST
@@ -1581,7 +1581,7 @@ collection:
               - id: pair_90dfc6f58a1341c4ac06c04d73df3fe7
                 name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0NzE2MDAyfQ.WEYANQ6_ZG18KYjrr5xFtJ6PB_dMV_-02fQD6XF7fHw
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NTg4NDY2fQ.mfiOSgNkZmmpUSKIFvbI-EWQ07dlZv2lYjZWsBgXju0
                 disabled: false
             settings:
               renderRequestBody: true
@@ -1596,7 +1596,7 @@ collection:
             meta:
               id: req_186bd5fffe9a4a838816609c26450c67
               created: 1744713856693
-              modified: 1744800775558
+              modified: 1745586681595
               isPrivate: false
               sortKey: -1744713856693
             method: GET
@@ -1607,8 +1607,85 @@ collection:
               - id: pair_f96851bf1d7648c9859bf34a446a9db5
                 name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ0ODAyNTYwfQ.oh38zMWrZ5XKNYoFaS9jgCLWDqu9GlEp5hanjJWWUUo
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NTg4NDY2fQ.mfiOSgNkZmmpUSKIFvbI-EWQ07dlZv2lYjZWsBgXju0
                 disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Relatorios
+        meta:
+          id: fld_1671303836b147c3a8d7dcf1688e3ec8
+          created: 1745505761860
+          modified: 1745505761860
+          sortKey: -1745505761860
+        children:
+          - url: "{{ base_url }}/relatorios-pagamento/metodo-pagamento"
+            name: Relatório por Método de Pagamento
+            meta:
+              id: req_63d74419803a44ae85bececdbdbe9d34
+              created: 1745505748983
+              modified: 1745505766353
+              isPrivate: false
+              sortKey: -1745505766227
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/relatorios-pagamento/status"
+            name: Relatório por Status
+            meta:
+              id: req_8fdb94cb6f054909ba8897729114534f
+              created: 1745505748985
+              modified: 1745505775814
+              isPrivate: false
+              sortKey: -1745505766327
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url }}/relatorios-pagamento/por-dia"
+            name: Relatório por Dia
+            meta:
+              id: req_5c5146eaefca4c13bfd3499b2b378b64
+              created: 1745505748986
+              modified: 1745505874750
+              isPrivate: false
+              sortKey: -1745505766277
+            method: GET
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ base_url
+              }}/relatorios-pagamento/filtrado?metodo=PIX&status=APROVADO&data_\
+              inicio=2024-01-01T00:00:00&data_fim=2024-12-31T23:59:59"
+            name: Relatório Filtrado
+            meta:
+              id: req_2f21785c191d44bc8cf39b9e0d8c0dca
+              created: 1745505748987
+              modified: 1745505771960
+              isPrivate: false
+              sortKey: -1745505766302
+            method: GET
             settings:
               renderRequestBody: true
               encodeUrl: true
