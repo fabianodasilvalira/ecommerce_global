@@ -16,6 +16,7 @@ router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
+
 # 📌 Função para obter a sessão do banco
 def get_db():
     db = SessionLocal()
@@ -23,6 +24,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 # 📌 Esquema de entrada para criação do usuário
 class UserCreate(BaseModel):
@@ -57,10 +59,12 @@ class UserCreate(BaseModel):
             raise ValueError("A senha deve ter pelo menos 8 caracteres, incluindo letras e números")
         return value
 
+
 # 📌 Esquema de entrada para login
 class UserLogin(BaseModel):
     email: EmailStr
     senha: str
+
 
 # 📌 Esquema para resposta com tokens
 class TokenSchema(BaseModel):
@@ -68,13 +72,28 @@ class TokenSchema(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
+
 # 📌 Esquema para Refresh Token
 class TokenRefresh(BaseModel):
     refresh_token: str
 
+
 # 📌 Endpoint para registrar usuário
 @router.post("/register", response_model=TokenSchema)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Endpoint para registrar um novo usuário.
+
+    Parâmetros:
+    - **user**: Dados do novo usuário a ser registrado (nome, email, senha, CPF/CNPJ, telefone, tipo de usuário).
+
+    Retorno:
+    - **TokenSchema**: Retorna os tokens de acesso e refresh token do usuário registrado.
+
+    Exceções:
+    - **HTTPException (400)**: Caso o e-mail ou CPF/CNPJ já estejam cadastrados.
+    - **HTTPException (500)**: Caso ocorra um erro interno durante o registro do usuário.
+    """
     try:
         if db.query(Usuario).filter(Usuario.email == user.email).first():
             raise HTTPException(status_code=400, detail="E-mail já cadastrado")
@@ -114,9 +133,23 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
+
 # 🔑 Endpoint para login
 @router.post("/login", response_model=TokenSchema)
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
+    """
+    Endpoint para realizar o login de um usuário.
+
+    Parâmetros:
+    - **user**: Dados de login do usuário (email e senha).
+
+    Retorno:
+    - **TokenSchema**: Retorna os tokens de acesso e refresh token para o usuário autenticado.
+
+    Exceções:
+    - **HTTPException (401)**: Caso as credenciais sejam inválidas.
+    - **HTTPException (403)**: Caso o usuário esteja inativo.
+    """
     db_user = db.query(Usuario).filter(Usuario.email == user.email).first()
 
     if not db_user or not verify_password(user.senha, db_user.senha):
@@ -146,6 +179,18 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
 # 🔄 Endpoint para renovar o token de acesso
 @router.post("/refresh", response_model=TokenSchema)
 def refresh_access_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
+    """
+    Endpoint para renovar o token de acesso usando o refresh token.
+
+    Parâmetros:
+    - **token_data**: Contém o refresh token para gerar um novo access token.
+
+    Retorno:
+    - **TokenSchema**: Retorna os novos tokens de acesso e refresh token.
+
+    Exceções:
+    - **HTTPException (401)**: Caso o refresh token seja inválido.
+    """
     db_user = db.query(Usuario).filter(Usuario.refresh_token == token_data.refresh_token).first()
     if not db_user:
         raise HTTPException(status_code=401, detail="Refresh Token inválido")
@@ -166,9 +211,22 @@ def refresh_access_token(token_data: TokenRefresh, db: Session = Depends(get_db)
         refresh_token=new_refresh_token
     )
 
+
 # 🚪 Endpoint para logout
 @router.post("/logout")
 def logout_user(token_data: TokenRefresh, db: Session = Depends(get_db)):
+    """
+    Endpoint para realizar o logout do usuário, invalidando o refresh token.
+
+    Parâmetros:
+    - **token_data**: Contém o refresh token para invalidar.
+
+    Retorno:
+    - **msg**: Mensagem de sucesso informando que o logout foi realizado.
+
+    Exceções:
+    - **HTTPException (401)**: Caso o refresh token seja inválido.
+    """
     db_user = db.query(Usuario).filter(Usuario.refresh_token == token_data.refresh_token).first()
     if not db_user:
         raise HTTPException(status_code=401, detail="Refresh Token inválido")

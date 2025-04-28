@@ -14,7 +14,7 @@ from app.services.produto_destaque_service import ProdutoDestaqueService
 
 router = APIRouter()
 
-
+# 📌 Endpoint para criar um novo destaque de produto
 @router.post(
     "/",
     response_model=ProdutoDestaqueResponse,
@@ -37,6 +37,7 @@ async def criar_destaque(
     return service.criar_destaque(destaque)
 
 
+# 📌 Endpoint para listar os destaques com filtros opcionais
 @router.get(
     "/",
     response_model=List[ProdutoDestaqueComProduto],
@@ -58,6 +59,7 @@ async def listar_destaques(
     return service.listar_destaques(tipo, ativo)
 
 
+# 📌 Endpoint para obter os detalhes de um destaque específico
 @router.get(
     "/{destaque_id}",
     response_model=ProdutoDestaqueComProduto,
@@ -81,6 +83,7 @@ async def obter_destaque(
     return destaque
 
 
+# 📌 Endpoint para atualizar um destaque existente
 @router.put(
     "/{destaque_id}",
     response_model=ProdutoDestaqueResponse,
@@ -104,6 +107,7 @@ async def atualizar_destaque(
     return service.atualizar_destaque(destaque_id, destaque)
 
 
+# 📌 Endpoint para remover um destaque
 @router.delete(
     "/{destaque_id}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -121,6 +125,7 @@ async def remover_destaque(
     service.remover_destaque(destaque_id)
 
 
+# 📌 Endpoint para alternar o status de um destaque
 @router.patch(
     "/{destaque_id}/alternar-status",
     response_model=ProdutoDestaqueResponse,
