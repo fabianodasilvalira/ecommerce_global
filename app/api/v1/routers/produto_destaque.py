@@ -31,7 +31,13 @@ async def criar_destaque(
 
     - **produto_id**: ID do produto a ser destacado (obrigatório)
     - **posicao**: Ordem de exibição (opcional, 1-99)
-    - **tipo_destaque**: Tipo de destaque (opcional, padrão: 'principal')
+    - **tipo_destaque**: Tipo de destaque (opcional, padrão: 'principal').
+      Tipos possíveis:
+      - **'principal'**: Destaque principal
+      - **'secundario'**: Destaque secundário
+      - **'promocional'**: Produto promocional
+      - **'novidade'**: Produto novo
+      - **'oferta'**: Produto em oferta
     """
     service = ProdutoDestaqueService(db)
     return service.criar_destaque(destaque)
@@ -52,7 +58,12 @@ async def listar_destaques(
     """
     Lista os produtos em destaque com filtros opcionais:
 
-    - **tipo**: Filtra por tipo de destaque
+    - **tipo**: Filtra por tipo de destaque. Tipos possíveis:
+      - **'principal'**: Destaque principal
+      - **'secundario'**: Destaque secundário
+      - **'promocional'**: Produto promocional
+      - **'novidade'**: Produto novo
+      - **'oferta'**: Produto em oferta
     - **ativo**: Filtra por status ativo/inativo (padrão: True)
     """
     service = ProdutoDestaqueService(db)
@@ -101,7 +112,12 @@ async def atualizar_destaque(
     Parâmetros atualizáveis:
     - **posicao**: Nova posição de exibição
     - **ativo**: Novo status
-    - **tipo_destaque**: Novo tipo de destaque
+    - **tipo_destaque**: Novo tipo de destaque. Tipos possíveis:
+      - **'principal'**: Destaque principal
+      - **'secundario'**: Destaque secundário
+      - **'promocional'**: Produto promocional
+      - **'novidade'**: Produto novo
+      - **'oferta'**: Produto em oferta
     """
     service = ProdutoDestaqueService(db)
     return service.atualizar_destaque(destaque_id, destaque)

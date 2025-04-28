@@ -6,14 +6,20 @@ from app.db.database import Base
 
 class MetodoPagamentoEnum(enum.Enum):
     PIX = "PIX"
-    CARTAO = "CARTAO"
+    CARTAO_CREDITO = "CARTAO_CREDITO"
+    CARTAO_DEBITO = "CARTAO_DEBITO"
     BOLETO = "BOLETO"
+    CARTEIRA_DIGITAL = "CARTEIRA_DIGITAL"  # tipo PicPay, MercadoPago, PayPal
 
 
 class StatusPagamento(enum.Enum):
-    PENDENTE = "PENDENTE"
-    APROVADO = "APROVADO"
-    CANCELADO = "CANCELADO"
+    PENDENTE = "PENDENTE"          # Pedido gerado, aguardando pagamento
+    EM_ANALISE = "EM_ANALISE"       # Pagamento recebido, mas em análise (ex.: antifraude)
+    APROVADO = "APROVADO"           # Pagamento confirmado
+    RECUSADO = "RECUSADO"           # Pagamento recusado pela operadora
+    CANCELADO = "CANCELADO"         # Pedido cancelado manualmente ou por timeout
+    ESTORNADO = "ESTORNADO"         # Pagamento devolvido após cancelamento ou disputa
+
 
 
 class Pagamento(Base):

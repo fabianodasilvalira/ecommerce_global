@@ -52,7 +52,7 @@ class ProdutoOut(BaseModel):
     id: int
     nome: str
     descricao: str
-    preco: float
+    preco_final: float
     imagem_url: str
     categoria: CategoriaSimpleResponse
     imagem_url: Optional[str] = None

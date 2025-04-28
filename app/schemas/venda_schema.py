@@ -75,18 +75,19 @@ class VendaOut(BaseModel):
 
     @classmethod
     def from_orm(cls, obj):
-        # Garante que promocoes seja None se não existir
+        # Garantir que promocoes seja None se não existir
         promocoes = None
         if hasattr(obj, 'promocoes') and obj.promocoes:
+            # Se o objeto 'promocoes' existir e contiver dados, converta cada promoção
             promocoes = [PromocaoOut.from_orm(p) for p in obj.promocoes]
 
-        # Constrói o dicionário manualmente para maior controle
+        # Construa o dicionário manualmente para maior controle
         venda_data = {
             "id": obj.id,
             "usuario": UsuarioOut.from_orm(obj.usuario),
             "endereco": EnderecoOut.from_orm(obj.endereco),
             "cupom": CupomOut.from_orm(obj.cupom) if obj.cupom else None,
-            "promocoes": promocoes,
+            "promocoes": promocoes,  # Agora incluímos promocoes diretamente
             "total": obj.total,
             "status": obj.status,
             "data_venda": obj.data_venda,
