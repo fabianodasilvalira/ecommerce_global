@@ -89,6 +89,7 @@ def criar_usuario_admin(db: Session):
     admin_existente = db.query(Usuario).filter(Usuario.tipo_usuario == TipoUsuarioEnum.ADMIN).first()
 
     if admin_existente:
+        print(f"Usuário administrador já existe: {admin_existente.email}")
         return  # Se já existir, não cria outro usuário ADMIN
 
     # Se não existir, cria o usuário administrador

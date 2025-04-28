@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.cupom import Cupom
@@ -12,7 +13,7 @@ def criar_cupom(db: Session, cupom_data: CupomCreate) -> CupomResponse:
     return CupomResponse.model_validate(cupom)
 
 
-def atualizar_cupom_por_id(db: Session, cupom_id: int, cupom_data: CupomUpdate) -> CupomResponse | None:
+def atualizar_cupom_por_id(db: Session, cupom_id: int, cupom_data: CupomUpdate) -> Optional[CupomResponse]:
     cupom = db.query(Cupom).filter(Cupom.id == cupom_id).first()
     if not cupom:
         return None
@@ -25,7 +26,7 @@ def atualizar_cupom_por_id(db: Session, cupom_id: int, cupom_data: CupomUpdate) 
     return CupomResponse.model_validate(cupom)
 
 
-def atualizar_cupom_por_codigo(db: Session, codigo: str, cupom_data: CupomUpdate) -> CupomResponse | None:
+def atualizar_cupom_por_codigo(db: Session, codigo: str, cupom_data: CupomUpdate) -> Optional[CupomResponse]:
     cupom = db.query(Cupom).filter(Cupom.codigo == codigo).first()
     if not cupom:
         return None
@@ -43,14 +44,14 @@ def listar_cupons(db: Session) -> list[CupomResponse]:
     return [CupomResponse.model_validate(c) for c in cupons]
 
 
-def buscar_cupom_por_codigo(db: Session, codigo: str) -> CupomResponse | None:
+def buscar_cupom_por_codigo(db: Session, codigo: str) -> Optional[CupomResponse]:
     cupom = db.query(Cupom).filter(Cupom.codigo == codigo, Cupom.ativo == True).first()
     if not cupom:
         return None
     return CupomResponse.model_validate(cupom)
 
 
-def desativar_cupom(db: Session, cupom_id: int) -> CupomResponse | None:
+def desativar_cupom(db: Session, cupom_id: int) -> Optional[CupomResponse]:
     cupom = db.query(Cupom).filter(Cupom.id == cupom_id).first()
     if not cupom:
         return None

@@ -13,7 +13,7 @@ class TipoImagemProduto(str, Enum):
 class ProdutoImagemBase(BaseModel):
     imagem_url: HttpUrl = Field(..., example="https://cdn.exemplo.com/imagem1.jpg")
     tipo: TipoImagemProduto = Field(default=TipoImagemProduto.GALERIA)
-    ordem: int | None = Field(default=None, example=1)
+    ordem: Optional[int] = Field(default=None, example=1)
     visivel: bool = Field(default=True)
 
 class ProdutoImagemCreate(ProdutoImagemBase):
