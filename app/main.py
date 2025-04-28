@@ -18,6 +18,8 @@ from app.api.v1.routers.relatorios import router as relatorios_router
 from app.api.v1.routers.venda import router as venda_router
 from app.api.v1.routers.carrinho import router as carrinho_router
 from app.api.v1.routers.lista_desejos import router as lista_desejos_router
+from app.db.database import SessionLocal
+from app.services.usuario_service import criar_usuario_admin
 
 app = FastAPI()
 
@@ -44,6 +46,16 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
+
+@app.on_event("startup")
+def startup_event():
+    db = SessionLocal()
+    criar_usuario_admin(db)  # Chama a função para criar o admin
+    db.close()
+
+@app.get("/")
+def read_root():
+    return {"message": "API está funcionando!"}
 
 # Inclusão de rotas
 app.include_router(auth.router, prefix="/auth", tags=["auth"])

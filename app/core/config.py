@@ -1,3 +1,4 @@
+from pydantic import Extra
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -5,7 +6,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_HOST: str
     DB_NAME: str
-    DATABASE_URL: str  # Adicionado para garantir que a URL seja carregada corretamente
+    DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
@@ -14,7 +15,9 @@ class Settings(BaseSettings):
     API_RELOAD: bool
     API_WORKERS: int
 
+    # Permite variáveis extras no arquivo .env (como ADMIN_EMAIL, ADMIN_PASSWORD)
     class Config:
         env_file = ".env"
+        extra = Extra.allow  # Permite que variáveis extras sejam carregadas
 
 settings = Settings()

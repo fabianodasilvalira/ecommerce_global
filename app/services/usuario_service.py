@@ -1,13 +1,19 @@
+import os
+from dotenv import load_dotenv
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.security import hash_password
 from app.db.database import get_db
-from app.models.usuario import Usuario
+from app.models.usuario import Usuario, TipoUsuarioEnum
 from app.schemas.usuario_schema import UsuarioCreate, UsuarioUpdate
 from passlib.context import CryptContext
 from app.services.auth import obter_usuario_logado
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+load_dotenv()
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
@@ -76,3 +82,30 @@ def inativar_usuario(db: Session, usuario_id: int):
 
 def obter_por_email(db: Session, email: str):
     return db.query(Usuario).filter(Usuario.email == email).first()
+
+
+def criar_usuario_admin(db: Session):
+    # Verificar se já existe um usuário ADMIN
+    admin_existente = db.query(Usuario).filter(Usuario.tipo_usuario == TipoUsuarioEnum.ADMIN).first()
+
+    if admin_existente:
+        return  # Se já existir, não cria outro usuário ADMIN
+
+    # Se não existir, cria o usuário administrador
+    usuario_admin = Usuario(
+        nome="Administrador",
+        email=os.getenv("ADMIN_EMAIL"),  # Carrega o email do admin a partir da variável de ambiente
+        senha=get_password_hash(os.getenv("ADMIN_PASSWORD")),  # Hash da senha do admin
+        cpf_cnpj="12345678901",  # Adapte conforme necessário
+        tipo_usuario=TipoUsuarioEnum.ADMIN,
+    )
+
+    try:
+        db.add(usuario_admin)  # Adiciona o novo usuário à sessão
+        db.commit()  # Realiza o commit para salvar a transação
+        db.refresh(usuario_admin)  # Atualiza o objeto do usuário com os dados do banco
+        print(f"Usuário administrador {usuario_admin.email} criado com sucesso.")
+    except Exception as e:
+        db.rollback()  # Reverte a transação em caso de erro
+        print(f"Erro ao criar usuário administrador: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao criar usuário administrador")
