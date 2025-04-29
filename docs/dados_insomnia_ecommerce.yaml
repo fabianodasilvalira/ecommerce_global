@@ -141,7 +141,7 @@ collection:
             meta:
               id: req_acc834a60f31430e99c7545aae8bdd9e
               created: 1743602857251
-              modified: 1744636226171
+              modified: 1745932103408
               isPrivate: false
               sortKey: -1743678218669
             method: POST
@@ -151,14 +151,21 @@ collection:
                 {
                   "nome": "csa",
                   "descricao": "casa com GPU dedicada",
-                  "preco": 1000.90,
+                  "preco": 1000,
                   "categoria_id": 1
                 }
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_2f246edfb4554f48a0db3b999997a378
               - name: User-Agent
                 value: insomnia/11.0.1
+                id: pair_1664b128253d4a129490fc97b1139a9b
+              - id: pair_b26315b941924a6c86be531bf82763fe
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMzODk3fQ._xN0ajgFY1wOseRb8O5JrDKZSfF0YooDeqHtQRoWCTs
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -248,7 +255,7 @@ collection:
             meta:
               id: req_fc8c1789f3544236b9bfe978abb31a7d
               created: 1743772541780
-              modified: 1744813621434
+              modified: 1745929480359
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -262,8 +269,15 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_0754d85b0ec348e19dfef2a22c8ab4c9
               - name: User-Agent
                 value: insomnia/11.0.2
+                id: pair_487277621cf34b378ad574d57e687867
+              - id: pair_407c59ee510848d9a70b4627202ee6d1
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMxMjUzfQ.3L_sbKI4vE-ZbgsBTaFBiIOijdiy666ewiGY5DufOsY
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -372,7 +386,7 @@ collection:
             meta:
               id: req_572fa30f15304f8c894ec8dd4fb7b9eb
               created: 1743774044025
-              modified: 1743776503780
+              modified: 1745929476041
               isPrivate: false
               sortKey: -1743776488492.5
             method: POST
@@ -388,8 +402,15 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_4a434330b20a429b9f3e7726c8ca6bab
               - name: User-Agent
                 value: insomnia/11.0.2
+                id: pair_a995818e7732427bb17493ac5985b302
+              - id: pair_51f401df17924365a69c8fd0c8f77c6c
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMxMjUzfQ.3L_sbKI4vE-ZbgsBTaFBiIOijdiy666ewiGY5DufOsY
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -521,7 +542,7 @@ collection:
             meta:
               id: req_f955c381207b432caeb29075e8f4c770
               created: 1743601564489
-              modified: 1745586665753
+              modified: 1745925935118
               isPrivate: false
               sortKey: -1743775521823
             method: POST
@@ -529,8 +550,8 @@ collection:
               mimeType: application/json
               text: |
                 {
-                  "email": "joao@email.com",
-                  "senha": "Senha123"
+                  "email": "admin@ecommerce.com",
+                  "senha": "senhaSegura123"
                 }
             headers:
               - name: Content-Type
@@ -557,7 +578,7 @@ collection:
             meta:
               id: req_031845d331f44340b4de32ba6c407ef1
               created: 1743776513738
-              modified: 1745407092474
+              modified: 1745929485704
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -574,8 +595,15 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_dc62960890424344936832092d66304a
               - name: User-Agent
                 value: insomnia/11.0.2
+                id: pair_ee32e1c703cf468294a15e2e24b796ef
+              - id: pair_aaae10ed1da74d03971a3f56140aaf44
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMxMjUzfQ.3L_sbKI4vE-ZbgsBTaFBiIOijdiy666ewiGY5DufOsY
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -677,22 +705,31 @@ collection:
             meta:
               id: req_f310fa480cf84910b20aa65741860bae
               created: 1744119666509
-              modified: 1745586713938
+              modified: 1745933188785
               isPrivate: false
               sortKey: -1744119678865
             method: POST
             body:
               mimeType: application/json
-              text: |
+              text: |-
                 {
                   "endereco_id": 1,
-                	"promocao_id": 1,
                   "itens": [
                     {
                       "produto_id": 1,
                       "quantidade": 1
+                    },
+                		{
+                      "produto_id": 2,
+                      "quantidade": 2
                     }
-                  ]
+                  ],
+                  "metodo_pagamento": "PIX",
+                	"cupom_id": "1",
+                  "numero_parcelas": "2",
+                  "bandeira_cartao": "VISA",
+                  "ultimos_digitos_cartao": "1234",
+                	"nome_cartao":"teste"
                 }
             headers:
               - name: Content-Type
@@ -700,7 +737,7 @@ collection:
                 id: pair_c826a1ff481849a78847b4e12561ceb6
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1NTg4NDY2fQ.mfiOSgNkZmmpUSKIFvbI-EWQ07dlZv2lYjZWsBgXju0
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMzODk3fQ._xN0ajgFY1wOseRb8O5JrDKZSfF0YooDeqHtQRoWCTs
                 id: pair_9599da96c0094c7ea181eeba0c9a72c0
             settings:
               renderRequestBody: true
@@ -789,7 +826,7 @@ collection:
             meta:
               id: req_9ad62cf83afb4d6b8fb4dc6c3a826be9
               created: 1744126357380
-              modified: 1744126404108
+              modified: 1745929470651
               isPrivate: false
               sortKey: -1744126357380
             method: POST
@@ -806,6 +843,12 @@ collection:
                   "estado": "SP",
                   "cep": "12345-678"
                 }
+            headers:
+              - id: pair_525bdb4b85dc4022a04d64cd45063174
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMxMjUzfQ.3L_sbKI4vE-ZbgsBTaFBiIOijdiy666ewiGY5DufOsY
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1142,7 +1185,7 @@ collection:
             meta:
               id: req_c14f568fbe9a4f15b21e37a4d8997a05
               created: 1744381852331
-              modified: 1745502063768
+              modified: 1745932274320
               isPrivate: false
               sortKey: -1744381880959
             method: POST
@@ -1150,8 +1193,8 @@ collection:
               mimeType: application/json
               text: |-
                 {
-                  "produto_id": 1,
-                  "quantidade": 2
+                  "produto_id": 16,
+                  "quantidade": 1
                 }
             settings:
               renderRequestBody: true
@@ -1249,10 +1292,30 @@ collection:
             meta:
               id: req_dde477ca73dd4c77880327015870590a
               created: 1744381852337
-              modified: 1745503832086
+              modified: 1745932464028
               isPrivate: false
               sortKey: -1744381881084
             method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "endereco_id": 1,
+                  "itens": [
+                    {
+                      "produto_id": 1,
+                      "quantidade": 1
+                    }
+                  ],
+                  "metodo_pagamento": "PIX",
+                  "numero_parcelas": "2",
+                  "bandeira_cartao": "VISA",
+                  "ultimos_digitos_cartao": "1234",
+                	"nome_cartao":"teste"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1694,6 +1757,88 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
+      - name: cartoesSalvos
+        meta:
+          id: fld_2878c88e9b164819aa013b83b1f8c5df
+          created: 1745924359204
+          modified: 1745924359204
+          sortKey: -1745924359204
+        children:
+          - url: "{{ _.base_url }}/api/v1/cartoes"
+            name: Salvar novo cartão
+            meta:
+              id: req_50f5e8a47d6741f88fdd5ab17ecbf4d1
+              created: 1745924348073
+              modified: 1745924364157
+              isPrivate: false
+              description: Salva um novo cartão de crédito (apenas os últimos 4 dígitos,
+                bandeira, validade e nome) para o usuário autenticado.
+              sortKey: -1745924364015
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "nome_cartao": "string",
+                  "bandeira_cartao": "string",
+                  "ultimos_digitos": "string",
+                  "validade": "string"
+                }
+            headers:
+              - name: Content-Type
+                disabled: false
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/cartaosalvo/"
+            name: Listar cartões salvos
+            meta:
+              id: req_fb1f33f41c94466f9721637ac827cb78
+              created: 1745924348074
+              modified: 1745924883764
+              isPrivate: false
+              description: Retorna todos os cartões salvos do usuário autenticado.
+              sortKey: -1745924364115
+            method: GET
+            headers:
+              - id: pair_e07c5dc86a5d4ac1bccb057cfa1b3b78
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTI2Mjk3fQ.j8kg6aoRMhLlVRXUMlqk1A3yBEksvrFvdKQVJtBUwaM
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.base_url }}/cartaosalvo/1"
+            name: Deletar cartão
+            meta:
+              id: req_0e5061a79852462bb18b02664bd59799
+              created: 1745924348075
+              modified: 1745924840877
+              isPrivate: false
+              description: Remove um cartão salvo pelo ID, desde que pertença ao usuário
+                autenticado.
+              sortKey: -1745924364065
+            method: DELETE
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
@@ -1705,8 +1850,10 @@ environments:
   meta:
     id: env_0759f43c3e826fa19a180f2b74c987576fe8f89e
     created: 1744631846227
-    modified: 1744631846227
+    modified: 1745924348067
     isPrivate: false
+  data:
+    base_url: "{{ _.scheme }}://{{ _.host }}{{ _.base_path }}"
   subEnvironments:
     - name: Development
       meta:
@@ -1918,3 +2065,13 @@ environments:
         sortKey: 1739620314051.5
       data:
         base_url: http://127.0.0.1:8000/api/v1
+    - name: OpenAPI env example.com
+      meta:
+        id: env_ab7d91b39eb54d4492e4469b51adb085
+        created: 1745924348069
+        modified: 1745924348069
+        isPrivate: false
+        sortKey: 1745924348069
+      data:
+        scheme: http
+        host: example.com
