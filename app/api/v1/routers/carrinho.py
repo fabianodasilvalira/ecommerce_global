@@ -6,7 +6,6 @@ from app.schemas.venda_schema import VendaResponse  # 👈 adicione isso
 from app.db.database import get_db
 from app.schemas import carrinho_schema as schemas
 from app.services import carrinho_service
-from app.services import venda_service as service_venda
 from app.models import Usuario
 
 router = APIRouter()
@@ -124,6 +123,7 @@ def finalizar_carrinho(
 
 @router.get("/historico", response_model=list[schemas.CarrinhoOut])
 def listar_historico(usuario_id: int, db: Session = Depends(get_db)):
+
     """
     Lista os carrinhos finalizados de um usuário.
 

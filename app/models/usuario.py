@@ -33,6 +33,5 @@ class Usuario(Base):
     carrinho = relationship("Carrinho", back_populates="usuario", uselist=False)
     cartoes = relationship("CartaoSalvo", back_populates="usuario", cascade="all, delete-orphan")
 
-
     def __repr__(self):
         return f"<Usuario(id={self.id}, email='{self.email}', tipo='{self.tipo_usuario}')>"

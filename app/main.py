@@ -3,6 +3,7 @@ from fastapi.openapi.utils import get_openapi
 
 from app.api.v1.endpoints import auth
 from app.api.v1.routers.carrinho import router as carrinho_router
+from app.api.v1.routers.cartaosalvo import router as cartaosalvo_router
 from app.api.v1.routers.categoria import router as categoria_router
 from app.api.v1.routers.categoria_imagem import router as categoria_imagem_router
 from app.api.v1.routers.cupom import router as cupom_router
@@ -11,6 +12,7 @@ from app.api.v1.routers.estoque import router as estoque_router
 from app.api.v1.routers.historico_pagamento import router as historico_pagamento_router
 from app.api.v1.routers.lista_desejos import router as lista_desejos_router
 from app.api.v1.routers.movimentacao_estoque import router as movimentacao_estoque_router
+from app.api.v1.routers.pagamento import router as pagamento_router
 from app.api.v1.routers.produto import router as produto_router
 from app.api.v1.routers.produto_destaque import router as produto_destaque_router
 from app.api.v1.routers.produto_imagem import router as produto_imagem_router
@@ -81,6 +83,7 @@ def startup_event():
 # Inclusão de rotas
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(carrinho_router, prefix="/api/v1/carrinho", tags=["carrinho"])
+app.include_router(cartaosalvo_router, prefix="/api/v1/cartaosalvo", tags=["cartaosalvo"])
 app.include_router(categoria_router, prefix="/api/v1/categorias", tags=["categorias"])
 app.include_router(categoria_imagem_router, prefix="/api/v1/categoria_imagem", tags=["categoria_imagem"])
 app.include_router(cupom_router, prefix="/api/v1/cupons", tags=["cupons"])
@@ -89,6 +92,7 @@ app.include_router(estoque_router, prefix="/api/v1/estoque", tags=["estoque"])
 app.include_router(historico_pagamento_router, prefix="/api/v1/historico_pagamento", tags=["historico_pagamento"])
 app.include_router(lista_desejos_router, prefix="/api/v1/lista_desejos", tags=["lista_desejos"])
 app.include_router(movimentacao_estoque_router, prefix="/api/v1/movimentacao_estoque", tags=["movimentacao_estoque"])
+app.include_router(pagamento_router, prefix="/api/v1/pagamento", tags=["pagamento"])
 app.include_router(produto_destaque_router, prefix="/api/v1/produto_destaque", tags=["produto_destaque"])
 app.include_router(produto_imagem_router, prefix="/api/v1/produto_imagem", tags=["produto_imagem"])
 app.include_router(produto_router, prefix="/api/v1/produtos", tags=["produtos"])

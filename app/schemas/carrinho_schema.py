@@ -23,6 +23,7 @@ class ItemCarrinhoOut(BaseModel):
     valor_unitario: float
     valor_total: float
     produto: ProdutoOut  # Dados do produto embutido
+    preco_final: Optional[float] = None  # Torne o campo opcional
 
     class Config:
         orm_mode = True

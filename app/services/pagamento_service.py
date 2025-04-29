@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.pagamento import Pagamento, StatusPagamento
 from app.models.venda import Venda
-from app.schemas.pagamento import PagamentoCreate, PagamentoUpdate, PagamentoResponse
+from app.schemas.pagamento_schema import PagamentoCreate, PagamentoUpdate, PagamentoResponse
 
 def criar_pagamento(db: Session, pagamento: PagamentoCreate) -> PagamentoResponse:
     # 🛡️ Verificar se a venda existe antes de criar o pagamento

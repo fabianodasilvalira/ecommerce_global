@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, TIMESTAMP, Boolean  # Adi
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import Base
+from datetime import datetime
 
 class Cupom(Base):
     __tablename__ = "cupom"
@@ -15,3 +16,9 @@ class Cupom(Base):
 
     # Relacionamento com Venda
     vendas = relationship("Venda", back_populates="cupom")
+
+    @property
+    def is_valido(self) -> bool:
+        """Retorna True se o cupom estiver ativo e dentro do prazo de validade."""
+        agora = datetime.utcnow()
+        return self.ativo and self.validade > agora

@@ -51,3 +51,13 @@ class PagamentoResponse(PagamentoBase):
 
     class Config:
         orm_mode = True  # Configuração importante para que o Pydantic converta SQLAlchemy para Pydantic
+
+class PagamentoOut(PagamentoBase):
+    id: int
+    status: StatusPagamento
+    numero_parcelas: Optional[int] = None
+    criado_em: datetime
+    atualizado_em: datetime
+
+    class Config:
+        from_attributes = True  # Necessário para usar from_orm

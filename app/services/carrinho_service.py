@@ -94,8 +94,8 @@ def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarr
             carrinho_id=carrinho.id,
             produto_id=item_data.produto_id,
             quantidade=item_data.quantidade,
-            valor_unitario=produto.preco,
-            valor_total=produto.preco * item_data.quantidade
+            valor_unitario=produto.preco_final,
+            valor_total=produto.preco_final * item_data.quantidade
         )
         db.add(item)
 
@@ -205,7 +205,7 @@ def formatar_produto(produto: Produto) -> Dict[str, Any]:
         "id": produto.id,
         "nome": produto.nome,
         "descricao": produto.descricao,
-        "preco": float(produto.preco),  # Ou preco_final, conforme o modelo
+        "preco_final": float(produto.preco_final),  # ✅ necessário
         "imagem_url": imagem_url,  # Agora sempre será uma string
         "categoria": {
             "id": produto.categoria.id,
@@ -301,7 +301,7 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
             "id": item.produto.id,
             "nome": item.produto.nome,
             "descricao": item.produto.descricao,
-            "preco": float(item.produto.preco),
+            "preco_final": float(item.produto.preco_final),
             "imagem_url": item.produto.imagens[0].imagem_url if item.produto.imagens else "",
             "categoria": {
                 "id": item.produto.categoria.id,

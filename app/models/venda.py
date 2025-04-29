@@ -15,6 +15,14 @@ class TipoDescontoEnum(str, enum.Enum):
     CUPOM = "cupom"
     PROMOCAO = "promocao"
 
+class StatusPagamentoEnum(str, enum.Enum):
+    PENDENTE = "pendente"
+    EM_ANALISE = "em_analise"
+    APROVADO = "aprovado"
+    RECUSADO = "recusado"
+    CANCELADO = "cancelado"
+    ESTORNADO = "estornado"
+
 class Venda(Base):
     __tablename__ = "venda"
 
@@ -40,6 +48,12 @@ class Venda(Base):
         default=StatusVendaEnum.PENDENTE
     )
 
+    status_pagamento = Column(
+        SqlEnum(StatusPagamentoEnum, name="status_pagamento_enum", native_enum=True, create_constraint=True),
+        nullable=False,
+        default=StatusPagamentoEnum.PENDENTE
+    )
+
     data_venda = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     is_ativo = Column(Boolean, default=True, nullable=False)
 
@@ -56,3 +70,12 @@ class Venda(Base):
         uselist=False,
         post_update=True  # Importante para relações one-to-one bidirecionais
     )
+
+    # Lógica de atualização do status da venda com base no status dos pagamentos
+    def atualizar_status_venda(self):
+        if all(pagamento.status == StatusPagamentoEnum.APROVADO for pagamento in self.pagamentos):
+            self.status = StatusVendaEnum.PAGO
+        elif any(pagamento.status == StatusPagamentoEnum.CANCELADO for pagamento in self.pagamentos):
+            self.status = StatusVendaEnum.CANCELADO
+        else:
+            self.status = StatusVendaEnum.PENDENTE

@@ -13,7 +13,7 @@ from app.models import (
     Pagamento, Endereco, Carrinho, Usuario,
     MovimentacaoEstoque
 )
-from app.models.pagamento import MetodoPagamentoEnum
+from app.models.pagamento import MetodoPagamentoEnum, StatusPagamento
 from app.schemas.relatorio_pagamento import StatusPagamentoEnum
 from app.schemas.venda_schema import VendaCreate, ItemVendaCreate, VendaOut
 from app.models.venda import StatusVendaEnum, TipoDescontoEnum
@@ -34,12 +34,13 @@ def produto_possui_promocao_ativa(produto: Produto) -> bool:
 def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> VendaOut:
     """
     Cria uma nova venda com validações:
-    - Estoque
-    - Cupom/promoção (não acumulativos)
+    - Estoque dos produtos
+    - Validação de cupons e promoções (não acumulativos)
     - Movimentação de estoque
-    - Pagamento pendente
+    - Criação de pagamento (à vista ou parcelado)
     """
     try:
+        # Criação da venda
         nova_venda = Venda(
             usuario_id=usuario.id,
             endereco_id=venda_data.endereco_id,
@@ -55,13 +56,16 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
 
         # Validação do cupom
         if venda_data.cupom_id:
-            cupom = db.query(Cupom).get(venda_data.cupom_id)
+            cupom = db.get(Cupom, venda_data.cupom_id)
             if not cupom:
                 raise HTTPException(status_code=404, detail="Cupom não encontrado")
+            if not cupom.is_valido:
+                raise HTTPException(status_code=400, detail="Cupom expirado ou inválido")
             if cupom.desconto:
                 desconto_percentual = Decimal(str(cupom.desconto)) / Decimal("100.00")
                 tipo_desconto = TipoDescontoEnum.CUPOM.value
 
+        # Validação do estoque e precificação dos itens
         for item in venda_data.itens:
             produto = db.query(Produto).options(
                 load_only(Produto.id, Produto.nome, Produto.preco_final),
@@ -72,7 +76,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             if not produto:
                 raise HTTPException(status_code=404, detail=f"Produto ID {item.produto_id} não encontrado")
 
-            # Valida estoque
             estoque_disponivel = produto.estoque.quantidade if produto.estoque else 0
             if estoque_disponivel < item.quantidade:
                 raise HTTPException(
@@ -80,7 +83,6 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
                     detail=f"Estoque insuficiente para '{produto.nome}'. Disponível: {estoque_disponivel}"
                 )
 
-            # Conflito cupom + promoção
             if venda_data.cupom_id and produto_possui_promocao_ativa(produto):
                 raise HTTPException(
                     status_code=400,
@@ -105,10 +107,8 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             )
             nova_venda.itens.append(item_venda)
 
-            # Atualiza estoque
             produto.estoque.quantidade -= item.quantidade
 
-            # Movimentação de estoque
             db.add(MovimentacaoEstoque(
                 produto_id=produto.id,
                 tipo_movimentacao=TipoMovimentoEnum.SAIDA,
@@ -117,28 +117,59 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
                 venda=nova_venda
             ))
 
+        # Cálculo dos valores totais
         valor_desconto = (total_bruto - total_com_desconto).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
         nova_venda.valor_total_bruto = total_bruto.quantize(Decimal("0.01"))
         nova_venda.total = total_com_desconto.quantize(Decimal("0.01"))
         nova_venda.valor_desconto = valor_desconto
         nova_venda.tipo_desconto = tipo_desconto
 
         db.add(nova_venda)
-        db.flush()  # gera o ID da venda para o pagamento
+        db.flush()  # Gera o ID da venda
 
-        # Cria o pagamento
-        db.add(Pagamento(
-            venda_id=nova_venda.id,
-            valor=nova_venda.total,
-            metodo_pagamento=MetodoPagamentoEnum.PIX,
-            status=StatusPagamentoEnum.PENDENTE
-        ))
+        # Processamento do pagamento
+        metodo_pagamento = venda_data.metodo_pagamento
+
+        if metodo_pagamento == MetodoPagamentoEnum.CARTAO_CREDITO:
+            numero_parcelas = int(venda_data.numero_parcelas)  # Converta para inteiro
+            if numero_parcelas is None or not (1 <= numero_parcelas <= 12):
+                raise HTTPException(status_code=400, detail="Número de parcelas deve ser entre 1 e 12")
+
+            if not venda_data.bandeira_cartao:
+                raise HTTPException(status_code=400, detail="Bandeira do cartão é obrigatória")
+
+            if not venda_data.ultimos_digitos_cartao or len(venda_data.ultimos_digitos_cartao) != 4:
+                raise HTTPException(status_code=400, detail="Últimos 4 dígitos do cartão inválidos")
+
+            valor_parcela = calcular_valor_parcela(nova_venda.total, numero_parcelas)
+
+            # Adicionar pagamento parcelado
+            for numero in range(1, numero_parcelas + 1):
+                db.add(Pagamento(
+                    venda_id=nova_venda.id,
+                    valor=valor_parcela,
+                    metodo_pagamento=metodo_pagamento.value,
+                    status=StatusPagamento.PENDENTE.value,
+                    numero_parcelas=numero,  # Aqui é necessário adicionar o número da parcela em cada pagamento
+                    bandeira_cartao=venda_data.bandeira_cartao,
+                    ultimos_digitos_cartao=venda_data.ultimos_digitos_cartao,
+                    nome_cartao=venda_data.nome_cartao
+                ))
+
+        else:
+            db.add(Pagamento(
+                venda_id=nova_venda.id,
+                valor=nova_venda.total,
+                metodo_pagamento=metodo_pagamento.value,
+                status=StatusPagamento.PENDENTE.value,
+                codigo_pix=getattr(venda_data, 'codigo_pix', None) if metodo_pagamento == MetodoPagamentoEnum.PIX else None,
+                linha_digitavel_boleto=getattr(venda_data, 'linha_digitavel_boleto', None) if metodo_pagamento == MetodoPagamentoEnum.BOLETO else None
+            ))
 
         db.commit()
         db.refresh(nova_venda)
 
-        return nova_venda  # retorna o modelo SQLAlchemy
+        return VendaOut.from_orm(nova_venda)
 
     except HTTPException:
         db.rollback()
@@ -151,6 +182,11 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
             detail="Erro ao processar venda"
         )
 
+
+def calcular_valor_parcela(valor_total: Decimal, parcelas: int) -> Decimal:
+    """Calcula o valor da parcela, podendo incluir juros se necessário"""
+    # Implementação básica sem juros
+    return (valor_total / parcelas).quantize(Decimal('0.01'))
 
 
 def calcular_preco_com_desconto(
@@ -198,6 +234,11 @@ def cancelar_venda(db: Session, venda_id: int, usuario: Usuario) -> None:
 
         venda.status = StatusVendaEnum.CANCELADO
         venda.is_ativo = False
+
+        for pagamento in venda.pagamentos:
+            if pagamento.status == StatusPagamentoEnum.PENDENTE:
+                pagamento.status = StatusPagamentoEnum.CANCELADO
+
         db.commit()
 
     except SQLAlchemyError as e:

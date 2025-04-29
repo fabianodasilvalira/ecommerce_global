@@ -1,10 +1,14 @@
-from pydantic import BaseModel, condecimal
+from dataclasses import Field
+
+from pydantic import BaseModel, Field, validator, condecimal
 from enum import Enum
 
 from datetime import datetime
 from typing import List, Optional
 from decimal import Decimal
 
+from app.models.pagamento import MetodoPagamentoEnum
+from app.schemas.pagamento_schema import PagamentoOut
 from app.schemas.usuario_schema import UsuarioOut
 from app.schemas.endereco import EnderecoOut
 from app.schemas.cupom_schema import CupomOut
@@ -27,6 +31,41 @@ class VendaCreate(BaseModel):
     endereco_id: Optional[int]
     cupom_id: Optional[int] = None
     itens: List[ItemVendaCreate]
+    metodo_pagamento: MetodoPagamentoEnum
+    nome_cartao: Optional[str] = None  # Defina o campo como opcional, mas podendo ser vazio
+
+
+    numero_parcelas: Optional[str] = Field(
+        default=None,
+        description="Número de parcelas (obrigatório para cartão de crédito)"
+    )
+    bandeira_cartao: Optional[str] = Field(
+        default=None,
+        max_length=50,
+        description="Bandeira do cartão (VISA, MASTERCARD, etc)"
+    )
+    ultimos_digitos_cartao: Optional[str] = Field(
+        default=None,
+        min_length=4,
+        max_length=4,
+        description="Últimos 4 dígitos do cartão"
+    )
+
+    @validator("numero_parcelas", always=True)
+    def validate_parcelas(cls, v, values):
+        metodo = values.get("metodo_pagamento")
+
+        if metodo in [MetodoPagamentoEnum.CARTAO_CREDITO]:
+            if v is None:
+                raise ValueError("O número de parcelas é obrigatório para o método de pagamento selecionado.")
+
+            # Converta v para inteiro, se for string
+            v = int(v) if isinstance(v, str) else v
+
+            if v < 1 or v > 12:
+                raise ValueError("O número de parcelas deve estar entre 1 e 12.")
+
+        return v
 
 
 class ItemVendaResponse(BaseModel):
@@ -57,6 +96,11 @@ class VendaDetalhadaResponse(VendaResponse):
     pass  # Herda de VendaResponse, já configurado corretamente
 
 
+from typing import List, Optional
+from datetime import datetime
+from decimal import Decimal
+from pydantic import BaseModel
+
 class VendaOut(BaseModel):
     id: int
     usuario: UsuarioOut
@@ -69,6 +113,8 @@ class VendaOut(BaseModel):
     itens: List[ItemVendaOut]
     carrinho_id: Optional[int] = None
     carrinho: Optional[dict] = None
+    pagamentos: Optional[List[PagamentoOut]] = None  # Adicionando pagamentos
+    total_parcelas: Optional[int] = None  # Total de parcelas
 
     class Config:
         from_attributes = True  # Usar apenas esta opção (orm_mode está deprecated)
@@ -104,4 +150,16 @@ class VendaOut(BaseModel):
                 "finalizado_em": obj.carrinho.atualizado_em
             }
 
+        # Adiciona os pagamentos, se existirem
+        if hasattr(obj, 'pagamentos') and obj.pagamentos:
+            venda_data["pagamentos"] = [
+                PagamentoOut.from_orm(pagamento) for pagamento in obj.pagamentos
+            ]
+            # Calcular o total de parcelas
+            venda_data["total_parcelas"] = max(pagamento.numero_parcelas for pagamento in obj.pagamentos)
+        else:
+            venda_data["pagamentos"] = None  # Caso contrário, setar como None
+            venda_data["total_parcelas"] = 0  # Nenhuma parcela, então o total é 0
+
         return cls(**venda_data)
+
