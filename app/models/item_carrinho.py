@@ -17,11 +17,15 @@ class ItemCarrinho(Base):
     carrinho = relationship("Carrinho", back_populates="itens")
     produto = relationship("Produto", lazy="joined")  # Alterado para eager loading
 
-    # Alterado: Adicionei validação pré-cálculo
-    def __init__(self, **kwargs):
+    def __init__(self, produto_id, quantidade=1, **kwargs):
         super().__init__(**kwargs)
+        self.produto_id = produto_id
+        self.quantidade = quantidade
+        self.valor_unitario = self.produto.preco_final  # Preço base do produto
         self.calcular_total()
 
     def calcular_total(self):
         if self.valor_unitario and self.quantidade:
             self.valor_total = self.valor_unitario * self.quantidade
+        else:
+            self.valor_total = Decimal("0.00")

@@ -11,10 +11,13 @@ from app.models import item_carrinho as item_model
 from app.models import produto as produto_model
 from app.models.carrinho import Carrinho
 from app.models.item_carrinho import ItemCarrinho
+from app.models.pagamento import MetodoPagamentoEnum, Pagamento
 from app.schemas.carrinho_schema import ItemCarrinhoBase
 from app.schemas.venda_schema import VendaCreate, ItemVendaCreate
 from app.services import venda_service
 from app.services.produto_service import logger
+from app.services.venda_service import criar_venda_a_partir_do_carrinho
+
 
 def buscar_ou_criar_carrinho(db: Session, usuario_id: int):
     return (
@@ -46,8 +49,8 @@ def calcular_totais(carrinho):
 
     # Calcula totais
     subtotal = sum(float(item.valor_total) for item in carrinho.itens)
-    total = subtotal  # Ou subtotal + taxas - descontos
-    data_finalizacao = carrinho.data_finalizacao if carrinho.data_finalizacao else None  # Garante que será None se não finalizado
+    total = subtotal  # Ou subtotal + taxas - descontos, se aplicável
+    data_finalizacao = carrinho.data_finalizacao if carrinho.data_finalizacao else None
 
     return {
         "id": carrinho.id,
@@ -56,8 +59,9 @@ def calcular_totais(carrinho):
         "subtotal": float(subtotal),
         "total": float(total),
         "is_finalizado": carrinho.is_finalizado,
-        "data_finalizacao": data_finalizacao  # Retorna o campo de data_finalizacao
+        "data_finalizacao": data_finalizacao
     }
+
 
 
 
@@ -312,22 +316,31 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
     }
 
 
+# Corrigindo a função finalizar_carrinho_e_criar_venda
 def finalizar_carrinho_e_criar_venda(
-        db: Session,
-        usuario_id: int,
-        endereco_id: int,
-        cupom_id: Optional[int] = None
+    db: Session,
+    usuario_id: int,
+    endereco_id: int,
+    cupom_id: Optional[int] = None,
+    metodo_pagamento: Optional[MetodoPagamentoEnum] = None,
+    numero_parcelas: Optional[int] = None,
+    bandeira_cartao: Optional[str] = None,
+    ultimos_digitos_cartao: Optional[str] = None,
+    nome_cartao: Optional[str] = None
 ) -> Venda:
+    """Finaliza o carrinho e cria uma venda com os dados adicionais de pagamento."""
 
+    # Busca o carrinho ativo
     carrinho = db.query(Carrinho).filter(
         Carrinho.usuario_id == usuario_id,
         Carrinho.is_finalizado == False
     ).first()
+
     if not carrinho:
         raise HTTPException(status_code=404, detail="Carrinho não encontrado ou já finalizado")
 
     try:
-        # 1. Busca e bloqueia APENAS o carrinho (sem joins)
+        # Bloqueia o carrinho para evitar concorrência
         carrinho = db.query(Carrinho).filter(
             and_(
                 Carrinho.usuario_id == usuario_id,
@@ -338,7 +351,7 @@ def finalizar_carrinho_e_criar_venda(
         if not carrinho:
             raise HTTPException(status_code=404, detail="Carrinho ativo não encontrado")
 
-        # 2. Agora carrega os relacionamentos necessários
+        # Carrega os itens do carrinho e o usuário
         carrinho = db.query(Carrinho).options(
             joinedload(Carrinho.itens).joinedload(ItemCarrinho.produto),
             joinedload(Carrinho.usuario)
@@ -347,17 +360,27 @@ def finalizar_carrinho_e_criar_venda(
         if not carrinho.itens:
             raise HTTPException(status_code=400, detail="Carrinho vazio")
 
-        # Finaliza carrinho
+        # Usa a função calcular_totais para obter totais do carrinho
+        totais = calcular_totais(carrinho)
+
+        # Atualiza os valores do carrinho com o total calculado
+        carrinho.total = totais["total"]
+        carrinho.subtotal = totais["subtotal"]
         carrinho.is_finalizado = True
         carrinho.data_finalizacao = func.now()
         carrinho.atualizado_em = func.now()
 
-        # Cria venda
-        venda = venda_service.criar_venda_a_partir_do_carrinho(
+        # Chama a função para criar a venda com os dados do carrinho
+        venda = criar_venda_a_partir_do_carrinho(
             db=db,
             carrinho=carrinho,
             endereco_id=endereco_id,
-            cupom_id=cupom_id
+            cupom_id=cupom_id,
+            metodo_pagamento=metodo_pagamento,
+            numero_parcelas=numero_parcelas,
+            bandeira_cartao=bandeira_cartao,
+            ultimos_digitos_cartao=ultimos_digitos_cartao,
+            nome_cartao=nome_cartao
         )
 
         db.commit()
@@ -366,7 +389,6 @@ def finalizar_carrinho_e_criar_venda(
     except HTTPException:
         db.rollback()
         raise
-
     except Exception as e:
         db.rollback()
         logger.error(f"Erro ao finalizar carrinho: {str(e)}", exc_info=True)
@@ -374,3 +396,5 @@ def finalizar_carrinho_e_criar_venda(
             status_code=500,
             detail="Erro interno ao processar finalização do carrinho"
         )
+
+

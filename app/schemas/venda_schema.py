@@ -32,10 +32,9 @@ class VendaCreate(BaseModel):
     cupom_id: Optional[int] = None
     itens: List[ItemVendaCreate]
     metodo_pagamento: MetodoPagamentoEnum
-    nome_cartao: Optional[str] = None  # Defina o campo como opcional, mas podendo ser vazio
+    nome_cartao: Optional[str] = None
 
-
-    numero_parcelas: Optional[str] = Field(
+    numero_parcelas: Optional[int] = Field(
         default=None,
         description="Número de parcelas (obrigatório para cartão de crédito)"
     )
@@ -55,17 +54,17 @@ class VendaCreate(BaseModel):
     def validate_parcelas(cls, v, values):
         metodo = values.get("metodo_pagamento")
 
-        if metodo in [MetodoPagamentoEnum.CARTAO_CREDITO]:
+        if metodo == MetodoPagamentoEnum.CARTAO_CREDITO:
             if v is None:
                 raise ValueError("O número de parcelas é obrigatório para o método de pagamento selecionado.")
-
-            # Converta v para inteiro, se for string
-            v = int(v) if isinstance(v, str) else v
-
-            if v < 1 or v > 12:
+            try:
+                v_int = int(v)
+            except ValueError:
+                raise ValueError("O número de parcelas deve ser um número inteiro.")
+            if v_int < 1 or v_int > 12:
                 raise ValueError("O número de parcelas deve estar entre 1 e 12.")
-
-        return v
+            return v_int
+        return None if v is None else int(v)
 
 
 class ItemVendaResponse(BaseModel):
@@ -123,23 +122,30 @@ class VendaOut(BaseModel):
     def from_orm(cls, obj):
         # Garantir que promocoes seja None se não existir
         promocoes = None
-        if hasattr(obj, 'promocoes') and obj.promocoes:
-            # Se o objeto 'promocoes' existir e contiver dados, converta cada promoção
-            promocoes = [PromocaoOut.from_orm(p) for p in obj.promocoes]
+        if hasattr(obj, 'itens') and obj.itens:
+            # Vamos usar a propriedade promocao_ativa do produto
+            promocoes_ativas = [
+                i.produto.promocao_ativa for i in obj.itens if i.produto.promocao_ativa
+            ]
 
-        # Construa o dicionário manualmente para maior controle
+            if promocoes_ativas:
+                # Converter as promoções ativas para o formato PromocaoOut
+                promocoes = [PromocaoOut.from_orm(p) for p in promocoes_ativas]
+            else:
+                print("Nenhuma promoção ativa encontrada.")
+
         venda_data = {
             "id": obj.id,
             "usuario": UsuarioOut.from_orm(obj.usuario),
             "endereco": EnderecoOut.from_orm(obj.endereco),
             "cupom": CupomOut.from_orm(obj.cupom) if obj.cupom else None,
-            "promocoes": promocoes,  # Agora incluímos promocoes diretamente
+            "promocoes": promocoes,  # Agora retorna as promoções como PromocaoOut
             "total": obj.total,
             "status": obj.status,
             "data_venda": obj.data_venda,
             "itens": [ItemVendaOut.from_orm(i) for i in obj.itens],
             "carrinho_id": obj.carrinho_id,
-            "carrinho": None  # Inicialmente None
+            "carrinho": None
         }
 
         # Processa carrinho apenas se existir
@@ -162,4 +168,5 @@ class VendaOut(BaseModel):
             venda_data["total_parcelas"] = 0  # Nenhuma parcela, então o total é 0
 
         return cls(**venda_data)
+
 

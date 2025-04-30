@@ -15,10 +15,7 @@ class Carrinho(Base):
     data_finalizacao = Column(DateTime, nullable=True)  # Será preenchido quando finalizado
 
 
-    # Alterado: Adicionei cascade para evitar problemas de deleção
     venda = relationship("Venda", back_populates="carrinho", uselist=False, cascade="save-update")
-
-    # Alterado: Adicionei order_by para itens
     usuario = relationship("Usuario", back_populates="carrinho")
     itens = relationship(
         "ItemCarrinho",
@@ -33,6 +30,4 @@ class Carrinho(Base):
 
     @subtotal.setter
     def subtotal(self, value: float):
-        # Isso permite que o valor seja definido, mas na prática não armazena
-        # pois é uma propriedade calculada
         pass

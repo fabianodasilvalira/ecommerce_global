@@ -39,10 +39,7 @@ class PromocaoResponse(BaseModel):
 
 
 class PromocaoOut(PromocaoResponse):
-    produto_id: int  # Produto ao qual a promoção está vinculada
-    produto_nome: Optional[str] = None  # Nome do produto, caso necessário
-    preco_original: Optional[float] = None  # Preço original do produto, se desejado
-    # Outros campos que forem necessários, como o tipo de promoção, etc.
 
     class Config:
         orm_mode = True  # Permite conversão ORM -> Pydantic
+        from_attributes = True  # Habilita o uso de from_orm
