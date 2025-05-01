@@ -1,6 +1,8 @@
+from _pydecimal import Decimal
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from app.db.database import Base
+from app.models import Produto
 
 
 class ItemCarrinho(Base):
@@ -13,15 +15,26 @@ class ItemCarrinho(Base):
     valor_unitario = Column(Numeric(10, 2))
     valor_total = Column(Numeric(10, 2))
 
-    # Alterado: Adicionei cascade para evitar problemas de deleção
     carrinho = relationship("Carrinho", back_populates="itens")
-    produto = relationship("Produto", lazy="joined")  # Alterado para eager loading
+    produto = relationship("Produto", lazy="joined")
 
-    def __init__(self, produto_id, quantidade=1, **kwargs):
+    def __init__(self, produto_id, quantidade=1, produto=None, **kwargs):
         super().__init__(**kwargs)
         self.produto_id = produto_id
         self.quantidade = quantidade
-        self.valor_unitario = self.produto.preco_final  # Preço base do produto
+
+        # Se o produto foi passado diretamente (por exemplo, de uma camada externa), usamos esse valor
+        if produto:
+            self.produto = produto
+        else:
+            # Caso contrário, consulte o banco para o produto
+            self.produto = Produto.query.filter(Produto.id == self.produto_id).first()
+
+        if self.produto:
+            self.valor_unitario = self.produto.preco_final
+        else:
+            self.valor_unitario = Decimal("0.00")
+
         self.calcular_total()
 
     def calcular_total(self):

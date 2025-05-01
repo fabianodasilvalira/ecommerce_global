@@ -44,6 +44,7 @@ def criar_venda(db: Session, venda_data: VendaCreate, usuario: Usuario) -> Venda
         nova_venda = Venda(
             usuario_id=usuario.id,
             endereco_id=venda_data.endereco_id,
+            carrinho_id=venda_data.carrinho_id,
             cupom_id=venda_data.cupom_id,
             status=StatusVendaEnum.PENDENTE.value,
             data_venda=datetime.utcnow()
@@ -323,93 +324,48 @@ def detalhar_venda(db: Session, venda_id: int, usuario: Usuario) -> Venda:
 
 
 
-# Corrigindo a função criar_venda_a_partir_do_carrinho
-def criar_venda_a_partir_do_carrinho(
-    db: Session,
-    carrinho: Carrinho,
-    endereco_id: int,
-    cupom_id: Optional[int] = None,
-    numero_parcelas: Optional[int] = None,  # O número de parcelas continua sendo passado
-    bandeira_cartao: Optional[str] = None,
-    ultimos_digitos_cartao: Optional[str] = None,
-    nome_cartao: Optional[str] = None,
-    metodo_pagamento: MetodoPagamentoEnum = MetodoPagamentoEnum.PIX  # Exemplo de valor, altere conforme necessário
-) -> Venda:
-    """Converte o carrinho em uma venda."""
-
+def criar_venda_a_partir_do_carrinho(db: Session, carrinho: Carrinho, venda_data: VendaCreate) -> Venda:
     try:
-        if carrinho.venda:
-            raise HTTPException(status_code=400, detail="Este carrinho já foi convertido em venda")
-
-        if not carrinho.itens:
-            raise HTTPException(status_code=400, detail="Carrinho vazio")
-
-        # Garantir que 'numero_parcelas' é um número inteiro, caso tenha sido enviado como string
-        if numero_parcelas is not None:
-            numero_parcelas = int(numero_parcelas)
-
-        # Prepara os dados da venda
-        venda_data = VendaCreate(
-            endereco_id=endereco_id,
-            cupom_id=cupom_id,
-            itens=[ItemVendaCreate(
-                produto_id=item.produto_id,
-                quantidade=item.quantidade
-            ) for item in carrinho.itens],
-            numero_parcelas=numero_parcelas,
-            bandeira_cartao=bandeira_cartao,
-            ultimos_digitos_cartao=ultimos_digitos_cartao,
-            nome_cartao=nome_cartao
+        # Cria a venda sem os dados de pagamento
+        venda = Venda(
+            endereco_id=venda_data.endereco_id,
+            cupom_id=venda_data.cupom_id,
+            usuario_id=carrinho.usuario_id
         )
-
-        # Cria a venda
-        venda_out = criar_venda(
-            db=db,
-            venda_data=venda_data,
-            usuario=carrinho.usuario
-        )
-
-        # Cria o pagamento associado à venda
-        pagamento = Pagamento(
-            venda_id=venda_out.id,
-            valor=carrinho.total,  # Valor do carrinho
-            status=StatusPagamento.PENDENTE,  # Exemplo, você pode mudar conforme necessário
-            metodo_pagamento=metodo_pagamento,
-            numero_parcelas=numero_parcelas,
-            bandeira_cartao=bandeira_cartao,
-            ultimos_digitos_cartao=ultimos_digitos_cartao,
-            nome_cartao=nome_cartao
-        )
-
-        db.add(pagamento)
-        db.commit()
-
-        # Atualiza a venda com o pagamento
-        venda = db.query(Venda).filter(Venda.id == venda_out.id).first()
-        if not venda:
-            raise HTTPException(status_code=404, detail="Venda não encontrada após criação")
-
-        # Estabelece a relação entre carrinho e venda
-        venda.carrinho_id = carrinho.id
-        carrinho.venda = venda
-        carrinho.is_finalizado = True
-        carrinho.data_finalizacao = func.now()
-
         db.add(venda)
-        db.add(carrinho)
-        db.commit()
-        db.refresh(venda)
+        db.flush()  # Para obter o ID da venda antes de criar o pagamento
 
+        # Adiciona os itens da venda
+        for item in venda_data.itens:
+            item_venda = ItemVenda(
+                produto_id=item.produto_id,
+                quantidade=item.quantidade,
+                preco_unitario=item.preco_unitario,
+                venda_id=venda.id
+            )
+            db.add(item_venda)
+
+        # Cria o pagamento associado
+        pagamento = Pagamento(
+            venda_id=venda.id,
+            metodo_pagamento=venda_data.metodo_pagamento,
+            numero_parcelas=venda_data.numero_parcelas,
+            bandeira_cartao=venda_data.bandeira_cartao,
+            ultimos_digitos_cartao=venda_data.ultimos_digitos_cartao,
+            nome_cartao=venda_data.nome_cartao
+        )
+        db.add(pagamento)
+
+        # Finaliza o carrinho
+        carrinho.is_finalizado = True
+
+        db.commit()
         return venda
 
-    except HTTPException:
-        db.rollback()
-        raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Erro ao criar venda do carrinho: {str(e)}")
+        logger.error(f"Erro ao criar venda a partir do carrinho: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao finalizar compra"
+            status_code=500,
+            detail="Erro interno ao criar venda a partir do carrinho"
         )
-

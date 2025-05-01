@@ -6,17 +6,17 @@ from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 
 from app import models
-from app.models import carrinho as carrinho_model, Venda, Produto
+from app.models import carrinho as carrinho_model, Venda, Produto, Usuario
 from app.models import item_carrinho as item_model
 from app.models import produto as produto_model
 from app.models.carrinho import Carrinho
 from app.models.item_carrinho import ItemCarrinho
-from app.models.pagamento import MetodoPagamentoEnum, Pagamento
-from app.schemas.carrinho_schema import ItemCarrinhoBase
+from app.models.pagamento import MetodoPagamentoEnum, Pagamento, StatusPagamento
+from app.schemas.carrinho_schema import ItemCarrinhoBase, CarrinhoOut
 from app.schemas.venda_schema import VendaCreate, ItemVendaCreate
 from app.services import venda_service
 from app.services.produto_service import logger
-from app.services.venda_service import criar_venda_a_partir_do_carrinho
+from app.services.venda_service import criar_venda_a_partir_do_carrinho, criar_venda
 
 
 def buscar_ou_criar_carrinho(db: Session, usuario_id: int):
@@ -316,13 +316,13 @@ def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
     }
 
 
-# Corrigindo a função finalizar_carrinho_e_criar_venda
+
 def finalizar_carrinho_e_criar_venda(
     db: Session,
     usuario_id: int,
     endereco_id: int,
     cupom_id: Optional[int] = None,
-    metodo_pagamento: Optional[MetodoPagamentoEnum] = None,
+    metodo_pagamento: [str] = None,
     numero_parcelas: Optional[int] = None,
     bandeira_cartao: Optional[str] = None,
     ultimos_digitos_cartao: Optional[str] = None,
@@ -360,28 +360,40 @@ def finalizar_carrinho_e_criar_venda(
         if not carrinho.itens:
             raise HTTPException(status_code=400, detail="Carrinho vazio")
 
-        # Usa a função calcular_totais para obter totais do carrinho
-        totais = calcular_totais(carrinho)
+        # Monta os itens para a venda
+        itens_venda = [
+            ItemVendaCreate(
+                produto_id=item.produto_id,
+                quantidade=item.quantidade,
+            )
+            for item in carrinho.itens
+        ]
 
-        # Atualiza os valores do carrinho com o total calculado
-        carrinho.total = totais["total"]
-        carrinho.subtotal = totais["subtotal"]
-        carrinho.is_finalizado = True
-        carrinho.data_finalizacao = func.now()
-        carrinho.atualizado_em = func.now()
-
-        # Chama a função para criar a venda com os dados do carrinho
-        venda = criar_venda_a_partir_do_carrinho(
-            db=db,
-            carrinho=carrinho,
+        # Monta o objeto de entrada para criação da venda
+        venda_data = VendaCreate(
             endereco_id=endereco_id,
             cupom_id=cupom_id,
+            itens=itens_venda,
+            carrinho_id=carrinho.id,  # Passando o ID do carrinho, não o objeto
             metodo_pagamento=metodo_pagamento,
             numero_parcelas=numero_parcelas,
             bandeira_cartao=bandeira_cartao,
             ultimos_digitos_cartao=ultimos_digitos_cartao,
             nome_cartao=nome_cartao
         )
+
+        # Cria a venda
+        usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
+
+        venda = criar_venda(
+            db=db,
+            venda_data=venda_data,
+            usuario=usuario,
+        )
+
+        # Finaliza o carrinho
+        carrinho.is_finalizado = True
+        carrinho.data_finalizacao = datetime.now()
 
         db.commit()
         return venda
@@ -396,5 +408,6 @@ def finalizar_carrinho_e_criar_venda(
             status_code=500,
             detail="Erro interno ao processar finalização do carrinho"
         )
+
 
 

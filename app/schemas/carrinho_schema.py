@@ -32,7 +32,7 @@ class ItemCarrinhoOut(BaseModel):
     preco_final: Optional[float] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Adicione essa linha!
 
 
 class CarrinhoOut(BaseModel):
@@ -44,7 +44,7 @@ class CarrinhoOut(BaseModel):
     data_finalizacao: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Adicione essa linha!
 
 
 class CarrinhoResponse(BaseModel):
@@ -62,13 +62,10 @@ class CarrinhoResponse(BaseModel):
 
 class FinalizarCarrinhoRequest(BaseModel):
     endereco_id: int
+    itens: List[ItemCarrinhoInput]
     cupom_id: Optional[int] = None
-    itens: List[ItemCarrinhoPydantic]
     metodo_pagamento: MetodoPagamentoEnum
-    numero_parcelas: Optional[int] = None  # Alterado para int
+    numero_parcelas: Optional[int] = None
     bandeira_cartao: Optional[str] = None
     ultimos_digitos_cartao: Optional[str] = None
     nome_cartao: Optional[str] = None
-
-    class Config:
-        arbitrary_types_allowed = True  # Permite tipos arbitrários como ItemCarrinho

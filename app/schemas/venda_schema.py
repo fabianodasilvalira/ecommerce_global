@@ -7,7 +7,9 @@ from datetime import datetime
 from typing import List, Optional
 from decimal import Decimal
 
+from app.models import Carrinho
 from app.models.pagamento import MetodoPagamentoEnum
+from app.schemas.carrinho_schema import CarrinhoOut
 from app.schemas.pagamento_schema import PagamentoOut
 from app.schemas.usuario_schema import UsuarioOut
 from app.schemas.endereco import EnderecoOut
@@ -31,7 +33,8 @@ class VendaCreate(BaseModel):
     endereco_id: Optional[int]
     cupom_id: Optional[int] = None
     itens: List[ItemVendaCreate]
-    metodo_pagamento: MetodoPagamentoEnum
+    carrinho_id: Optional[int] = None
+    metodo_pagamento: Optional[MetodoPagamentoEnum] = None
     nome_cartao: Optional[str] = None
 
     numero_parcelas: Optional[int] = Field(
