@@ -78,12 +78,12 @@ def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarr
         raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
 
     # Buscar o produto
-    produto = db.query(Produto).filter(Produto.id == item_data.produto_id).first()
+    produto = db.query(Produto).options(joinedload(Produto.estoque)).filter(Produto.id == item_data.produto_id).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
     # Verificar estoque
-    if hasattr(produto, 'estoque') and produto.estoque.quantidade < item_data.quantidade:
+    if produto.estoque is None or produto.estoque.quantidade < item_data.quantidade:
         raise HTTPException(status_code=400, detail="Quantidade indisponível em estoque")
 
     # Buscar ou criar carrinho
