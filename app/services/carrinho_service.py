@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional, Dict, Any
 
 from sqlalchemy import func, and_
@@ -20,19 +21,25 @@ from app.services.venda_service import criar_venda_a_partir_do_carrinho, criar_v
 
 
 def buscar_ou_criar_carrinho(db: Session, usuario_id: int):
-    return (
-        db.query(Carrinho)
-        .options(
-            joinedload(Carrinho.itens)
-            .joinedload(ItemCarrinho.produto)
-            .joinedload(Produto.imagens),
-            joinedload(Carrinho.itens)
-            .joinedload(ItemCarrinho.produto)
-            .joinedload(Produto.categoria)
-        )
+    # Verifica apenas se o carrinho não finalizado já existe
+    carrinho = (
+        db.query(carrinho_model.Carrinho)
         .filter_by(usuario_id=usuario_id, is_finalizado=False)
         .first()
     )
+
+    if not carrinho:
+        carrinho = carrinho_model.Carrinho(
+            usuario_id=usuario_id,
+            is_finalizado=False,
+            criado_em=datetime.now()  # ou datetime.utcnow() dependendo do padrão do seu projeto
+        )
+        db.add(carrinho)
+        db.commit()
+        db.refresh(carrinho)
+
+    return carrinho
+
 
 
 def calcular_totais(carrinho):
@@ -44,7 +51,9 @@ def calcular_totais(carrinho):
             "quantidade": item.quantidade,
             "valor_unitario": float(item.valor_unitario),
             "valor_total": float(item.valor_total),
-            "produto": formatar_produto(item.produto)
+            "produto": formatar_produto(item.produto),
+            "data_finalizacao": carrinho.data_finalizacao
+
         })
 
     # Calcula totais
@@ -63,52 +72,43 @@ def calcular_totais(carrinho):
     }
 
 
-
-
 def adicionar_item_ao_carrinho(db: Session, usuario_id: int, item_data: ItemCarrinhoBase):
     # Verificar se a quantidade é válida
     if item_data.quantidade <= 0:
         raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
 
     # Buscar o produto
-    produto = db.query(produto_model.Produto).filter_by(id=item_data.produto_id).first()
+    produto = db.query(Produto).filter(Produto.id == item_data.produto_id).first()
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-    # Verificar estoque, se o produto possui o atributo de estoque
-    if hasattr(produto, 'estoque_disponivel') and produto.estoque_disponivel < item_data.quantidade:
+    # Verificar estoque
+    if hasattr(produto, 'estoque') and produto.estoque.quantidade < item_data.quantidade:
         raise HTTPException(status_code=400, detail="Quantidade indisponível em estoque")
 
-    # Buscar ou criar o carrinho do usuário
+    # Buscar ou criar carrinho
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
 
-    # Verificar se o item já está no carrinho
-    item = db.query(item_model.ItemCarrinho).filter_by(
-        carrinho_id=carrinho.id,
-        produto_id=item_data.produto_id
-    ).first()
+    # Verificar se item já existe no carrinho
+    item_existente = db.query(ItemCarrinho).filter(ItemCarrinho.carrinho_id == carrinho.id, ItemCarrinho.produto_id == item_data.produto_id ).first()
 
-    # Se o item já existe no carrinho, apenas atualiza a quantidade e o valor total
-    if item:
-        item.quantidade += item_data.quantidade
-        item.valor_total = item.quantidade * item.valor_unitario
+    if item_existente:
+        # Atualizar item existente
+        item_existente.quantidade += item_data.quantidade
+        item_existente.valor_total = produto.preco_final * item_existente.quantidade
     else:
-        # Caso o item não exista no carrinho, cria um novo item
-        item = item_model.ItemCarrinho(
+        # Criar novo item
+        novo_item = ItemCarrinho(
             carrinho_id=carrinho.id,
             produto_id=item_data.produto_id,
             quantidade=item_data.quantidade,
             valor_unitario=produto.preco_final,
             valor_total=produto.preco_final * item_data.quantidade
         )
-        db.add(item)
+        db.add(novo_item)
 
-    # Salvar as alterações no banco de dados
     db.commit()
-    db.refresh(carrinho)
-
-    # Calcular os totais atualizados do carrinho
-    return calcular_totais(buscar_ou_criar_carrinho(db, usuario_id))
+    return calcular_totais(carrinho)
 
 
 def remover_item_do_carrinho(db: Session, usuario_id: int, produto_id: int):
@@ -280,40 +280,25 @@ def listar_carrinhos_finalizados(
 def ver_item_especifico(db: Session, usuario_id: int, produto_id: int):
     carrinho = buscar_ou_criar_carrinho(db, usuario_id)
 
-    item = (
-        db.query(item_model.ItemCarrinho)
-        .options(
-            joinedload(item_model.ItemCarrinho.produto)
-            .joinedload(produto_model.Produto.imagens),
-            joinedload(item_model.ItemCarrinho.produto)
-            .joinedload(produto_model.Produto.categoria)
-        )
-        .filter_by(carrinho_id=carrinho.id, produto_id=produto_id)
-        .first()
-    )
+    if not carrinho:
+        raise HTTPException(status_code=404, detail="carrinho não encontrado")
+
+    produto = db.query(produto_model.Produto).filter_by(id=produto_id).first()
+
+    # Se o produto não for encontrado, levanta uma exceção
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    # Tenta buscar o item diretamente
+
+    item = db.query(item_model.ItemCarrinho).filter(
+        item_model.ItemCarrinho.carrinho_id == carrinho.id,
+        item_model.ItemCarrinho.produto_id == produto_id
+    ).first()
 
     if not item:
         raise HTTPException(status_code=404, detail="Item não encontrado")
 
-    # Formatar a resposta conforme o schema esperado
-    return {
-        "id": item.id,
-        "quantidade": item.quantidade,
-        "valor_unitario": float(item.valor_unitario),
-        "valor_total": float(item.valor_total),
-        "produto": {
-            "id": item.produto.id,
-            "nome": item.produto.nome,
-            "descricao": item.produto.descricao,
-            "preco_final": float(item.produto.preco_final),
-            "imagem_url": item.produto.imagens[0].imagem_url if item.produto.imagens else "",
-            "categoria": {
-                "id": item.produto.categoria.id,
-                "nome": item.produto.categoria.nome,
-                "descricao": item.produto.categoria.descricao,
-                "ativo": item.produto.categoria.ativo
-            } if item.produto.categoria else None        }
-    }
+    return item  # Agora pode retornar o item diretamente
 
 
 

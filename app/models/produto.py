@@ -11,7 +11,7 @@ class Produto(Base):
     sku = Column(String(50), unique=True, nullable=False, index=True)
     nome = Column(String(100), nullable=False)
     descricao = Column(String(255), nullable=True)
-    preco = Column(DECIMAL(10, 2), nullable=False)
+    _preco = Column("preco", DECIMAL(10, 2), nullable=False)  # Usar '_preco' internamente
     volume = Column(Float, nullable=True)
     unidade_medida = Column(String(10), nullable=True)
     ativo = Column(Boolean, default=True)
@@ -29,12 +29,30 @@ class Produto(Base):
     itens_carrinho = relationship("ItemCarrinho", back_populates="produto")
 
     def calcular_preco_final(self):
-        preco_decimal = Decimal(str(self.preco))
+        preco_decimal = Decimal(str(self._preco))  # Usando '_preco' internamente
         margem_decimal = Decimal(self.margem_lucro) / Decimal(100) + Decimal(1)
         return preco_decimal * margem_decimal
 
     def atualizar_preco_final(self):
         self.preco_final = self.calcular_preco_final()
+
+    @property
+    def preco(self):
+        return self._preco
+
+    @preco.setter
+    def preco(self, value):
+        self._preco = Decimal(str(value))  # Garantir que o valor seja convertido para Decimal
+        self.atualizar_preco_final()  # Atualiza o preco_final sempre que o preco mudar
+
+    @property
+    def margem_lucro(self):
+        return self._margem_lucro
+
+    @margem_lucro.setter
+    def margem_lucro(self, value):
+        self._margem_lucro = Decimal(str(value))  # Garantir que o valor seja convertido para Decimal
+        self.atualizar_preco_final()  # Atualiza o preco_final sempre que a margem_lucro mudar
 
     @property
     def promocao_ativa(self):

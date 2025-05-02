@@ -107,32 +107,29 @@ class VendaOut(BaseModel):
     id: int
     usuario: UsuarioOut
     endereco: EnderecoOut
-    cupom: Optional[CupomOut] = None  # Explicitamente None como default
-    promocoes: Optional[List[PromocaoOut]] = None  # Mudado para None
+    cupom: Optional[CupomOut] = None
+    promocoes: Optional[List[PromocaoOut]] = None
     total: Decimal
     status: str
     data_venda: datetime
     itens: List[ItemVendaOut]
     carrinho_id: Optional[int] = None
     carrinho: Optional[dict] = None
-    pagamentos: Optional[List[PagamentoOut]] = None  # Adicionando pagamentos
-    total_parcelas: Optional[int] = None  # Total de parcelas
+    pagamentos: Optional[List[PagamentoOut]] = None
+    total_parcelas: Optional[int] = None
 
     class Config:
-        from_attributes = True  # Usar apenas esta opção (orm_mode está deprecated)
+        from_attributes = True
 
     @classmethod
     def from_orm(cls, obj):
-        # Garantir que promocoes seja None se não existir
         promocoes = None
         if hasattr(obj, 'itens') and obj.itens:
-            # Vamos usar a propriedade promocao_ativa do produto
             promocoes_ativas = [
                 i.produto.promocao_ativa for i in obj.itens if i.produto.promocao_ativa
             ]
 
             if promocoes_ativas:
-                # Converter as promoções ativas para o formato PromocaoOut
                 promocoes = [PromocaoOut.from_orm(p) for p in promocoes_ativas]
             else:
                 print("Nenhuma promoção ativa encontrada.")

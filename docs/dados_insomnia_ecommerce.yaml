@@ -255,7 +255,7 @@ collection:
             meta:
               id: req_fc8c1789f3544236b9bfe978abb31a7d
               created: 1743772541780
-              modified: 1745929480359
+              modified: 1746020221717
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -276,7 +276,7 @@ collection:
               - id: pair_407c59ee510848d9a70b4627202ee6d1
                 name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMxMjUzfQ.3L_sbKI4vE-ZbgsBTaFBiIOijdiy666ewiGY5DufOsY
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MDIyMDEwfQ.l5u3smn4CtOvIVVfzJlq7sK5YQ91v_Hc-Z8XvJOKX9k
                 disabled: false
             settings:
               renderRequestBody: true
@@ -578,7 +578,7 @@ collection:
             meta:
               id: req_031845d331f44340b4de32ba6c407ef1
               created: 1743776513738
-              modified: 1745929485704
+              modified: 1746010405019
               isPrivate: false
               sortKey: -1743772541780
             method: POST
@@ -588,8 +588,8 @@ collection:
                 {
                   "produto_id": 5,
                   "preco_promocional": 50.00,
-                  "data_inicio": "2025-05-06T00:00:00",
-                  "data_fim": "2025-06-06T23:59:59",
+                  "data_inicio": "2025-04-06T00:00:00",
+                  "data_fim": "2026-06-06T23:59:59",
                   "ativo": true
                 }
             headers:
@@ -705,7 +705,7 @@ collection:
             meta:
               id: req_f310fa480cf84910b20aa65741860bae
               created: 1744119666509
-              modified: 1745933188785
+              modified: 1746029152840
               isPrivate: false
               sortKey: -1744119678865
             method: POST
@@ -718,14 +718,10 @@ collection:
                     {
                       "produto_id": 1,
                       "quantidade": 1
-                    },
-                		{
-                      "produto_id": 2,
-                      "quantidade": 2
                     }
                   ],
                   "metodo_pagamento": "PIX",
-                	"cupom_id": "1",
+
                   "numero_parcelas": "2",
                   "bandeira_cartao": "VISA",
                   "ultimos_digitos_cartao": "1234",
@@ -737,7 +733,7 @@ collection:
                 id: pair_c826a1ff481849a78847b4e12561ceb6
               - name: Authorization
                 value: Bearer
-                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ1OTMzODk3fQ._xN0ajgFY1wOseRb8O5JrDKZSfF0YooDeqHtQRoWCTs
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MDMwOTQzfQ.xSF1kegBjDsAtzBBsS6ZTKha40c6JWISsHkLpvytZjE
                 id: pair_9599da96c0094c7ea181eeba0c9a72c0
             settings:
               renderRequestBody: true
@@ -1180,12 +1176,12 @@ collection:
           modified: 1744381875084
           sortKey: -1744381875084
         children:
-          - url: "{{ base_url }}/carrinho/adicionar?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/adicionar/"
             name: Adicionar Item
             meta:
               id: req_c14f568fbe9a4f15b21e37a4d8997a05
               created: 1744381852331
-              modified: 1745932274320
+              modified: 1746185297176
               isPrivate: false
               sortKey: -1744381880959
             method: POST
@@ -1193,9 +1189,15 @@ collection:
               mimeType: application/json
               text: |-
                 {
-                  "produto_id": 16,
-                  "quantidade": 1
+                  "produto_id": 1,
+                  "quantidade": 2
                 }
+            headers:
+              - id: pair_033c0cc10ec34dc6b8b2afb31d1dcc1a
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg3MDg4fQ.JzmO3cVS7_EWG-7iLj4IU-KS0bDS4Q6X7p_O50w9tnY
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1209,10 +1211,16 @@ collection:
             meta:
               id: req_674ddbb4529c42cf96bd6886c8091dcf
               created: 1744381852333
-              modified: 1745500163724
+              modified: 1746186702174
               isPrivate: false
               sortKey: -1744381880859
             method: GET
+            headers:
+              - id: pair_b63a5ba474804b19ac14fd2f5f279c22
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1221,15 +1229,21 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/remover/1?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/remover/2"
             name: Remover Item
             meta:
               id: req_9a89c46c2b75419aa9ab09f7cc85b72d
               created: 1744381852334
-              modified: 1745500564922
+              modified: 1746186673079
               isPrivate: false
               sortKey: -1744381881059
             method: DELETE
+            headers:
+              - id: pair_77950900d0684ab1b3478126adeaa50f
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1243,7 +1257,7 @@ collection:
             meta:
               id: req_2dd03eadf435474ba31f7feb6ac3a8e2
               created: 1744381852335
-              modified: 1745504425260
+              modified: 1746188323514
               isPrivate: false
               sortKey: -1744381881159
             method: PUT
@@ -1262,6 +1276,12 @@ collection:
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_79d9ebc79e0b4f88bab4a6fff2d1e552
+              - id: pair_4d35e2ae09c941b1b475097922066e06
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1270,15 +1290,21 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/limpar?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/limpar"
             name: Limpar Carrinho
             meta:
               id: req_5d495d5a28a44eb2a285b37a5d4a9ce8
               created: 1744381852336
-              modified: 1744381890759
+              modified: 1746186739770
               isPrivate: false
               sortKey: -1744381881109
             method: DELETE
+            headers:
+              - id: pair_0c8e2ca999ca434abd88433cf378a29f
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1287,12 +1313,12 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/finalizar?usuario_id=1&endereco_id=1"
+          - url: "{{ base_url }}/carrinho/finalizar_carrinho"
             name: Finalizar Carrinho
             meta:
               id: req_dde477ca73dd4c77880327015870590a
               created: 1744381852337
-              modified: 1745932464028
+              modified: 1746181799433
               isPrivate: false
               sortKey: -1744381881084
             method: POST
@@ -1302,20 +1328,24 @@ collection:
                 {
                   "endereco_id": 1,
                   "itens": [
-                    {
-                      "produto_id": 1,
-                      "quantidade": 1
-                    }
+                    { "produto_id": 1, "quantidade": 2 },
+                    { "produto_id": 3, "quantidade": 1 }
                   ],
-                  "metodo_pagamento": "PIX",
-                  "numero_parcelas": "2",
+                  "metodo_pagamento": "CARTAO_CREDITO",
+                  "nome_cartao": "João da Silva",
+                  "numero_parcelas": 3,
                   "bandeira_cartao": "VISA",
-                  "ultimos_digitos_cartao": "1234",
-                	"nome_cartao":"teste"
+                  "ultimos_digitos_cartao": "1234"
                 }
             headers:
               - name: Content-Type
                 value: application/json
+                id: pair_4f883bd55b01457b887b8a4f1d27dac3
+              - id: pair_05e3f5bd96aa4aa59de6c1aa94de3c76
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTgzMzg1fQ.HP2Qv7byhGX5BCk1flSqzAG1wLX64MCoGnBx4POTsdQ
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1324,15 +1354,21 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/finalizados?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/finalizados"
             name: Listar Carrinhos Finalizados
             meta:
               id: req_7125c13b9f994fb2a800fc332c7e5ce8
               created: 1744381852338
-              modified: 1744805207188
+              modified: 1746186766952
               isPrivate: false
               sortKey: -1744381881121.5
             method: GET
+            headers:
+              - id: pair_59732fcff944463c88798a44f731682f
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -1341,15 +1377,21 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{ base_url }}/carrinho/item/1?usuario_id=1"
+          - url: "{{ base_url }}/carrinho/item/1"
             name: Ver Item Específico
             meta:
               id: req_df5d3ee9e5be462f81ed46020428871e
               created: 1744381852338
-              modified: 1744815645216
+              modified: 1746186836507
               isPrivate: false
               sortKey: -1744381881134
             method: GET
+            headers:
+              - id: pair_8d27eb36e1bb4bf495bf46190776d362
+                name: Authorization
+                value: Bearer
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzQ2MTg4MzM2fQ.Y-RRrgrvJXPj81bRsq6-5uBSy5gjGfw5SnlTN2DSqAA
+                disabled: false
             settings:
               renderRequestBody: true
               encodeUrl: true

@@ -14,7 +14,6 @@ class ItemCarrinhoInput(BaseModel):
 
 
 class CarrinhoAtualizarInput(BaseModel):
-    usuario_id: int  # necessário para associar o carrinho ao usuário que está atualizando
     itens: List[ItemCarrinhoInput]
 
 
@@ -29,7 +28,6 @@ class ItemCarrinhoOut(BaseModel):
     valor_unitario: float
     valor_total: float
     produto: ProdutoOut
-    preco_final: Optional[float] = None
 
     class Config:
         from_attributes = True  # Adicione essa linha!
