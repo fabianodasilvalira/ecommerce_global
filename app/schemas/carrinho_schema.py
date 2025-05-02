@@ -60,7 +60,7 @@ class CarrinhoResponse(BaseModel):
 
 class FinalizarCarrinhoRequest(BaseModel):
     endereco_id: int
-    itens: List[ItemCarrinhoInput]
+    itens: List[ItemCarrinhoInput] = None
     cupom_id: Optional[int] = None
     metodo_pagamento: MetodoPagamentoEnum
     numero_parcelas: Optional[int] = None

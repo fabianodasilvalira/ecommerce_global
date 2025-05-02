@@ -54,32 +54,14 @@ def limpar_carrinho(
 ):
     return carrinho_service.limpar_carrinho(db, usuario.id)
 
+
 @router.post("/finalizar_carrinho")
 def finalizar_carrinho(
-        payload: FinalizarCarrinhoRequest,
-        db: Session = Depends(get_db),
-        usuario: Usuario = Depends(get_current_user)
+    payload: FinalizarCarrinhoRequest,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(get_current_user)
 ):
     try:
-
-        # Validação adicional dos itens do carrinho
-        if not payload.itens or len(payload.itens) == 0:
-            raise HTTPException(status_code=400, detail="O carrinho não pode estar vazio")
-
-        # Validação de pagamento com cartão
-        if payload.metodo_pagamento in [MetodoPagamentoEnum.CARTAO_CREDITO, MetodoPagamentoEnum.CARTAO_DEBITO]:
-            if not payload.bandeira_cartao or not payload.ultimos_digitos_cartao or not payload.nome_cartao:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Para pagamento com cartão, bandeira, dígitos finais e nome no cartão são obrigatórios"
-                )
-            if payload.metodo_pagamento == MetodoPagamentoEnum.CARTAO_CREDITO and not payload.numero_parcelas:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Número de parcelas é obrigatório para cartão de crédito"
-                )
-
-        # Chama o serviço de finalização do carrinho e criação de venda
         return carrinho_service.finalizar_carrinho_e_criar_venda(
             db=db,
             usuario_id=usuario.id,
@@ -95,6 +77,7 @@ def finalizar_carrinho(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao finalizar o carrinho: {str(e)}")
+
 
 
 @router.get("/historico", response_model=List[schemas.CarrinhoOut])
