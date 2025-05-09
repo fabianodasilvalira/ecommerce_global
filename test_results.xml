@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="3" failures="17" skipped="0" tests="20" time="0.381" timestamp="2025-05-08T20:59:59.682354-04:00" hostname="a52a6a6b8fc8"><testcase classname="tests.test_auth" name="test_login_admin_success" time="0.159"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46e69ec50&gt;
+
+    @pytest.mark.asyncio
+    async def test_login_admin_success(client: AsyncClient):
+        """Testa o login bem-sucedido do usuário administrador padrão."""
+        # As credenciais do admin são carregadas de variáveis de ambiente em usuario_service.py
+        # Para o teste, podemos usar as mesmas variáveis ou mocká-las se necessário.
+        # Vamos assumir que o usuário admin é criado no startup do app.
+        login_data = {
+            "username": settings.ADMIN_EMAIL, # Usar o email do admin configurado
+            "password": settings.ADMIN_PASSWORD # Usar a senha do admin configurada
+        }
+&gt;       response = await client.post("/auth/login", data=login_data)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_auth.py:19: AttributeError</failure></testcase><testcase classname="tests.test_auth" name="test_login_invalid_credentials" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c9f6f20&gt;
+
+    @pytest.mark.asyncio
+    async def test_login_invalid_credentials(client: AsyncClient):
+        """Testa o login com credenciais inválidas."""
+        login_data = {
+            "username": "usuarioinexistente@example.com",
+            "password": "senhainvalida123"
+        }
+&gt;       response = await client.post("/auth/login", data=login_data)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_auth.py:33: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_criar_novo_produto" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c9f7790&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e7240&gt;
+categoria_teste_id = &lt;coroutine object categoria_teste_id at 0x7fd46d623100&gt;
+
+    @pytest.mark.asyncio
+    async def test_criar_novo_produto(client: AsyncClient, admin_auth_headers: dict, categoria_teste_id: int):
+        """Testa a criação de um novo produto por um administrador."""
+        novo_produto_data = {
+            "nome": "Produto Teste 1",
+            "descricao": "Descrição do Produto Teste 1",
+            "preco": 19.99,
+            "categoria_id": categoria_teste_id,
+            "volume": 1.5,
+            "unidade_medida": "L",
+            "ativo": True,
+            "margem_lucro": 25.0
+        }
+&gt;       response = await client.post("/api/v1/produtos/", json=novo_produto_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:42: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_criar_produto_categoria_inexistente" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d4a90&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e5840&gt;
+
+    @pytest.mark.asyncio
+    async def test_criar_produto_categoria_inexistente(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a criação de um produto com uma categoria_id que não existe."""
+        produto_data_cat_invalida = {
+            "nome": "Produto Categoria Inválida",
+            "descricao": "Teste com categoria inexistente",
+            "preco": 10.00,
+            "categoria_id": 99999, # ID de categoria improvável de existir
+            "ativo": True
+        }
+&gt;       response = await client.post("/api/v1/produtos/", json=produto_data_cat_invalida, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:61: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_listar_produtos" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d4f40&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e5d40&gt;
+categoria_teste_id = &lt;coroutine object categoria_teste_id at 0x7fd46d6234c0&gt;
+
+    @pytest.mark.asyncio
+    async def test_listar_produtos(client: AsyncClient, admin_auth_headers: dict, categoria_teste_id: int):
+        """Testa a listagem de produtos."""
+        # Criar alguns produtos para garantir que a lista não esteja vazia
+&gt;       await client.post("/api/v1/produtos/", json={"nome": "Produto Lista 1", "descricao": "Desc Prod Lista 1", "preco": 5.0, "categoria_id": categoria_teste_id, "ativo": True}, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:70: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_obter_produto_por_id" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d58a0&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c590840&gt;
+categoria_teste_id = &lt;coroutine object categoria_teste_id at 0x7fd46d623600&gt;
+
+    @pytest.mark.asyncio
+    async def test_obter_produto_por_id(client: AsyncClient, admin_auth_headers: dict, categoria_teste_id: int):
+        """Testa a obtenção de um produto específico por ID."""
+        novo_produto_data = {
+            "nome": "Produto Para Buscar ID",
+            "descricao": "Descrição do Produto Para Buscar ID",
+            "preco": 29.99,
+            "categoria_id": categoria_teste_id,
+            "ativo": True
+        }
+&gt;       response_create = await client.post("/api/v1/produtos/", json=novo_produto_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:93: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_obter_produto_inexistente" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'get'">client = &lt;async_generator object client at 0x7fd46c9f7880&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e4b40&gt;
+
+    @pytest.mark.asyncio
+    async def test_obter_produto_inexistente(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a tentativa de obter um produto com ID inexistente."""
+        id_inexistente = 999999
+&gt;       response = await client.get(f"/api/v1/produtos/{id_inexistente}", headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'get'
+
+tests/test_produtos.py:107: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_atualizar_produto" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d6020&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e6440&gt;
+categoria_teste_id = &lt;coroutine object categoria_teste_id at 0x7fd46d6234c0&gt;
+
+    @pytest.mark.asyncio
+    async def test_atualizar_produto(client: AsyncClient, admin_auth_headers: dict, categoria_teste_id: int):
+        """Testa a atualização de um produto existente."""
+        # Criar produto para atualizar
+        produto_original_data = {
+            "nome": "Produto Original Para Atualizar",
+            "descricao": "Descrição Original",
+            "preco": 50.00,
+            "categoria_id": categoria_teste_id,
+            "ativo": True
+        }
+&gt;       res_create = await client.post("/api/v1/produtos/", json=produto_original_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:122: AttributeError</failure></testcase><testcase classname="tests.test_produtos" name="test_inativar_reativar_produto" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d57b0&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e7140&gt;
+categoria_teste_id = &lt;coroutine object categoria_teste_id at 0x7fd46d622fc0&gt;
+
+    @pytest.mark.asyncio
+    async def test_inativar_reativar_produto(client: AsyncClient, admin_auth_headers: dict, categoria_teste_id: int):
+        """Testa a inativação e reativação de um produto."""
+        produto_data = {
+            "nome": "Produto Para Inativar/Reativar",
+            "descricao": "Descrição",
+            "preco": 10.00,
+            "categoria_id": categoria_teste_id,
+            "ativo": True
+        }
+&gt;       res_create = await client.post("/api/v1/produtos/", json=produto_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_produtos.py:145: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_criar_novo_usuario_como_admin" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d6110&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c590140&gt;
+
+    @pytest.mark.asyncio
+    async def test_criar_novo_usuario_como_admin(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a criação de um novo usuário (não admin) por um administrador."""
+        novo_usuario_data = {
+            "nome": "Usuário Teste Criado Por Admin",
+            "email": "usuariotestecriado@example.com",
+            "senha": "senhaforte123",
+            "cpf_cnpj": "12345678902",
+            "telefone": "11987654321",
+            "tipo_usuario": "cliente" # Admin pode definir o tipo
+        }
+&gt;       response = await client.post("/api/v1/usuarios/", json=novo_usuario_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:22: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_criar_usuario_email_duplicado" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d64d0&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c591840&gt;
+
+    @pytest.mark.asyncio
+    async def test_criar_usuario_email_duplicado(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a tentativa de criar um usuário com e-mail já existente."""
+        # Primeiro, cria um usuário
+        usuario_existente_data = {
+            "nome": "Usuário Email Duplicado",
+            "email": "emailduplicado@example.com",
+            "senha": "senha123",
+            "cpf_cnpj": "00011122233",
+            "tipo_usuario": "cliente"
+        }
+&gt;       response_primeiro = await client.post("/api/v1/usuarios/", json=usuario_existente_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:42: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_listar_usuarios_como_admin" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d6890&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c592240&gt;
+
+    @pytest.mark.asyncio
+    async def test_listar_usuarios_como_admin(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a listagem de usuários por um administrador."""
+        # Criar alguns usuários para garantir que a lista não esteja vazia
+&gt;       await client.post("/api/v1/usuarios/", json={"nome": "User List Test 1", "email": "userlist1@example.com", "senha": "pass1", "cpf_cnpj": "11100011100", "tipo_usuario": "cliente"}, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:56: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_obter_usuario_por_id_como_admin" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c9f74c0&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e7340&gt;
+
+    @pytest.mark.asyncio
+    async def test_obter_usuario_por_id_como_admin(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a obtenção de um usuário específico por ID por um administrador."""
+        # Criar um usuário para buscar
+        novo_usuario_data = {
+            "nome": "Usuário Para Buscar",
+            "email": "buscarporid@example.com",
+            "senha": "senhaforte123",
+            "cpf_cnpj": "98765432100",
+            "tipo_usuario": "cliente"
+        }
+&gt;       response_create = await client.post("/api/v1/usuarios/", json=novo_usuario_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:81: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_obter_usuario_inexistente" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'get'">client = &lt;async_generator object client at 0x7fd46c5d62f0&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c9e6140&gt;
+
+    @pytest.mark.asyncio
+    async def test_obter_usuario_inexistente(client: AsyncClient, admin_auth_headers: dict):
+        """Testa a tentativa de obter um usuário com ID inexistente."""
+        id_inexistente = 999999
+&gt;       response = await client.get(f"/api/v1/usuarios/{id_inexistente}", headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'get'
+
+tests/test_usuarios.py:95: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_atualizar_proprio_usuario" time="0.001"><failure message="NameError: name 'admin_auth_headers' is not defined">client = &lt;async_generator object client at 0x7fd46c5d4c70&gt;
+db_session = &lt;sqlalchemy.orm.session.Session object at 0x7fd46c564fd0&gt;
+
+    @pytest.mark.asyncio
+    async def test_atualizar_proprio_usuario(client: AsyncClient, db_session: Session):
+        """Testa se um usuário comum pode atualizar seus próprios dados (exceto tipo_usuario e ativo)."""
+        # 1. Criar um usuário comum (sem ser admin) para o teste
+        #    Idealmente, teríamos um endpoint de registro público ou criaríamos diretamente no DB para teste.
+        #    Por simplicidade, vamos criar via admin e depois logar como esse usuário.
+&gt;       admin_headers = await admin_auth_headers(client) # Obtem headers do admin
+E       NameError: name 'admin_auth_headers' is not defined
+
+tests/test_usuarios.py:105: NameError</failure></testcase><testcase classname="tests.test_usuarios" name="test_admin_atualiza_outro_usuario" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d4f40&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c591a40&gt;
+
+    @pytest.mark.asyncio
+    async def test_admin_atualiza_outro_usuario(client: AsyncClient, admin_auth_headers: dict):
+        """Testa se um admin pode atualizar dados de outro usuário, incluindo tipo e status ativo."""
+        # Criar um usuário para ser atualizado pelo admin
+        usuario_alvo_data = {
+            "nome": "Usuário Alvo do Admin",
+            "email": "alvoadmin@example.com",
+            "senha": "alvosenha",
+            "cpf_cnpj": "30303030303",
+            "tipo_usuario": "cliente"
+        }
+&gt;       res_create = await client.post("/api/v1/usuarios/", json=usuario_alvo_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:144: AttributeError</failure></testcase><testcase classname="tests.test_usuarios" name="test_admin_inativa_usuario" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'post'">client = &lt;async_generator object client at 0x7fd46c5d4d60&gt;
+admin_auth_headers = &lt;coroutine object admin_auth_headers at 0x7fd46c590540&gt;
+
+    @pytest.mark.asyncio
+    async def test_admin_inativa_usuario(client: AsyncClient, admin_auth_headers: dict):
+        """Testa se um admin pode inativar (soft delete) um usuário."""
+        # Criar um usuário para ser inativado
+        usuario_para_inativar_data = {
+            "nome": "Usuário Para Inativar",
+            "email": "inativar@example.com",
+            "senha": "senha123",
+            "cpf_cnpj": "40404040404",
+            "tipo_usuario": "cliente"
+        }
+&gt;       res_create = await client.post("/api/v1/usuarios/", json=usuario_para_inativar_data, headers=admin_auth_headers)
+E       AttributeError: 'async_generator' object has no attribute 'post'
+
+tests/test_usuarios.py:172: AttributeError</failure></testcase><testcase classname="tests.test_vendas" name="test_criar_nova_venda_simples" time="0.001"><error message="failed on setup with &quot;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 83&#10;  @pytest.mark.asyncio&#10;  async def test_criar_nova_venda_simples(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):&#10;      &quot;&quot;&quot;Testa a criação de uma nova venda simples (um produto, sem cupom, pagamento PIX).&quot;&quot;&quot;&#10;      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=2)&#10;      venda_data = VendaCreate(&#10;          endereco_id=endereco_admin_id,&#10;          itens=[item_venda],&#10;          metodo_pagamento=&quot;PIX&quot; # Usar string conforme o Enum no schema&#10;      )&#10;&#10;      response = await client.post(&quot;/api/v1/vendas/&quot;, json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)&#10;&#10;      assert response.status_code == status.HTTP_201_CREATED&#10;      data = response.json()&#10;      assert data[&quot;status&quot;] == &quot;PENDENTE&quot; # Ou o status inicial definido&#10;      assert len(data[&quot;itens&quot;]) == 1&#10;      assert data[&quot;itens&quot;][0][&quot;produto_id&quot;] == produto_para_venda_id&#10;      assert data[&quot;itens&quot;][0][&quot;quantidade&quot;] == 2&#10;      assert Decimal(str(data[&quot;total&quot;])) &gt; Decimal(&quot;0.00&quot;)&#10;      assert &quot;pagamentos&quot; in data&#10;      assert len(data[&quot;pagamentos&quot;]) == 1&#10;      assert data[&quot;pagamentos&quot;][0][&quot;metodo_pagamento&quot;] == &quot;PIX&quot;&#10;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15&#10;  @pytest.fixture(scope=&quot;function&quot;)&#10;  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:&#10;      &quot;&quot;&quot;Cria um produto de teste com estoque e retorna seu ID.&quot;&quot;&quot;&#10;      produto_data = {&#10;          &quot;nome&quot;: &quot;Produto Para Venda Teste&quot;,&#10;          &quot;descricao&quot;: &quot;Descrição do Produto Para Venda&quot;,&#10;          &quot;preco&quot;: 100.00,&#10;          &quot;categoria_id&quot;: categoria_teste_id,&#10;          &quot;ativo&quot;: True&#10;      }&#10;      response_prod = await client.post(&quot;/api/v1/produtos/&quot;, json=produto_data, headers=admin_auth_headers)&#10;      assert response_prod.status_code == status.HTTP_201_CREATED&#10;      produto_id = response_prod.json()[&quot;id&quot;]&#10;&#10;      # Adicionar estoque ao produto&#10;      estoque_data = {&#10;          &quot;produto_id&quot;: produto_id,&#10;          &quot;quantidade&quot;: 50,&#10;          &quot;localizacao&quot;: &quot;Estoque Principal Teste&quot;&#10;      }&#10;      response_estoque = await client.post(f&quot;/api/v1/estoque/&quot;, json=estoque_data, headers=admin_auth_headers)&#10;      assert response_estoque.status_code == status.HTTP_201_CREATED&#10;      return produto_id&#10;E       fixture 'categoria_teste_id' not found&#10;&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory&#10;&gt;       use 'pytest --fixtures [testpath]' for help on them.&#10;&#10;/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15&quot;">file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 83
+  @pytest.mark.asyncio
+  async def test_criar_nova_venda_simples(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):
+      """Testa a criação de uma nova venda simples (um produto, sem cupom, pagamento PIX)."""
+      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=2)
+      venda_data = VendaCreate(
+          endereco_id=endereco_admin_id,
+          itens=[item_venda],
+          metodo_pagamento="PIX" # Usar string conforme o Enum no schema
+      )
+
+      response = await client.post("/api/v1/vendas/", json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)
+
+      assert response.status_code == status.HTTP_201_CREATED
+      data = response.json()
+      assert data["status"] == "PENDENTE" # Ou o status inicial definido
+      assert len(data["itens"]) == 1
+      assert data["itens"][0]["produto_id"] == produto_para_venda_id
+      assert data["itens"][0]["quantidade"] == 2
+      assert Decimal(str(data["total"])) &gt; Decimal("0.00")
+      assert "pagamentos" in data
+      assert len(data["pagamentos"]) == 1
+      assert data["pagamentos"][0]["metodo_pagamento"] == "PIX"
+file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15
+  @pytest.fixture(scope="function")
+  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:
+      """Cria um produto de teste com estoque e retorna seu ID."""
+      produto_data = {
+          "nome": "Produto Para Venda Teste",
+          "descricao": "Descrição do Produto Para Venda",
+          "preco": 100.00,
+          "categoria_id": categoria_teste_id,
+          "ativo": True
+      }
+      response_prod = await client.post("/api/v1/produtos/", json=produto_data, headers=admin_auth_headers)
+      assert response_prod.status_code == status.HTTP_201_CREATED
+      produto_id = response_prod.json()["id"]
+
+      # Adicionar estoque ao produto
+      estoque_data = {
+          "produto_id": produto_id,
+          "quantidade": 50,
+          "localizacao": "Estoque Principal Teste"
+      }
+      response_estoque = await client.post(f"/api/v1/estoque/", json=estoque_data, headers=admin_auth_headers)
+      assert response_estoque.status_code == status.HTTP_201_CREATED
+      return produto_id
+E       fixture 'categoria_teste_id' not found
+&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+&gt;       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15</error></testcase><testcase classname="tests.test_vendas" name="test_criar_venda_estoque_insuficiente" time="0.001"><error message="failed on setup with &quot;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 106&#10;  @pytest.mark.asyncio&#10;  async def test_criar_venda_estoque_insuficiente(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):&#10;      &quot;&quot;&quot;Testa a criação de uma venda com quantidade maior que o estoque disponível.&quot;&quot;&quot;&#10;      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=1000) # Quantidade muito alta&#10;      venda_data = VendaCreate(&#10;          endereco_id=endereco_admin_id,&#10;          itens=[item_venda],&#10;          metodo_pagamento=&quot;BOLETO&quot;&#10;      )&#10;&#10;      response = await client.post(&quot;/api/v1/vendas/&quot;, json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)&#10;      assert response.status_code == status.HTTP_400_BAD_REQUEST&#10;      assert &quot;Estoque insuficiente&quot; in response.json()[&quot;detail&quot;]&#10;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15&#10;  @pytest.fixture(scope=&quot;function&quot;)&#10;  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:&#10;      &quot;&quot;&quot;Cria um produto de teste com estoque e retorna seu ID.&quot;&quot;&quot;&#10;      produto_data = {&#10;          &quot;nome&quot;: &quot;Produto Para Venda Teste&quot;,&#10;          &quot;descricao&quot;: &quot;Descrição do Produto Para Venda&quot;,&#10;          &quot;preco&quot;: 100.00,&#10;          &quot;categoria_id&quot;: categoria_teste_id,&#10;          &quot;ativo&quot;: True&#10;      }&#10;      response_prod = await client.post(&quot;/api/v1/produtos/&quot;, json=produto_data, headers=admin_auth_headers)&#10;      assert response_prod.status_code == status.HTTP_201_CREATED&#10;      produto_id = response_prod.json()[&quot;id&quot;]&#10;&#10;      # Adicionar estoque ao produto&#10;      estoque_data = {&#10;          &quot;produto_id&quot;: produto_id,&#10;          &quot;quantidade&quot;: 50,&#10;          &quot;localizacao&quot;: &quot;Estoque Principal Teste&quot;&#10;      }&#10;      response_estoque = await client.post(f&quot;/api/v1/estoque/&quot;, json=estoque_data, headers=admin_auth_headers)&#10;      assert response_estoque.status_code == status.HTTP_201_CREATED&#10;      return produto_id&#10;E       fixture 'categoria_teste_id' not found&#10;&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory&#10;&gt;       use 'pytest --fixtures [testpath]' for help on them.&#10;&#10;/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15&quot;">file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 106
+  @pytest.mark.asyncio
+  async def test_criar_venda_estoque_insuficiente(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):
+      """Testa a criação de uma venda com quantidade maior que o estoque disponível."""
+      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=1000) # Quantidade muito alta
+      venda_data = VendaCreate(
+          endereco_id=endereco_admin_id,
+          itens=[item_venda],
+          metodo_pagamento="BOLETO"
+      )
+
+      response = await client.post("/api/v1/vendas/", json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)
+      assert response.status_code == status.HTTP_400_BAD_REQUEST
+      assert "Estoque insuficiente" in response.json()["detail"]
+file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15
+  @pytest.fixture(scope="function")
+  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:
+      """Cria um produto de teste com estoque e retorna seu ID."""
+      produto_data = {
+          "nome": "Produto Para Venda Teste",
+          "descricao": "Descrição do Produto Para Venda",
+          "preco": 100.00,
+          "categoria_id": categoria_teste_id,
+          "ativo": True
+      }
+      response_prod = await client.post("/api/v1/produtos/", json=produto_data, headers=admin_auth_headers)
+      assert response_prod.status_code == status.HTTP_201_CREATED
+      produto_id = response_prod.json()["id"]
+
+      # Adicionar estoque ao produto
+      estoque_data = {
+          "produto_id": produto_id,
+          "quantidade": 50,
+          "localizacao": "Estoque Principal Teste"
+      }
+      response_estoque = await client.post(f"/api/v1/estoque/", json=estoque_data, headers=admin_auth_headers)
+      assert response_estoque.status_code == status.HTTP_201_CREATED
+      return produto_id
+E       fixture 'categoria_teste_id' not found
+&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+&gt;       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15</error></testcase><testcase classname="tests.test_vendas" name="test_listar_vendas_usuario_logado" time="0.054"><error message="failed on setup with &quot;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 121&#10;  @pytest.mark.asyncio&#10;  async def test_listar_vendas_usuario_logado(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):&#10;      &quot;&quot;&quot;Testa a listagem de vendas para o usuário logado (admin neste caso).&quot;&quot;&quot;&#10;      # Criar uma venda para garantir que haja algo para listar&#10;      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=1)&#10;      venda_data = VendaCreate(endereco_id=endereco_admin_id, itens=[item_venda], metodo_pagamento=&quot;DINHEIRO&quot;)&#10;      await client.post(&quot;/api/v1/vendas/&quot;, json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)&#10;&#10;      response = await client.get(&quot;/api/v1/vendas/&quot;, headers=admin_auth_headers)&#10;      assert response.status_code == status.HTTP_200_OK&#10;      data = response.json()&#10;      assert isinstance(data, list)&#10;      assert len(data) &gt; 0 # Deve haver pelo menos uma venda&#10;      # Verificar se a venda criada (ou uma delas) está na lista&#10;      # Isso pode ser mais complexo se houver muitas vendas; aqui verificamos a estrutura básica&#10;      assert &quot;id&quot; in data[0]&#10;      assert &quot;status&quot; in data[0]&#10;      assert &quot;total&quot; in data[0]&#10;      assert &quot;itens&quot; in data[0]&#10;file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15&#10;  @pytest.fixture(scope=&quot;function&quot;)&#10;  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:&#10;      &quot;&quot;&quot;Cria um produto de teste com estoque e retorna seu ID.&quot;&quot;&quot;&#10;      produto_data = {&#10;          &quot;nome&quot;: &quot;Produto Para Venda Teste&quot;,&#10;          &quot;descricao&quot;: &quot;Descrição do Produto Para Venda&quot;,&#10;          &quot;preco&quot;: 100.00,&#10;          &quot;categoria_id&quot;: categoria_teste_id,&#10;          &quot;ativo&quot;: True&#10;      }&#10;      response_prod = await client.post(&quot;/api/v1/produtos/&quot;, json=produto_data, headers=admin_auth_headers)&#10;      assert response_prod.status_code == status.HTTP_201_CREATED&#10;      produto_id = response_prod.json()[&quot;id&quot;]&#10;&#10;      # Adicionar estoque ao produto&#10;      estoque_data = {&#10;          &quot;produto_id&quot;: produto_id,&#10;          &quot;quantidade&quot;: 50,&#10;          &quot;localizacao&quot;: &quot;Estoque Principal Teste&quot;&#10;      }&#10;      response_estoque = await client.post(f&quot;/api/v1/estoque/&quot;, json=estoque_data, headers=admin_auth_headers)&#10;      assert response_estoque.status_code == status.HTTP_201_CREATED&#10;      return produto_id&#10;E       fixture 'categoria_teste_id' not found&#10;&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory&#10;&gt;       use 'pytest --fixtures [testpath]' for help on them.&#10;&#10;/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15&quot;">file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 121
+  @pytest.mark.asyncio
+  async def test_listar_vendas_usuario_logado(client: AsyncClient, admin_auth_headers: dict, produto_para_venda_id: int, endereco_admin_id: int):
+      """Testa a listagem de vendas para o usuário logado (admin neste caso)."""
+      # Criar uma venda para garantir que haja algo para listar
+      item_venda = ItemVendaCreate(produto_id=produto_para_venda_id, quantidade=1)
+      venda_data = VendaCreate(endereco_id=endereco_admin_id, itens=[item_venda], metodo_pagamento="DINHEIRO")
+      await client.post("/api/v1/vendas/", json=venda_data.model_dump(mode='json'), headers=admin_auth_headers)
+
+      response = await client.get("/api/v1/vendas/", headers=admin_auth_headers)
+      assert response.status_code == status.HTTP_200_OK
+      data = response.json()
+      assert isinstance(data, list)
+      assert len(data) &gt; 0 # Deve haver pelo menos uma venda
+      # Verificar se a venda criada (ou uma delas) está na lista
+      # Isso pode ser mais complexo se houver muitas vendas; aqui verificamos a estrutura básica
+      assert "id" in data[0]
+      assert "status" in data[0]
+      assert "total" in data[0]
+      assert "itens" in data[0]
+file /home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py, line 15
+  @pytest.fixture(scope="function")
+  async def produto_para_venda_id(db_session: Session, admin_auth_headers: dict, client: AsyncClient, categoria_teste_id: int) -&gt; int:
+      """Cria um produto de teste com estoque e retorna seu ID."""
+      produto_data = {
+          "nome": "Produto Para Venda Teste",
+          "descricao": "Descrição do Produto Para Venda",
+          "preco": 100.00,
+          "categoria_id": categoria_teste_id,
+          "ativo": True
+      }
+      response_prod = await client.post("/api/v1/produtos/", json=produto_data, headers=admin_auth_headers)
+      assert response_prod.status_code == status.HTTP_201_CREATED
+      produto_id = response_prod.json()["id"]
+
+      # Adicionar estoque ao produto
+      estoque_data = {
+          "produto_id": produto_id,
+          "quantidade": 50,
+          "localizacao": "Estoque Principal Teste"
+      }
+      response_estoque = await client.post(f"/api/v1/estoque/", json=estoque_data, headers=admin_auth_headers)
+      assert response_estoque.status_code == status.HTTP_201_CREATED
+      return produto_id
+E       fixture 'categoria_teste_id' not found
+&gt;       available fixtures: _session_event_loop, admin_auth_headers, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, db_session, doctest_namespace, endereco_admin_id, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, initialize_db, monkeypatch, produto_para_venda_id, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_vendas.py::&lt;event_loop&gt;, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+&gt;       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/ecommerce_project/ecommerce_global-main/tests/test_vendas.py:15</error></testcase></testsuite></testsuites>

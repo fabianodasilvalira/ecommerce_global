@@ -5,6 +5,7 @@ from typing import Optional, List
 
 from app.schemas.categoria_schema import CategoriaSimpleResponse
 from app.schemas.produto_imagem_schema import ProdutoImagemResponse
+from app.schemas.promocao_schema import PromocaoOut
 
 
 class ProdutoCreate(BaseModel):
@@ -30,7 +31,7 @@ class ProdutoResponse(BaseModel):
     preco_final: float
     preco_com_promocao: Optional[float] = None
     imagens: List[ProdutoImagemResponse] = []  # Lista de imagens do produto
-    promocoes_ativas: List[ProdutoImagemResponse] = []  # Lista de promoções ativas
+    promocoes_ativas: List[PromocaoOut] = []  # Lista de promoções ativas
     estoque_disponivel: Optional[int] = None  # Quantidade em estoque
 
     class Config:
